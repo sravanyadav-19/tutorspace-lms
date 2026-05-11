@@ -67,69 +67,11 @@ const Sidebar = ({ userRole = 'student' }) => {
       <div className={styles.sidebarFooter}>
         <a href="/profile" className={styles.navItem}>
           <User size={20} className={styles.navIcon} />
-
-# Update App.jsx to show dashboard layout
-cat > src/App.jsx << 'EOF'
-import React, { useState } from 'react'
-import DashboardLayout from './components/layout/DashboardLayout'
-import Button from './components/shared/Button'
-import Input, { Textarea } from './components/shared/Input'
-import './App.css'
-
-function App() {
-  const [userRole, setUserRole] = useState('student')
-
-  return (
-    <DashboardLayout userRole={userRole}>
-      <div className="dashboard-content">
-        <div className="page-header">
-          <h1 className="page-title">Dashboard</h1>
-          <p className="page-subtitle">Welcome to your TutorSpace dashboard</p>
-        </div>
-        
-        <div className="demo-section">
-          <h2 className="section-title">Role Demo</h2>
-          <p className="section-description">Switch between user roles to see different navigation:</p>
-          
-          <div className="role-switcher">
-            <Button 
-              variant={userRole === 'student' ? 'primary' : 'secondary'}
-              onClick={() => setUserRole('student')}
-            >
-              Student View
-            </Button>
-            <Button 
-              variant={userRole === 'teacher' ? 'primary' : 'secondary'}
-              onClick={() => setUserRole('teacher')}
-            >
-              Teacher View
-            </Button>
-            <Button 
-              variant={userRole === 'admin' ? 'primary' : 'secondary'}
-              onClick={() => setUserRole('admin')}
-            >
-              Admin View
-            </Button>
-          </div>
-          
-          <div className="status-display">
-            <div className="status-card">
-              <h3 className="card-title">Current Role</h3>
-              <p className="card-value">{userRole.charAt(0).toUpperCase() + userRole.slice(1)}</p>
-            </div>
-            <div className="status-card">
-              <h3 className="card-title">Day Progress</h3>
-              <p className="card-value">2/50</p>
-            </div>
-            <div className="status-card">
-              <h3 className="card-title">Components</h3>
-              <p className="card-value">Layout Ready</p>
-            </div>
-          </div>
-        </div>
+          <span className={styles.navLabel}>Profile</span>
+        </a>
       </div>
-    </DashboardLayout>
+    </aside>
   )
 }
 
-export default App
+export default Sidebar
