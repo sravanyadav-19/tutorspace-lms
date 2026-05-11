@@ -1,0 +1,69 @@
+.topbar {
+  grid-area: topbar;
+  background: var(--color-surface-card);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 var(--space-xl);
+  height: var(--topbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbarLeft {
+  flex: 1;
+}
+
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.iconButton {
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.userName {
+  font: var(--font-regular) var(--text-body) var(--font-body);
+  color: var(--color-ink);
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: var(--font-bold) var(--text-body-sm) var(--font-body);
+  letter-spacing: 0.02em;
+}
+
+/* Mobile TopBar */
+@media (max-width: 768px) {
+  .topbar {
+    padding: 0 var(--space-lg);
+  }
+  
+  .userName {
+    display: none;
+  }
+  
+  .topbarRight {
+    gap: var(--space-sm);
+  }
+}

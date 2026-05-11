@@ -1,0 +1,34 @@
+.dashboardLayout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--topbar-height) 1fr;
+  grid-template-areas:
+    "sidebar topbar"
+    "sidebar main";
+}
+
+.dashboardMain {
+  grid-area: main;
+  padding: var(--space-xl);
+  background: var(--color-canvas);
+  overflow-y: auto;
+  max-height: calc(100vh - var(--topbar-height));
+}
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+  .dashboardLayout {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--topbar-height) auto 1fr;
+    grid-template-areas:
+      "topbar"
+      "sidebar"
+      "main";
+  }
+  
+  .dashboardMain {
+    max-height: none;
+    padding: var(--space-lg);
+  }
+}
