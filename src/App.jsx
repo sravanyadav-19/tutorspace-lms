@@ -1,4 +1,5 @@
 import React from 'react'
+import Button from './components/shared/Button'
 import './App.css'
 
 function App() {
@@ -15,9 +16,23 @@ function App() {
           <p className="welcome-text">
             Building a warm, approachable learning platform with modern web technologies.
           </p>
+          
           <div className="status-badges">
             <span className="badge badge-success">Day 2/50</span>
-            <span className="badge badge-primary">React Ready</span>
+            <span className="badge badge-primary">Components Ready</span>
+          </div>
+          
+          <div className="button-showcase">
+            <h3 className="showcase-title">Button Component Demo</h3>
+            <div className="button-grid">
+              <Button variant="primary">Create Class</Button>
+              <Button variant="secondary">Cancel</Button>
+              <Button variant="ghost">View Details</Button>
+              <Button variant="primary" size="sm">Small</Button>
+              <Button variant="primary" size="lg">Large Button</Button>
+              <Button variant="danger">Delete</Button>
+              <Button variant="primary" disabled>Disabled</Button>
+            </div>
           </div>
         </div>
       </main>
