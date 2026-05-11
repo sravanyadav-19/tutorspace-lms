@@ -4,16 +4,13 @@
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  width: var(--sidebar-width);
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
+  /* REMOVE: position: fixed; width: var(--sidebar-width); height: 100vh; left: 0; top: 0; */
 }
 
 .sidebarHeader {
   padding: var(--space-xl);
   border-bottom: 1px solid var(--color-border-soft);
+  flex-shrink: 0;
 }
 
 .logo {
@@ -37,6 +34,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+  overflow-y: auto;
 }
 
 .navItem {
@@ -80,14 +78,12 @@
 .sidebarFooter {
   padding: var(--space-lg) 0;
   border-top: 1px solid var(--color-border-soft);
+  flex-shrink: 0;
 }
 
 /* Mobile Sidebar */
 @media (max-width: 768px) {
   .sidebar {
-    position: static;
-    width: 100%;
-    height: auto;
     border-right: none;
     border-bottom: 1px solid var(--color-border);
   }
@@ -96,6 +92,7 @@
     flex-direction: row;
     overflow-x: auto;
     padding: var(--space-sm) var(--space-lg);
+    flex: none;
   }
   
   .navItem {
