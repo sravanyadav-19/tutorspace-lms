@@ -1,0 +1,199 @@
+/* ================================
+   DASHBOARD CONTENT
+================================ */
+.dashboard-content {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ================================
+   PAGE HEADER
+================================ */
+.page-header {
+  margin-bottom: var(--space-section);
+  padding-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: var(--text-display-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-sm) 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: var(--font-regular);
+  color: var(--color-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ================================
+   DEMO SECTION CARD
+================================ */
+.demo-section {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xxl);
+  margin-bottom: var(--space-xl);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-md) 0;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.section-description {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--color-body);
+  margin: 0 0 var(--space-xl) 0;
+  line-height: 1.6;
+}
+
+/* ================================
+   ROLE SWITCHER BUTTONS
+================================ */
+.role-switcher {
+  display: flex;
+  flex-direction: row;        /* Force horizontal */
+  gap: var(--space-md);
+  margin-bottom: var(--space-xxl);
+  flex-wrap: wrap;
+}
+
+.role-btn {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: var(--font-bold);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  cursor: pointer;
+  height: 44px;
+  min-width: 130px;
+  transition: all 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.role-btn:hover {
+  border-color: var(--color-ink);
+  background: var(--color-canvas);
+}
+
+.role-btn-active {
+  background: var(--color-primary) !important;
+  color: var(--color-on-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.role-btn-active:hover {
+  background: var(--color-primary-hover) !important;
+  border-color: var(--color-primary-hover) !important;
+}
+
+/* ================================
+   STATUS CARDS GRID
+================================ */
+.status-display {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);  /* Force 4 columns */
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+.status-card {
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+}
+
+.card-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--font-bold);
+  color: var(--color-muted);
+  margin: 0 0 var(--space-sm) 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.card-value {
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.card-value-success {
+  color: #5db872 !important;
+  font-size: var(--text-body) !important;
+  font-family: var(--font-body) !important;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+@media (max-width: 1024px) {
+  .status-display {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 28px;
+  }
+
+  .role-switcher {
+    flex-direction: column;
+  }
+
+  .role-btn {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .status-display {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+
+  .demo-section {
+    padding: var(--space-xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .status-display {
+    grid-template-columns: 1fr;
+  }
+}
