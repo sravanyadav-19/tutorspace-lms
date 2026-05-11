@@ -1,0 +1,110 @@
+/* Input Group */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+/* Label */
+.label {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  line-height: 1.4;
+  margin-bottom: var(--space-xs);
+}
+
+.required {
+  color: #c64545;
+  margin-left: 2px;
+}
+
+/* Input Base */
+.input {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: var(--font-regular);
+  color: var(--color-ink);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md) var(--space-lg);
+  height: 44px;
+  width: 100%;
+  transition: all 200ms ease;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+/* Input States */
+.input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(204, 120, 92, 0.1);
+  background: var(--color-surface-card);
+}
+
+.input:hover:not(:focus):not(:disabled) {
+  border-color: var(--color-body);
+}
+
+.input-error {
+  border-color: #c64545;
+  background: rgba(198, 69, 69, 0.02);
+}
+
+.input-error:focus {
+  border-color: #c64545;
+  box-shadow: 0 0 0 3px rgba(198, 69, 69, 0.1);
+}
+
+.input-disabled {
+  background: var(--color-border-soft);
+  color: var(--color-disabled);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.input-disabled::placeholder {
+  color: var(--color-disabled);
+}
+
+/* Helper Text */
+.helperText {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--color-muted);
+  line-height: 1.4;
+  margin-top: var(--space-xs);
+}
+
+/* Error Text */
+.error {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: #c64545;
+  line-height: 1.4;
+  margin-top: var(--space-xs);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .input {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px; /* WCAG touch target */
+  }
+}
+
+/* Textarea */
+.textarea {
+  height: auto;
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+  padding: var(--space-md) var(--space-lg);
+}
