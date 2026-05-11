@@ -1,0 +1,74 @@
+.app {
+  min-height: 100vh;
+  background: var(--color-canvas);
+  padding: var(--space-xl);
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: var(--space-section);
+}
+
+.app-title {
+  font: var(--font-bold) var(--text-display-xl) var(--font-display);
+  color: var(--color-ink);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.app-subtitle {
+  font: var(--font-regular) var(--text-body) var(--font-body);
+  color: var(--color-muted);
+  margin: var(--space-sm) 0 0 0;
+}
+
+.app-main {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.welcome-card {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xxl);
+  text-align: center;
+}
+
+.welcome-title {
+  font: var(--font-bold) var(--text-display-md) var(--font-display);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-lg) 0;
+  letter-spacing: -0.01em;
+}
+
+.welcome-text {
+  font: var(--font-regular) var(--text-body) var(--font-body);
+  color: var(--color-body);
+  line-height: 1.6;
+  margin: 0 0 var(--space-xl) 0;
+}
+
+.status-badges {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+}
+
+.badge {
+  font: var(--font-bold) var(--text-label) var(--font-body);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.badge-success {
+  background: #5db872;
+  color: white;
+}
+
+.badge-primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
