@@ -1,0 +1,256 @@
+// TutorSpace LMS Database Schema
+// Prisma v5
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================================
+// ROLES TABLE
+// ================================
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  permissions String[]
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  users User[]
+
+  @@map("roles")
+}
+
+// ================================
+// USERS TABLE
+// ================================
+model User {
+  id                  Int       @id @default(autoincrement())
+  email               String    @unique
+  passwordHash        String    @map("password_hash")
+  name                String
+  roleId              Int       @map("role_id")
+  status              String    @default("pending")
+  emailVerified       Boolean   @default(false) @map("email_verified")
+  emailVerifyToken    String?   @map("email_verify_token")
+  resetPasswordToken  String?   @map("reset_password_token")
+  resetPasswordExpiry DateTime? @map("reset_password_expiry")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  role              Role                  @relation(fields: [roleId], references: [id])
+  enrollments       ClassEnrollment[]
+  createdClasses    Class[]               @relation("ClassCreator")
+  approvedClasses   Class[]               @relation("ClassApprover")
+  announcements     Announcement[]
+  comments          AnnouncementComment[]
+  uploadedFiles     File[]
+  createdQuizzes    Quiz[]
+  quizSubmissions   QuizSubmission[]      @relation("StudentSubmissions")
+  gradedSubmissions QuizSubmission[]      @relation("GradedSubmissions")
+
+  @@map("users")
+}
+
+// ================================
+// CLASSES TABLE
+// ================================
+model Class {
+  id           Int      @id @default(autoincrement())
+  name         String
+  subject      String
+  description  String?
+  createdById  Int      @map("created_by")
+  approvedById Int?     @map("approved_by")
+  status       String   @default("pending")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  createdBy     User              @relation("ClassCreator", fields: [createdById], references: [id])
+  approvedBy    User?             @relation("ClassApprover", fields: [approvedById], references: [id])
+  enrollments   ClassEnrollment[]
+  announcements Announcement[]
+  files         File[]
+  categories    FileCategory[]
+  quizzes       Quiz[]
+
+  @@map("classes")
+}
+
+// ================================
+// CLASS ENROLLMENTS TABLE
+// ================================
+model ClassEnrollment {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  classId    Int      @map("class_id")
+  enrolledAt DateTime @default(now()) @map("enrolled_at")
+
+  user  User  @relation(fields: [userId], references: [id])
+  class Class @relation(fields: [classId], references: [id])
+
+  @@unique([userId, classId])
+  @@map("class_enrollments")
+}
+
+// ================================
+// ANNOUNCEMENTS TABLE
+// ================================
+model Announcement {
+  id            Int      @id @default(autoincrement())
+  title         String
+  content       String
+  authorId      Int      @map("author_id")
+  classId       Int      @map("class_id")
+  allowComments Boolean  @default(true) @map("allow_comments")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  author   User                  @relation(fields: [authorId], references: [id])
+  class    Class                 @relation(fields: [classId], references: [id])
+  comments AnnouncementComment[]
+
+  @@map("announcements")
+}
+
+// ================================
+// ANNOUNCEMENT COMMENTS TABLE
+// ================================
+model AnnouncementComment {
+  id             Int      @id @default(autoincrement())
+  announcementId Int      @map("announcement_id")
+  authorId       Int      @map("author_id")
+  commentText    String   @map("comment_text")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  announcement Announcement @relation(fields: [announcementId], references: [id])
+  author       User         @relation(fields: [authorId], references: [id])
+
+  @@map("announcement_comments")
+}
+
+// ================================
+// FILE CATEGORIES TABLE
+// ================================
+model FileCategory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  classId   Int      @map("class_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  class Class  @relation(fields: [classId], references: [id])
+  files File[]
+
+  @@map("file_categories")
+}
+
+// ================================
+// FILES TABLE
+// ================================
+model File {
+  id           Int      @id @default(autoincrement())
+  filename     String
+  originalName String   @map("original_name")
+  filePath     String   @map("file_path")
+  description  String?
+  fileSize     Int?     @map("file_size")
+  mimeType     String?  @map("mime_type")
+  uploaderId   Int      @map("uploader_id")
+  classId      Int      @map("class_id")
+  categoryId   Int?     @map("category_id")
+  uploadedAt   DateTime @default(now()) @map("uploaded_at")
+
+  uploader User          @relation(fields: [uploaderId], references: [id])
+  class    Class         @relation(fields: [classId], references: [id])
+  category FileCategory? @relation(fields: [categoryId], references: [id])
+
+  @@map("files")
+}
+
+// ================================
+// QUIZZES TABLE
+// ================================
+model Quiz {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  classId     Int       @map("class_id")
+  createdById Int       @map("created_by")
+  timeLimit   Int?      @map("time_limit")
+  startTime   DateTime? @map("start_time")
+  endTime     DateTime? @map("end_time")
+  isPublished Boolean   @default(false) @map("is_published")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  class       Class            @relation(fields: [classId], references: [id])
+  createdBy   User             @relation(fields: [createdById], references: [id])
+  questions   QuizQuestion[]
+  submissions QuizSubmission[]
+
+  @@map("quizzes")
+}
+
+// ================================
+// QUIZ QUESTIONS TABLE
+// ================================
+model QuizQuestion {
+  id            Int      @id @default(autoincrement())
+  quizId        Int      @map("quiz_id")
+  questionText  String   @map("question_text")
+  questionType  String   @map("question_type")
+  options       Json?
+  correctAnswer String   @map("correct_answer")
+  points        Int      @default(1)
+  orderNumber   Int?     @map("order_number")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  quiz    Quiz         @relation(fields: [quizId], references: [id])
+  answers QuizAnswer[]
+
+  @@map("quiz_questions")
+}
+
+// ================================
+// QUIZ SUBMISSIONS TABLE
+// ================================
+model QuizSubmission {
+  id          Int       @id @default(autoincrement())
+  quizId      Int       @map("quiz_id")
+  studentId   Int       @map("student_id")
+  score       Int?
+  totalPoints Int?      @map("total_points")
+  submittedAt DateTime  @default(now()) @map("submitted_at")
+  gradedAt    DateTime? @map("graded_at")
+  gradedById  Int?      @map("graded_by")
+  isReleased  Boolean   @default(false) @map("is_released")
+
+  quiz     Quiz         @relation(fields: [quizId], references: [id])
+  student  User         @relation("StudentSubmissions", fields: [studentId], references: [id])
+  gradedBy User?        @relation("GradedSubmissions", fields: [gradedById], references: [id])
+  answers  QuizAnswer[]
+
+  @@unique([quizId, studentId])
+  @@map("quiz_submissions")
+}
+
+// ================================
+// QUIZ ANSWERS TABLE
+// ================================
+model QuizAnswer {
+  id            Int      @id @default(autoincrement())
+  submissionId  Int      @map("submission_id")
+  questionId    Int      @map("question_id")
+  studentAnswer String   @map("student_answer")
+  isCorrect     Boolean? @map("is_correct")
+  pointsEarned  Int      @default(0) @map("points_earned")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  submission QuizSubmission @relation(fields: [submissionId], references: [id])
+  question   QuizQuestion   @relation(fields: [questionId], references: [id])
+
+  @@map("quiz_answers")
+}
