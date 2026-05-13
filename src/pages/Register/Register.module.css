@@ -1,0 +1,206 @@
+.registerContainer {
+  width: 100%;
+}
+
+/* Header */
+.registerHeader {
+  margin-bottom: var(--space-xxl);
+}
+
+.registerTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-display-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-sm) 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.registerSubtitle {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--color-muted);
+  margin: 0;
+}
+
+/* Error Alert */
+.errorAlert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: rgba(198, 69, 69, 0.08);
+  border: 1px solid rgba(198, 69, 69, 0.2);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-xl);
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: #c64545;
+}
+
+/* Form */
+.registerForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+/* Role Selection */
+.roleSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.roleLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+}
+
+.required {
+  color: #c64545;
+  margin-left: 2px;
+}
+
+.roleOptions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.roleOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  background: var(--color-surface-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 80px;
+}
+
+.roleOption:hover {
+  border-color: var(--color-primary);
+  background: rgba(204, 120, 92, 0.03);
+}
+
+.roleOptionActive {
+  border-color: var(--color-primary) !important;
+  background: rgba(204, 120, 92, 0.08) !important;
+}
+
+.roleOptionIcon {
+  font-size: 24px;
+}
+
+.roleOptionText {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+}
+
+/* Submit */
+.submitButton {
+  width: 100% !important;
+  margin-top: var(--space-sm);
+}
+
+/* Login Prompt */
+.loginPrompt {
+  text-align: center;
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--color-border-soft);
+}
+
+.loginText {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.loginLink {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-bold);
+}
+
+.loginLink:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+/* Success State */
+.successContainer {
+  width: 100%;
+  text-align: center;
+  padding: var(--space-xl) 0;
+}
+
+.successIcon {
+  font-size: 64px;
+  margin-bottom: var(--space-xl);
+}
+
+.successTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-lg) 0;
+}
+
+.successText {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--color-body);
+  margin: 0 0 var(--space-xxl) 0;
+  line-height: 1.6;
+}
+
+.successSteps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xxl);
+  text-align: left;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.stepNum {
+  width: 32px;
+  height: 32px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--text-body-sm);
+  font-weight: var(--font-bold);
+  flex-shrink: 0;
+}
+
+.stepText {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--color-body);
+}
+
+.loginBtn {
+  width: 100% !important;
+}
