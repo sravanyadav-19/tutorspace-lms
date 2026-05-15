@@ -576,3 +576,42 @@ export const removeStudent = async (req, res) => {
     })
   }
 }
+
+// Get classes for student
+export const getStudentClasses = async (req, res) => {
+  try {
+    const studentId = req.user.id
+
+    const classes = await prisma.class.findMany({
+      where: {
+        enrollments: {
+          some: {
+            userId: studentId
+          }
+        }
+      },
+      include: {
+        _count: {
+          select: {
+            enrollments: true,
+            announcements: true,
+            quizzes: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    res.status(200).json({
+      success: true,
+      message: 'Student classes retrieved successfully',
+      data: { classes }
+    })
+  } catch (error) {
+    console.error('Get student classes error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve student classes'
+    })
+  }
+}

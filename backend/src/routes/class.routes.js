@@ -1,10 +1,11 @@
 import express from 'express'
-import { 
-  getAllClasses, 
+import {
+  getAllClasses,
   getTeacherClasses,
+  getStudentClasses,
   getClassById,
-  createClass, 
-  updateClass, 
+  createClass,
+  updateClass,
   deleteClass,
   enrollStudent,
   removeStudent
@@ -15,6 +16,7 @@ const router = express.Router()
 
 router.get('/', authenticate, authorize('admin'), getAllClasses)
 router.get('/teacher', authenticate, authorize('teacher'), getTeacherClasses)
+router.get('/student', authenticate, authorize('student'), getStudentClasses)
 router.get('/:id', authenticate, getClassById)
 router.post('/', authenticate, authorize('admin'), createClass)
 router.put('/:id', authenticate, authorize('admin'), updateClass)

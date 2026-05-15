@@ -2,15 +2,11 @@ import axios from 'axios'
 
 const API_BASE_URL = 'http://localhost:5000/api'
 
-// Create axios instance with defaults
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  headers: { 'Content-Type': 'application/json' }
 })
 
-// Add auth token to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('tutorspace_token')
   if (token) {
@@ -19,7 +15,6 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Handle auth errors with better logging
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -30,7 +25,6 @@ api.interceptors.response.use(
       message: error.response?.data?.message,
       token: localStorage.getItem('tutorspace_token') ? 'Present' : 'Missing'
     })
-    
     if (error.response?.status === 401) {
       localStorage.removeItem('tutorspace_token')
       localStorage.removeItem('tutorspace_user')
@@ -40,19 +34,12 @@ api.interceptors.response.use(
   }
 )
 
-// ================================
-// AUTH API
-// ================================
 export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (userData) => api.post('/auth/register', userData),
-  logout: () => api.post('/auth/logout'),
   getProfile: () => api.get('/auth/profile')
 }
 
-// ================================
-// USER API
-// ================================
 export const userAPI = {
   getAllUsers: () => api.get('/users'),
   getUserById: (id) => api.get(`/users/${id}`),
@@ -60,41 +47,34 @@ export const userAPI = {
   deleteUser: (id) => api.delete(`/users/${id}`)
 }
 
-// ================================
-// CLASS API
-// ================================
 export const classAPI = {
   getAllClasses: () => api.get('/classes'),
   getTeacherClasses: () => api.get('/classes/teacher'),
+  getStudentClasses: () => api.get('/classes/student'),
   getClassById: (id) => api.get(`/classes/${id}`),
   createClass: (data) => api.post('/classes', data),
   updateClass: (id, data) => api.put(`/classes/${id}`, data),
   deleteClass: (id) => api.delete(`/classes/${id}`),
-  enrollStudent: (classId, userId) => 
+  enrollStudent: (classId, userId) =>
     api.post(`/classes/${classId}/enroll/${userId}`),
-  removeStudent: (classId, userId) => 
+  removeStudent: (classId, userId) =>
     api.delete(`/classes/${classId}/enroll/${userId}`)
 }
 
-// ================================
-// ANNOUNCEMENT API (NEW!)
-// ================================
 export const announcementAPI = {
-  getClassAnnouncements: (classId) => 
+  getClassAnnouncements: (classId) =>
     api.get(`/announcements/class/${classId}`),
-  createAnnouncement: (classId, data) => 
+  createAnnouncement: (classId, data) =>
     api.post(`/announcements/class/${classId}`, data),
-  updateAnnouncement: (id, data) => 
+  updateAnnouncement: (id, data) =>
     api.put(`/announcements/${id}`, data),
-  deleteAnnouncement: (id) => 
+  deleteAnnouncement: (id) =>
     api.delete(`/announcements/${id}`),
-  
-  // Comments
-  getAnnouncementComments: (announcementId) => 
+  getAnnouncementComments: (announcementId) =>
     api.get(`/announcements/${announcementId}/comments`),
-  addComment: (announcementId, data) => 
+  addComment: (announcementId, data) =>
     api.post(`/announcements/${announcementId}/comments`, data),
-  deleteComment: (commentId) => 
+  deleteComment: (commentId) =>
     api.delete(`/announcements/comments/${commentId}`)
 }
 

@@ -17,40 +17,15 @@ import TeacherDashboard from './pages/teacher/Dashboard/TeacherDashboard'
 import TeacherClasses from './pages/teacher/Classes/TeacherClasses'
 import NewAnnouncement from './pages/teacher/Announcements/New/NewAnnouncement'
 
+// Student Pages
+import StudentDashboard from './pages/student/Dashboard/StudentDashboard'
+import StudentAnnouncements from './pages/student/Announcements/StudentAnnouncements'
+import AnnouncementDetail from './pages/student/Announcements/Detail/AnnouncementDetail'
+
 // Protected Route
 import ProtectedRoute from './components/shared/ProtectedRoute'
 
-// Dashboard Layout
-import DashboardLayout from './components/layout/DashboardLayout'
-
 import './App.css'
-
-const StudentDashboard = () => {
-  const { user } = useAuth()
-  return (
-    <DashboardLayout userRole="student">
-      <div className="dashboard-content">
-        <div className="page-header">
-          <h1 className="page-title">
-            Welcome, {user?.name}! 👋
-          </h1>
-          <p className="page-subtitle">
-            Student Dashboard - Coming Day 7!
-          </p>
-        </div>
-        <div className="demo-section">
-          <h2 className="section-title">
-            🚧 Under Construction
-          </h2>
-          <p className="section-description">
-            Student features being built in Day 7.
-            Check back soon!
-          </p>
-        </div>
-      </div>
-    </DashboardLayout>
-  )
-}
 
 const Unauthorized = () => (
   <div style={{
@@ -94,7 +69,6 @@ const Unauthorized = () => (
 
 const SmartDashboard = () => {
   const { user } = useAuth()
-
   switch (user?.role) {
     case 'admin':
       return <Navigate to="/admin/dashboard" replace />
@@ -111,7 +85,6 @@ function App() {
 
   return (
     <Routes>
-      {/* Public Routes */}
       <Route
         path="/login"
         element={
@@ -128,8 +101,6 @@ function App() {
             : <Register />
         }
       />
-
-      {/* Smart Dashboard Redirect */}
       <Route
         path="/dashboard"
         element={
@@ -208,19 +179,27 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/student/announcements"
+        element={
+          <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
+            <StudentAnnouncements />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/announcements/:announcementId"
+        element={
+          <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
+            <AnnouncementDetail />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Utility */}
       <Route path="/unauthorized" element={<Unauthorized />} />
-
-      {/* Default */}
-      <Route
-        path="/"
-        element={<Navigate to="/dashboard" replace />}
-      />
-      <Route
-        path="*"
-        element={<Navigate to="/dashboard" replace />}
-      />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
 }

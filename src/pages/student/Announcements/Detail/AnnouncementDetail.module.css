@@ -1,0 +1,231 @@
+.announcementDetail {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.loadingState,
+.errorState {
+  text-align: center;
+  padding: var(--space-page);
+  font-family: var(--font-body);
+  color: var(--color-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.backBtn {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--color-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--transition-fast);
+  text-align: left;
+}
+
+.backBtn:hover {
+  color: var(--color-primary);
+}
+
+.announcementCard {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xxl);
+}
+
+.announcementHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.authorInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.authorAvatar {
+  width: 48px;
+  height: 48px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.authorName {
+  font-family: var(--font-body);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0 0 2px 0;
+}
+
+.postTime {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.announcementTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-display-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-lg) 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.announcementText {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--color-body);
+  margin: 0;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* Comments Section */
+.commentsSection {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xxl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.commentsTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0;
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.addCommentForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.commentActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.noComments {
+  text-align: center;
+  padding: var(--space-xxl);
+  font-family: var(--font-body);
+  color: var(--color-muted);
+}
+
+.commentsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.commentCard {
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+}
+
+.commentHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.commentAuthor {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.commentAvatar {
+  width: 36px;
+  height: 36px;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.commentAuthorName {
+  font-family: var(--font-body);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0 0 2px 0;
+  font-size: var(--text-body-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.teacherBadge {
+  font-size: 11px;
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  background: rgba(204, 120, 92, 0.1);
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.commentTime {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.deleteCommentBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+  opacity: 0.6;
+}
+
+.deleteCommentBtn:hover {
+  background: rgba(198, 69, 69, 0.1);
+  opacity: 1;
+}
+
+.commentText {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--color-body);
+  margin: 0;
+  line-height: 1.5;
+}
