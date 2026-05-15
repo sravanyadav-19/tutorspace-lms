@@ -12,10 +12,15 @@ import { authenticate, authorize } from '../middleware/auth.middleware.js'
 
 const router = express.Router()
 
+// Anyone enrolled can view announcements
 router.get('/class/:classId', authenticate, getClassAnnouncements)
-router.post('/class/:classId', authenticate, authorize('teacher'), createAnnouncement)
-router.put('/:id', authenticate, authorize('teacher'), updateAnnouncement)
-router.delete('/:id', authenticate, authorize('teacher'), deleteAnnouncement)
+
+// Teachers AND admins can create/update/delete
+router.post('/class/:classId', authenticate, authorize('teacher', 'admin'), createAnnouncement)
+router.put('/:id', authenticate, authorize('teacher', 'admin'), updateAnnouncement)
+router.delete('/:id', authenticate, authorize('teacher', 'admin'), deleteAnnouncement)
+
+// Anyone can comment
 router.get('/:announcementId/comments', authenticate, getAnnouncementComments)
 router.post('/:announcementId/comments', authenticate, addComment)
 router.delete('/comments/:commentId', authenticate, deleteComment)
