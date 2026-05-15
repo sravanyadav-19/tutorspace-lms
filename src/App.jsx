@@ -12,6 +12,11 @@ import AdminUsers from './pages/admin/Users'
 import AdminClasses from './pages/admin/Classes'
 import NewClass from './pages/admin/Classes/NewClass'
 
+// Teacher Pages
+import TeacherDashboard from './pages/teacher/Dashboard/TeacherDashboard'
+import TeacherClasses from './pages/teacher/Classes/TeacherClasses'
+import NewAnnouncement from './pages/teacher/Announcements/New/NewAnnouncement'
+
 // Protected Route
 import ProtectedRoute from './components/shared/ProtectedRoute'
 
@@ -19,36 +24,6 @@ import ProtectedRoute from './components/shared/ProtectedRoute'
 import DashboardLayout from './components/layout/DashboardLayout'
 
 import './App.css'
-
-// ================================
-// PLACEHOLDER PAGES
-// ================================
-const TeacherDashboard = () => {
-  const { user } = useAuth()
-  return (
-    <DashboardLayout userRole="teacher">
-      <div className="dashboard-content">
-        <div className="page-header">
-          <h1 className="page-title">
-            Welcome, {user?.name}! 👋
-          </h1>
-          <p className="page-subtitle">
-            Teacher Dashboard - Coming Day 6!
-          </p>
-        </div>
-        <div className="demo-section">
-          <h2 className="section-title">
-            🚧 Under Construction
-          </h2>
-          <p className="section-description">
-            Teacher features being built in Day 6.
-            Check back soon!
-          </p>
-        </div>
-      </div>
-    </DashboardLayout>
-  )
-}
 
 const StudentDashboard = () => {
   const { user } = useAuth()
@@ -117,9 +92,6 @@ const Unauthorized = () => (
   </div>
 )
 
-// ================================
-// SMART DASHBOARD REDIRECT
-// ================================
 const SmartDashboard = () => {
   const { user } = useAuth()
 
@@ -134,9 +106,6 @@ const SmartDashboard = () => {
   }
 }
 
-// ================================
-// MAIN APP ROUTES
-// ================================
 function App() {
   const { isAuthenticated } = useAuth()
 
@@ -170,9 +139,7 @@ function App() {
         }
       />
 
-      {/* ========================
-          ADMIN ROUTES
-      ======================== */}
+      {/* ADMIN ROUTES */}
       <Route
         path="/admin/dashboard"
         element={
@@ -206,9 +173,7 @@ function App() {
         }
       />
 
-      {/* ========================
-          TEACHER ROUTES
-      ======================== */}
+      {/* TEACHER ROUTES */}
       <Route
         path="/teacher/dashboard"
         element={
@@ -217,10 +182,24 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/teacher/classes"
+        element={
+          <ProtectedRoute allowedRoles={['teacher', 'admin']}>
+            <TeacherClasses />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/classes/:classId/announcements/new"
+        element={
+          <ProtectedRoute allowedRoles={['teacher', 'admin']}>
+            <NewAnnouncement />
+          </ProtectedRoute>
+        }
+      />
 
-      {/* ========================
-          STUDENT ROUTES
-      ======================== */}
+      {/* STUDENT ROUTES */}
       <Route
         path="/student/dashboard"
         element={

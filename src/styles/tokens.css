@@ -81,3 +81,4 @@
   --transition-base: 200ms ease;
   --transition-slow: 300ms ease;
 }
+  --sidebar-collapsed-width: 80px;

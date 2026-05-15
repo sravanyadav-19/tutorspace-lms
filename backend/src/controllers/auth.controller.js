@@ -1,10 +1,10 @@
 import bcrypt from 'bcryptjs'
 import { PrismaClient } from '@prisma/client'
-import { 
-  generateAccessToken, 
-  generateRandomToken 
+import {
+  generateAccessToken,
+  generateRandomToken
 } from '../utils/jwt.utils.js'
-import { 
+import {
   sendVerificationEmail,
   sendPasswordResetEmail
 } from '../utils/email.utils.js'
@@ -162,14 +162,6 @@ export const login = async (req, res) => {
       })
     }
 
-    // Check email verification
-    if (!user.emailVerified) {
-      return res.status(401).json({
-        success: false,
-        message: 'Please verify your email before logging in'
-      })
-    }
-
     // Check account status
     if (user.status === 'pending') {
       return res.status(401).json({
@@ -186,7 +178,7 @@ export const login = async (req, res) => {
     }
 
     // Generate token
-    const token = generateAccessToken(user.id)
+    const token = generateAccessToken(user.id, user.role.name)
 
     // Return user data (exclude sensitive fields)
     const userData = {
@@ -211,6 +203,57 @@ export const login = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Login failed. Please try again.'
+    })
+  }
+}
+
+// ================================
+// GET PROFILE
+// GET /api/auth/profile
+// ================================
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id
+
+    // Find user with role
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { 
+        role: {
+          select: { name: true }
+        }
+      }
+    })
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+
+    // Return user data (exclude sensitive fields)
+    const userData = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role.name,
+      status: user.status,
+      emailVerified: user.emailVerified,
+      createdAt: user.createdAt
+    }
+
+    res.json({
+      success: true,
+      message: 'Profile retrieved successfully',
+      data: { user: userData }
+    })
+
+  } catch (error) {
+    console.error('Get profile error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve profile'
     })
   }
 }

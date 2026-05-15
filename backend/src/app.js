@@ -1,58 +1,65 @@
 import express from 'express'
 import cors from 'cors'
-import dotenv from 'dotenv'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
 
-// Import routes
+// Route imports
 import authRoutes from './routes/auth.routes.js'
 import userRoutes from './routes/user.routes.js'
 import classRoutes from './routes/class.routes.js'
+import announcementRoutes from './routes/announcement.routes.js'
 
-// Load environment variables
-dotenv.config()
-
+// Create Express app
 const app = express()
 
-// ================================
-// MIDDLEWARE
-// ================================
-
-// CORS - Allow frontend to communicate
+// CORS configuration - MUST BE FIRST
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: 'http://localhost:3000',
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }))
 
-// Parse JSON bodies
+// Handle OPTIONS preflight for all routes
+app.options('*', cors())
+
+// Security middleware
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}))
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: {
+    success: false,
+    message: 'Too many requests from this IP, please try again later.'
+  }
+})
+app.use(limiter)
+
+// Body parsing middleware
 app.use(express.json({ limit: '10mb' }))
+app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
-// Parse URL encoded bodies
-app.use(express.urlencoded({ extended: true }))
-
-// ================================
-// HEALTH CHECK ROUTE
-// ================================
+// Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    message: 'TutorSpace API is running!',
+  res.status(200).json({
+    success: true,
+    message: 'TutorSpace LMS Backend is running!',
     timestamp: new Date().toISOString(),
-    version: '0.1.0',
-    day: '3/50'
+    environment: process.env.NODE_ENV || 'development'
   })
 })
 
-// ================================
-// API ROUTES
-// ================================
+// API Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/classes', classRoutes)
+app.use('/api/announcements', announcementRoutes)
 
-// ================================
-// 404 HANDLER
-// ================================
+// 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -60,18 +67,14 @@ app.use('*', (req, res) => {
   })
 })
 
-// ================================
-// ERROR HANDLER
-// ================================
+// Global error handler
 app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.message)
-
+  console.error('Global error:', err)
+  
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { 
-      stack: err.stack 
-    })
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   })
 })
 

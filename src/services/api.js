@@ -12,20 +12,28 @@ const api = axios.create({
 
 // Add auth token to requests
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('tutorspace_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
   return config
 })
 
-// Handle auth errors
+// Handle auth errors with better logging
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      message: error.response?.data?.message,
+      token: localStorage.getItem('tutorspace_token') ? 'Present' : 'Missing'
+    })
+    
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
+      localStorage.removeItem('tutorspace_token')
+      localStorage.removeItem('tutorspace_user')
       window.location.href = '/login'
     }
     return Promise.reject(error)
@@ -57,7 +65,7 @@ export const userAPI = {
 // ================================
 export const classAPI = {
   getAllClasses: () => api.get('/classes'),
-  getTeacherClasses: () => api.get('/classes/teacher'), // NEW!
+  getTeacherClasses: () => api.get('/classes/teacher'),
   getClassById: (id) => api.get(`/classes/${id}`),
   createClass: (data) => api.post('/classes', data),
   updateClass: (id, data) => api.put(`/classes/${id}`, data),
@@ -73,9 +81,9 @@ export const classAPI = {
 // ================================
 export const announcementAPI = {
   getClassAnnouncements: (classId) => 
-    api.get(`/classes/${classId}/announcements`),
+    api.get(`/announcements/class/${classId}`),
   createAnnouncement: (classId, data) => 
-    api.post(`/classes/${classId}/announcements`, data),
+    api.post(`/announcements/class/${classId}`, data),
   updateAnnouncement: (id, data) => 
     api.put(`/announcements/${id}`, data),
   deleteAnnouncement: (id) => 
@@ -87,7 +95,7 @@ export const announcementAPI = {
   addComment: (announcementId, data) => 
     api.post(`/announcements/${announcementId}/comments`, data),
   deleteComment: (commentId) => 
-    api.delete(`/comments/${commentId}`)
+    api.delete(`/announcements/comments/${commentId}`)
 }
 
 export default api

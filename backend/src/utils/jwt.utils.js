@@ -1,9 +1,12 @@
 import jwt from 'jsonwebtoken'
 
-// Generate access token
-export const generateAccessToken = (userId) => {
+// Generate access token with role
+export const generateAccessToken = (userId, role) => {
   return jwt.sign(
-    { userId },
+    { 
+      userId,
+      role 
+    },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   )
@@ -25,6 +28,6 @@ export const verifyToken = (token, secret) => {
 
 // Generate random token for email verification
 export const generateRandomToken = () => {
-  return Math.random().toString(36).substring(2) + 
+  return Math.random().toString(36).substring(2) +
          Date.now().toString(36)
 }
