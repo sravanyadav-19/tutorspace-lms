@@ -1,46 +1,31 @@
 import axios from 'axios'
 
-// ================================
-// BASE CONFIGURATION
-// ================================
-const BASE_URL = 'http://localhost:5000/api'
+const API_BASE_URL = 'http://localhost:5000/api'
 
+// Create axios instance with defaults
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
-  },
-  timeout: 10000
+  }
 })
 
-// ================================
-// REQUEST INTERCEPTOR
-// Adds JWT token to every request
-// ================================
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('tutorspace_token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
+// Add auth token to requests
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
   }
-)
+  return config
+})
 
-// ================================
-// RESPONSE INTERCEPTOR
-// Handles token expiry globally
-// ================================
+// Handle auth errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('tutorspace_token')
-      localStorage.removeItem('tutorspace_user')
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
       window.location.href = '/login'
     }
     return Promise.reject(error)
@@ -51,11 +36,10 @@ api.interceptors.response.use(
 // AUTH API
 // ================================
 export const authAPI = {
-  register: (data) => api.post('/auth/register', data),
-  login: (data) => api.post('/auth/login', data),
-  verifyEmail: (token) => api.get(`/auth/verify-email/${token}`),
-  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
-  resetPassword: (data) => api.post('/auth/reset-password', data)
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (userData) => api.post('/auth/register', userData),
+  logout: () => api.post('/auth/logout'),
+  getProfile: () => api.get('/auth/profile')
 }
 
 // ================================
@@ -73,12 +57,37 @@ export const userAPI = {
 // ================================
 export const classAPI = {
   getAllClasses: () => api.get('/classes'),
+  getTeacherClasses: () => api.get('/classes/teacher'), // NEW!
   getClassById: (id) => api.get(`/classes/${id}`),
   createClass: (data) => api.post('/classes', data),
   updateClass: (id, data) => api.put(`/classes/${id}`, data),
   deleteClass: (id) => api.delete(`/classes/${id}`),
   enrollStudent: (classId, userId) => 
-    api.post(`/classes/${classId}/enroll`, { userId })
+    api.post(`/classes/${classId}/enroll/${userId}`),
+  removeStudent: (classId, userId) => 
+    api.delete(`/classes/${classId}/enroll/${userId}`)
+}
+
+// ================================
+// ANNOUNCEMENT API (NEW!)
+// ================================
+export const announcementAPI = {
+  getClassAnnouncements: (classId) => 
+    api.get(`/classes/${classId}/announcements`),
+  createAnnouncement: (classId, data) => 
+    api.post(`/classes/${classId}/announcements`, data),
+  updateAnnouncement: (id, data) => 
+    api.put(`/announcements/${id}`, data),
+  deleteAnnouncement: (id) => 
+    api.delete(`/announcements/${id}`),
+  
+  // Comments
+  getAnnouncementComments: (announcementId) => 
+    api.get(`/announcements/${announcementId}/comments`),
+  addComment: (announcementId, data) => 
+    api.post(`/announcements/${announcementId}/comments`, data),
+  deleteComment: (commentId) => 
+    api.delete(`/comments/${commentId}`)
 }
 
 export default api
