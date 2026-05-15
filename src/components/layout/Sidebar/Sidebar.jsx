@@ -1,76 +1,228 @@
 import React from 'react'
-import { 
-  LayoutDashboard, 
-  Users, 
-  BookOpen, 
-  Megaphone, 
-  FileText, 
-  ClipboardList,
-  Settings,
-  User
-} from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../../../context/AuthContext'
 import styles from './Sidebar.module.css'
 
-const Sidebar = ({ userRole = 'student' }) => {
-  const getNavigationItems = () => {
-    switch (userRole) {
+const Sidebar = ({ isCollapsed, onToggle }) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { user } = useAuth()
+
+  const getMenuItems = () => {
+    switch (user?.role) {
       case 'admin':
         return [
-          { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-          { icon: Users, label: 'Users', href: '/users' },
-          { icon: BookOpen, label: 'Classes', href: '/classes' },
-          { icon: FileText, label: 'Reports', href: '/reports' },
-          { icon: Settings, label: 'Settings', href: '/settings' }
+          {
+            icon: '📊',
+            label: 'Dashboard',
+            path: '/admin/dashboard',
+            description: 'Overview & stats'
+          },
+          {
+            icon: '👥',
+            label: 'Users',
+            path: '/admin/users',
+            description: 'Manage users'
+          },
+          {
+            icon: '📚',
+            label: 'Classes',
+            path: '/admin/classes',
+            description: 'Manage classes'
+          },
+          {
+            icon: '➕',
+            label: 'Create Class',
+            path: '/admin/classes/new',
+            description: 'Add new class'
+          },
+          {
+            icon: '⚙️',
+            label: 'Settings',
+            path: '/admin/settings',
+            description: 'System settings'
+          }
         ]
+
       case 'teacher':
         return [
-          { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-          { icon: BookOpen, label: 'Classes', href: '/classes' },
-          { icon: Megaphone, label: 'Announcements', href: '/announcements' },
-          { icon: FileText, label: 'Materials', href: '/materials' },
-          { icon: ClipboardList, label: 'Quizzes', href: '/quizzes' },
-          { icon: Users, label: 'Students', href: '/students' }
+          {
+            icon: '📊',
+            label: 'Dashboard',
+            path: '/teacher/dashboard',
+            description: 'Your overview'
+          },
+          {
+            icon: '📚',
+            label: 'My Classes',
+            path: '/teacher/classes',
+            description: 'Your classes'
+          },
+          {
+            icon: '📢',
+            label: 'Announcements',
+            path: '/teacher/announcements',
+            description: 'Post updates'
+          },
+          {
+            icon: '📄',
+            label: 'Files',
+            path: '/teacher/files',
+            description: 'Upload files'
+          },
+          {
+            icon: '📝',
+            label: 'Quizzes',
+            path: '/teacher/quizzes',
+            description: 'Create quizzes'
+          },
+          {
+            icon: '👥',
+            label: 'Students',
+            path: '/teacher/students',
+            description: 'View students'
+          }
         ]
+
       case 'student':
-      default:
         return [
-          { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-          { icon: BookOpen, label: 'My Classes', href: '/classes' },
-          { icon: Megaphone, label: 'Announcements', href: '/announcements' },
-          { icon: FileText, label: 'Materials', href: '/materials' }
+          {
+            icon: '📊',
+            label: 'Dashboard',
+            path: '/student/dashboard',
+            description: 'Your overview'
+          },
+          {
+            icon: '📚',
+            label: 'My Classes',
+            path: '/student/classes',
+            description: 'Enrolled classes'
+          },
+          {
+            icon: '📢',
+            label: 'Announcements',
+            path: '/student/announcements',
+            description: 'Latest updates'
+          },
+          {
+            icon: '📄',
+            label: 'Files',
+            path: '/student/files',
+            description: 'Download files'
+          },
+          {
+            icon: '📝',
+            label: 'Quizzes',
+            path: '/student/quizzes',
+            description: 'Take quizzes'
+          },
+          {
+            icon: '📊',
+            label: 'Results',
+            path: '/student/results',
+            description: 'View grades'
+          }
         ]
+
+      default:
+        return []
     }
   }
 
-  const navigationItems = getNavigationItems()
+  const menuItems = getMenuItems()
+
+  const handleNavigation = (path) => {
+    navigate(path)
+  }
+
+  const isActivePath = (path) => {
+    return location.pathname === path
+  }
 
   return (
-    <aside className={styles.sidebar}>
+    <div className={`
+      ${styles.sidebar} 
+      ${isCollapsed ? styles.collapsed : ''}
+    `}>
+      {/* Sidebar Header */}
       <div className={styles.sidebarHeader}>
-        <h2 className={styles.logo}>TutorSpace</h2>
-        <p className={styles.roleLabel}>{userRole.charAt(0).toUpperCase() + userRole.slice(1)}</p>
+        <div className={styles.logo}>
+          <span className={styles.logoIcon}>🎓</span>
+          {!isCollapsed && (
+            <span className={styles.logoText}>TutorSpace</span>
+          )}
+        </div>
+        <button
+          className={styles.toggleBtn}
+          onClick={onToggle}
+          aria-label="Toggle sidebar"
+        >
+          {isCollapsed ? '→' : '←'}
+        </button>
       </div>
-      
-      <nav className={styles.navigation}>
-        {navigationItems.map((item, index) => (
-          <a 
-            key={index}
-            href={item.href} 
-            className={`${styles.navItem} ${index === 0 ? styles.navItemActive : ''}`}
-          >
-            <item.icon size={20} className={styles.navIcon} />
-            <span className={styles.navLabel}>{item.label}</span>
-          </a>
-        ))}
+
+      {/* User Info */}
+      <div className={styles.userInfo}>
+        <div className={styles.userAvatar}>
+          {user?.name
+            ?.split(' ')
+            .map(n => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2) || 'U'}
+        </div>
+        {!isCollapsed && (
+          <div className={styles.userDetails}>
+            <p className={styles.userName}>{user?.name}</p>
+            <p className={styles.userRole}>{user?.role}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Navigation Menu */}
+      <nav className={styles.nav}>
+        <ul className={styles.navList}>
+          {menuItems.map((item) => (
+            <li key={item.path} className={styles.navItem}>
+              <button
+                className={`
+                  ${styles.navLink}
+                  ${isActivePath(item.path) ? styles.navLinkActive : ''}
+                `}
+                onClick={() => handleNavigation(item.path)}
+                title={isCollapsed ? item.label : ''}
+              >
+                <span className={styles.navIcon}>
+                  {item.icon}
+                </span>
+                {!isCollapsed && (
+                  <div className={styles.navContent}>
+                    <span className={styles.navLabel}>
+                      {item.label}
+                    </span>
+                    <span className={styles.navDescription}>
+                      {item.description}
+                    </span>
+                  </div>
+                )}
+                {isActivePath(item.path) && (
+                  <span className={styles.activeIndicator} />
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
       </nav>
-      
+
+      {/* Sidebar Footer */}
       <div className={styles.sidebarFooter}>
-        <a href="/profile" className={styles.navItem}>
-          <User size={20} className={styles.navIcon} />
-          <span className={styles.navLabel}>Profile</span>
-        </a>
+        {!isCollapsed && (
+          <p className={styles.footerText}>
+            Day 6/50 • Teacher Dashboard
+          </p>
+        )}
       </div>
-    </aside>
+    </div>
   )
 }
 
