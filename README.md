@@ -1,2 +1,106 @@
 # tutorspace-lms
 Personal tutoring LMS 
+
+```
+tutorspace-lms
+├─ backend
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ prisma
+│  │  ├─ schema.prisma
+│  │  └─ seed.js
+│  └─ src
+│     ├─ app.js
+│     ├─ config
+│     ├─ controllers
+│     │  ├─ auth.controller.js
+│     │  ├─ class.controller.js
+│     │  └─ user.controller.js
+│     ├─ index.js
+│     ├─ middleware
+│     │  └─ auth.middleware.js
+│     └─ utils
+│        ├─ email.utils.js
+│        └─ jwt.utils.js
+├─ docs
+│  ├─ api-endpoints.md
+│  ├─ component-guide.md
+│  └─ database-schema.md
+├─ index.html
+├─ LICENSE
+├─ package-lock.json
+├─ package.json
+├─ public
+├─ README.md
+├─ src
+│  ├─ App.css
+│  ├─ App.jsx
+│  ├─ assets
+│  │  ├─ fonts
+│  │  ├─ icons
+│  │  └─ images
+│  ├─ components
+│  │  ├─ announcements
+│  │  ├─ auth
+│  │  ├─ classes
+│  │  ├─ dashboard
+│  │  │  ├─ ActivityFeed.jsx
+│  │  │  ├─ ActivityFeed.module.css
+│  │  │  ├─ StatCard.jsx
+│  │  │  └─ StatCard.module.css
+│  │  ├─ materials
+│  │  ├─ quizzes
+│  │  ├─ shared
+│  │  │  ├─ Button
+│  │  │  │  ├─ Button.jsx
+│  │  │  │  ├─ Button.module.css
+│  │  │  │  └─ index.js
+│  │  │  └─ Input
+│  │  │     ├─ index.js
+│  │  │     ├─ Input.jsx
+│  │  │     ├─ Input.module.css
+│  │  │     └─ Textarea.jsx
+│  │  └─ users
+│  ├─ context
+│  │  └─ AuthContext.jsx
+│  ├─ hooks
+│  ├─ index.css
+│  ├─ index.js
+│  ├─ main.jsx
+│  ├─ pages
+│  │  ├─ admin
+│  │  │  ├─ Classes
+│  │  │  │  ├─ AdminClasses.jsx
+│  │  │  │  ├─ AdminClasses.module.css
+│  │  │  │  ├─ index.js
+│  │  │  │  └─ NewClass
+│  │  │  │     ├─ index.js
+│  │  │  │     ├─ NewClass.jsx
+│  │  │  │     └─ NewClass.module.css
+│  │  │  ├─ Dashboard
+│  │  │  │  ├─ AdminDashboard.jsx
+│  │  │  │  ├─ AdminDashboard.module.css
+│  │  │  │  └─ index.js
+│  │  │  └─ Users
+│  │  │     ├─ AdminUsers.jsx
+│  │  │     ├─ AdminUsers.module.css
+│  │  │     └─ index.js
+│  │  ├─ Login
+│  │  │  ├─ index.js
+│  │  │  ├─ Login.jsx
+│  │  │  └─ Login.module.css
+│  │  └─ Register
+│  │     ├─ index.js
+│  │     ├─ Register.jsx
+│  │     └─ Register.module.css
+│  ├─ services
+│  │  └─ api.js
+│  ├─ styles
+│  │  ├─ components.css
+│  │  ├─ globals.css
+│  │  └─ tokens.css
+│  └─ utils
+├─ tests
+└─ vite.config.js
+
+```

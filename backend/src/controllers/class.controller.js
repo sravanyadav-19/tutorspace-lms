@@ -1,4 +1,6 @@
-import prisma from '../config/database.js'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 // Get all classes (Admin)
 export const getAllClasses = async (req, res) => {

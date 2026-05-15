@@ -1,35 +1,40 @@
 import express from 'express'
-import {
-  getAllClasses,
+import { 
+  getAllClasses, 
+  getTeacherClasses,
   getClassById,
-  createClass,
-  updateClass,
+  createClass, 
+  updateClass, 
   deleteClass,
-  enrollStudent
+  enrollStudent,
+  removeStudent
 } from '../controllers/class.controller.js'
 import { authenticate, authorize } from '../middleware/auth.middleware.js'
 
 const router = express.Router()
 
-// All routes require authentication
-router.use(authenticate)
+// Get all classes (Admin only)
+router.get('/', authenticate, authorize(['admin']), getAllClasses)
 
-// GET /api/classes
-router.get('/', getAllClasses)
+// Get teacher's classes (Teacher only)
+router.get('/teacher', authenticate, authorize(['teacher']), getTeacherClasses)
 
-// GET /api/classes/:id
-router.get('/:id', getClassById)
+// Get single class
+router.get('/:id', authenticate, getClassById)
 
-// POST /api/classes - Admin only
-router.post('/', authorize('admin'), createClass)
+// Create new class (Admin only)
+router.post('/', authenticate, authorize(['admin']), createClass)
 
-// PUT /api/classes/:id - Admin only
-router.put('/:id', authorize('admin'), updateClass)
+// Update class (Admin only)
+router.put('/:id', authenticate, authorize(['admin']), updateClass)
 
-// DELETE /api/classes/:id - Admin only
-router.delete('/:id', authorize('admin'), deleteClass)
+// Delete class (Admin only)
+router.delete('/:id', authenticate, authorize(['admin']), deleteClass)
 
-// POST /api/classes/:id/enroll - Admin only
-router.post('/:id/enroll', authorize('admin'), enrollStudent)
+// Enroll student (Admin only)
+router.post('/:classId/enroll/:userId', authenticate, authorize(['admin']), enrollStudent)
+
+// Remove student (Admin only)
+router.delete('/:classId/enroll/:userId', authenticate, authorize(['admin']), removeStudent)
 
 export default router
