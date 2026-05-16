@@ -16,6 +16,7 @@ import NewClass from './pages/admin/Classes/NewClass'
 import TeacherDashboard from './pages/teacher/Dashboard/TeacherDashboard'
 import TeacherClasses from './pages/teacher/Classes/TeacherClasses'
 import NewAnnouncement from './pages/teacher/Announcements/New/NewAnnouncement'
+import TeacherFiles from './pages/teacher/Files/TeacherFiles'
 
 // Student Pages
 import StudentDashboard from './pages/student/Dashboard/StudentDashboard'
@@ -166,6 +167,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={['teacher', 'admin']}>
             <NewAnnouncement />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/files"
+        element={
+          <ProtectedRoute allowedRoles={['teacher', 'admin']}>
+            <TeacherFiles />
           </ProtectedRoute>
         }
       />
