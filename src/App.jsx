@@ -16,11 +16,13 @@ import NewClass from './pages/admin/Classes/NewClass'
 import TeacherDashboard from './pages/teacher/Dashboard/TeacherDashboard'
 import TeacherClasses from './pages/teacher/Classes/TeacherClasses'
 import NewAnnouncement from './pages/teacher/Announcements/New/NewAnnouncement'
+import TeacherFiles from './pages/teacher/Files/TeacherFiles'
 
 // Student Pages
 import StudentDashboard from './pages/student/Dashboard/StudentDashboard'
 import StudentAnnouncements from './pages/student/Announcements/StudentAnnouncements'
 import AnnouncementDetail from './pages/student/Announcements/Detail/AnnouncementDetail'
+import StudentFiles from './pages/student/Files/StudentFiles'
 
 // Protected Route
 import ProtectedRoute from './components/shared/ProtectedRoute'
@@ -169,6 +171,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/teacher/files"
+        element={
+          <ProtectedRoute allowedRoles={['teacher', 'admin']}>
+            <TeacherFiles />
+          </ProtectedRoute>
+        }
+      />
 
       {/* STUDENT ROUTES */}
       <Route
@@ -192,6 +202,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
             <AnnouncementDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/files"
+        element={
+          <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
+            <StudentFiles />
           </ProtectedRoute>
         }
       />

@@ -78,4 +78,21 @@ export const announcementAPI = {
     api.delete(`/announcements/comments/${commentId}`)
 }
 
+export const fileAPI = {
+  uploadFile: (classId, formData) =>
+    api.post(`/files/class/${classId}/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+  getClassFiles: (classId) =>
+    api.get(`/files/class/${classId}`),
+  getTeacherFiles: () =>
+    api.get('/files/teacher'),
+  getStudentFiles: () =>
+    api.get('/files/student'),
+  downloadFile: (fileId) =>
+    api.get(`/files/download/${fileId}`, { responseType: 'blob' }),
+  deleteFile: (fileId) =>
+    api.delete(`/files/${fileId}`)
+}
+
 export default api
