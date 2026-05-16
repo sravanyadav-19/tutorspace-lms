@@ -22,6 +22,7 @@ import TeacherFiles from './pages/teacher/Files/TeacherFiles'
 import StudentDashboard from './pages/student/Dashboard/StudentDashboard'
 import StudentAnnouncements from './pages/student/Announcements/StudentAnnouncements'
 import AnnouncementDetail from './pages/student/Announcements/Detail/AnnouncementDetail'
+import StudentFiles from './pages/student/Files/StudentFiles'
 
 // Protected Route
 import ProtectedRoute from './components/shared/ProtectedRoute'
@@ -201,6 +202,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
             <AnnouncementDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/files"
+        element={
+          <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
+            <StudentFiles />
           </ProtectedRoute>
         }
       />

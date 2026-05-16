@@ -8,17 +8,14 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Route imports
 import authRoutes from './routes/auth.routes.js'
 import userRoutes from './routes/user.routes.js'
 import classRoutes from './routes/class.routes.js'
 import announcementRoutes from './routes/announcement.routes.js'
 import fileRoutes from './routes/file.routes.js'
 
-// Create Express app
 const app = express()
 
-// CORS configuration - MUST BE FIRST
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
@@ -26,18 +23,19 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }))
 
-// Handle OPTIONS preflight for all routes
 app.options('*', cors())
 
-// Security middleware
+// Helmet - explicitly disable X-Frame-Options
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  frameguard: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: false
 }))
 
-// Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 1000,
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.'
@@ -45,14 +43,13 @@ const limiter = rateLimit({
 })
 app.use(limiter)
 
-// Body parsing middleware
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
-// Serve uploaded files statically
-app.use('/uploads', express.static(path.join(__dirname, '../../uploads')))
+app.use('/uploads', express.static(
+  path.join(__dirname, '../../uploads')
+))
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
@@ -62,14 +59,12 @@ app.get('/health', (req, res) => {
   })
 })
 
-// API Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/classes', classRoutes)
 app.use('/api/announcements', announcementRoutes)
 app.use('/api/files', fileRoutes)
 
-// 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -77,11 +72,9 @@ app.use('*', (req, res) => {
   })
 })
 
-// Global error handler
 app.use((err, req, res, next) => {
   console.error('Global error:', err)
 
-  // Handle multer errors
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({
       success: false,
@@ -89,7 +82,7 @@ app.use((err, req, res, next) => {
     })
   }
 
-  if (err.message && err.message.includes('Invalid file type')) {
+  if (err.message && err.message.includes('Only PDF')) {
     return res.status(400).json({
       success: false,
       message: err.message

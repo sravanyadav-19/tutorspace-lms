@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
-import { classAPI } from '../../../services/api'
-import { fileAPI } from '../../../services/api'
+import { classAPI, fileAPI } from '../../../services/api'
 import styles from './TeacherFiles.module.css'
 
 const TeacherFiles = () => {
@@ -19,14 +18,10 @@ const TeacherFiles = () => {
   const [success, setSuccess] = useState('')
   const fileInputRef = useRef(null)
 
-  useEffect(() => {
-    fetchClasses()
-  }, [])
+  useEffect(() => { fetchClasses() }, [])
 
   useEffect(() => {
-    if (selectedClass) {
-      fetchFiles(selectedClass.id)
-    }
+    if (selectedClass) fetchFiles(selectedClass.id)
   }, [selectedClass])
 
   const fetchClasses = async () => {
@@ -51,7 +46,6 @@ const TeacherFiles = () => {
       const res = await fileAPI.getClassFiles(classId)
       setFiles(res.data.data.files)
     } catch (err) {
-      console.error('Fetch files error:', err)
       setFiles([])
     } finally {
       setFilesLoading(false)
@@ -61,6 +55,11 @@ const TeacherFiles = () => {
   const handleFileSelect = (e) => {
     const file = e.target.files[0]
     if (file) {
+      // Validate file type
+      if (file.type !== 'application/pdf' && file.type !== 'image/png') {
+        setError('Only PDF and PNG files are allowed')
+        return
+      }
       setSelectedFile(file)
       setError('')
     }
@@ -71,15 +70,17 @@ const TeacherFiles = () => {
     setDragOver(true)
   }
 
-  const handleDragLeave = () => {
-    setDragOver(false)
-  }
+  const handleDragLeave = () => setDragOver(false)
 
   const handleDrop = (e) => {
     e.preventDefault()
     setDragOver(false)
     const file = e.dataTransfer.files[0]
     if (file) {
+      if (file.type !== 'application/pdf' && file.type !== 'image/png') {
+        setError('Only PDF and PNG files are allowed')
+        return
+      }
       setSelectedFile(file)
       setError('')
     }
@@ -90,7 +91,6 @@ const TeacherFiles = () => {
       setError('Please select a file first')
       return
     }
-
     if (!selectedClass) {
       setError('Please select a class first')
       return
@@ -108,25 +108,16 @@ const TeacherFiles = () => {
       const res = await fileAPI.uploadFile(selectedClass.id, formData)
       const uploadedFile = res.data.data.file
 
-      // Add new file to list
       setFiles(prev => [uploadedFile, ...prev])
-
-      // Reset form
       setSelectedFile(null)
       setDescription('')
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
+      if (fileInputRef.current) fileInputRef.current.value = ''
 
       setSuccess(`"${uploadedFile.originalName}" uploaded successfully!`)
-
-      // Clear success message after 3 seconds
       setTimeout(() => setSuccess(''), 3000)
 
     } catch (err) {
-      setError(
-        err.response?.data?.message || 'Failed to upload file'
-      )
+      setError(err.response?.data?.message || 'Failed to upload file')
     } finally {
       setUploading(false)
     }
@@ -134,7 +125,6 @@ const TeacherFiles = () => {
 
   const handleDelete = async (fileId, fileName) => {
     if (!window.confirm(`Delete "${fileName}"? This cannot be undone.`)) return
-
     try {
       await fileAPI.deleteFile(fileId)
       setFiles(prev => prev.filter(f => f.id !== fileId))
@@ -145,27 +135,12 @@ const TeacherFiles = () => {
     }
   }
 
-  const handleDownload = (fileId, fileName) => {
-    const token = localStorage.getItem('tutorspace_token')
-    const link = document.createElement('a')
-    link.href = `http://localhost:5000/api/files/download/${fileId}`
-    link.setAttribute('download', fileName)
-    link.setAttribute('target', '_blank')
-    
-    // Add auth header via fetch
-    fetch(`http://localhost:5000/api/files/download/${fileId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.blob())
-      .then(blob => {
-        const url = window.URL.createObjectURL(blob)
-        link.href = url
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url)
-      })
-      .catch(() => setError('Failed to download file'))
+  const getFileSize = (file) => {
+    if (!file) return ''
+    const bytes = file.size
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
   }
 
   const formatDate = (dateString) => {
@@ -174,14 +149,6 @@ const TeacherFiles = () => {
       month: 'short',
       day: 'numeric'
     })
-  }
-
-  const getFileSize = (file) => {
-    if (!file) return ''
-    const bytes = file.size
-    if (bytes < 1024) return `${bytes} B`
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
   }
 
   return (
@@ -193,7 +160,7 @@ const TeacherFiles = () => {
           <div>
             <h1 className={styles.pageTitle}>📄 File Sharing</h1>
             <p className={styles.pageSubtitle}>
-              Upload and manage files for your classes
+              Upload PDF and PNG files for your classes
             </p>
           </div>
           <Button variant="secondary" onClick={fetchClasses}>
@@ -201,7 +168,7 @@ const TeacherFiles = () => {
           </Button>
         </div>
 
-        {/* Success/Error Messages */}
+        {/* Banners */}
         {success && (
           <div className={styles.successBanner}>✅ {success}</div>
         )}
@@ -224,7 +191,7 @@ const TeacherFiles = () => {
         ) : (
           <div className={styles.contentLayout}>
 
-            {/* Class Selector */}
+            {/* Class Selector Sidebar */}
             <div className={styles.classSidebar}>
               <h3 className={styles.sidebarTitle}>Your Classes</h3>
               <div className={styles.classList}>
@@ -234,17 +201,14 @@ const TeacherFiles = () => {
                     className={`
                       ${styles.classItem}
                       ${selectedClass?.id === cls.id
-                        ? styles.classItemActive
-                        : ''}
+                        ? styles.classItemActive : ''}
                     `}
                     onClick={() => setSelectedClass(cls)}
                   >
                     <span className={styles.classItemIcon}>📚</span>
                     <div className={styles.classItemInfo}>
                       <p className={styles.classItemName}>{cls.name}</p>
-                      <p className={styles.classItemSubject}>
-                        {cls.subject}
-                      </p>
+                      <p className={styles.classItemSubject}>{cls.subject}</p>
                     </div>
                   </button>
                 ))}
@@ -257,8 +221,16 @@ const TeacherFiles = () => {
               {/* Upload Section */}
               <div className={styles.uploadSection}>
                 <h2 className={styles.sectionTitle}>
-                  ⬆️ Upload File to {selectedClass?.name}
+                  ⬆️ Upload to {selectedClass?.name}
                 </h2>
+
+                {/* File Type Notice */}
+                <div className={styles.fileTypeNotice}>
+                  <span>📄 PDF</span>
+                  <span>and</span>
+                  <span>🖼️ PNG</span>
+                  <span>files only • Max 10MB</span>
+                </div>
 
                 {/* Drop Zone */}
                 <div
@@ -277,18 +249,23 @@ const TeacherFiles = () => {
                     type="file"
                     className={styles.fileInput}
                     onChange={handleFileSelect}
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif,.zip"
+                    accept=".pdf,.png"
                   />
 
                   {selectedFile ? (
                     <div className={styles.selectedFile}>
-                      <div className={styles.selectedFileIcon}>📄</div>
+                      <div className={styles.selectedFileIcon}>
+                        {selectedFile.type === 'application/pdf'
+                          ? '📄' : '🖼️'}
+                      </div>
                       <div className={styles.selectedFileInfo}>
                         <p className={styles.selectedFileName}>
                           {selectedFile.name}
                         </p>
                         <p className={styles.selectedFileSize}>
-                          {getFileSize(selectedFile)}
+                          {getFileSize(selectedFile)} •{' '}
+                          {selectedFile.type === 'application/pdf'
+                            ? 'PDF Document' : 'PNG Image'}
                         </p>
                       </div>
                       <button
@@ -306,16 +283,13 @@ const TeacherFiles = () => {
                     </div>
                   ) : (
                     <div className={styles.dropZoneContent}>
-                      <div className={styles.dropZoneIcon}>📁</div>
+                      <div className={styles.dropZoneIcons}>
+                        <span>📄</span>
+                        <span>🖼️</span>
+                      </div>
                       <p className={styles.dropZoneText}>
-                        Drag & drop a file here, or{' '}
-                        <span className={styles.browseLink}>
-                          browse
-                        </span>
-                      </p>
-                      <p className={styles.dropZoneHint}>
-                        PDF, Word, Excel, PowerPoint, Images, ZIP
-                        (max 10MB)
+                        Drag & drop a PDF or PNG here, or{' '}
+                        <span className={styles.browseLink}>browse</span>
                       </p>
                     </div>
                   )}
@@ -324,12 +298,12 @@ const TeacherFiles = () => {
                 {/* Description Input */}
                 <div className={styles.descriptionField}>
                   <label className={styles.descriptionLabel}>
-                    Description (Optional)
+                    File Name / Description
                   </label>
                   <input
                     type="text"
                     className={styles.descriptionInput}
-                    placeholder="e.g. Chapter 5 notes, Assignment 2..."
+                    placeholder="e.g. Chapter 5 Notes, Assignment 2 Guide..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
@@ -349,7 +323,7 @@ const TeacherFiles = () => {
               {/* Files List */}
               <div className={styles.filesSection}>
                 <h2 className={styles.sectionTitle}>
-                  📁 Files in {selectedClass?.name}
+                  📁 Uploaded Files
                   <span className={styles.fileCount}>
                     {files.length} files
                   </span>
@@ -363,7 +337,7 @@ const TeacherFiles = () => {
                   <div className={styles.emptyFiles}>
                     <div className={styles.emptyIcon}>📭</div>
                     <p className={styles.emptyText}>
-                      No files uploaded yet. Upload your first file above!
+                      No files uploaded yet.
                     </p>
                   </div>
                 ) : (
@@ -371,9 +345,9 @@ const TeacherFiles = () => {
                     {files.map(file => (
                       <div key={file.id} className={styles.fileCard}>
                         <div className={styles.fileIcon}>
-                          {file.icon}
+                          {file.mimeType === 'application/pdf'
+                            ? '📄' : '🖼️'}
                         </div>
-
                         <div className={styles.fileInfo}>
                           <p className={styles.fileName}>
                             {file.originalName}
@@ -381,36 +355,31 @@ const TeacherFiles = () => {
                           <div className={styles.fileMeta}>
                             <span>{file.formattedSize}</span>
                             <span>•</span>
+                            <span>
+                              {file.mimeType === 'application/pdf'
+                                ? 'PDF' : 'PNG'}
+                            </span>
+                            <span>•</span>
                             <span>{formatDate(file.uploadedAt)}</span>
                             {file.description && (
                               <>
                                 <span>•</span>
-                                <span>{file.description}</span>
+                                <span className={styles.fileDescription}>
+                                  {file.description}
+                                </span>
                               </>
                             )}
                           </div>
                         </div>
-
-                        <div className={styles.fileActions}>
-                          <button
-                            className={styles.downloadBtn}
-                            onClick={() => handleDownload(
-                              file.id,
-                              file.originalName
-                            )}
-                          >
-                            ⬇️ Download
-                          </button>
-                          <button
-                            className={styles.deleteBtn}
-                            onClick={() => handleDelete(
-                              file.id,
-                              file.originalName
-                            )}
-                          >
-                            🗑️
-                          </button>
-                        </div>
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={() => handleDelete(
+                            file.id,
+                            file.originalName
+                          )}
+                        >
+                          🗑️ Delete
+                        </button>
                       </div>
                     ))}
                   </div>

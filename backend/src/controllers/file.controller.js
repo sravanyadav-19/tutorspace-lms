@@ -341,3 +341,55 @@ export const getStudentFiles = async (req, res) => {
     })
   }
 }
+
+// View file inline (no download) - for students
+export const viewFile = async (req, res) => {
+  try {
+    const { fileId } = req.params
+
+    // Get file from database
+    const file = await prisma.file.findUnique({
+      where: { id: parseInt(fileId) }
+    })
+
+    if (!file) {
+      return res.status(404).json({
+        success: false,
+        message: 'File not found'
+      })
+    }
+
+    // Check if file exists on disk
+    if (!fs.existsSync(file.filePath)) {
+      return res.status(404).json({
+        success: false,
+        message: 'File not found on server'
+      })
+    }
+
+    // Set headers to DISPLAY inline (not download)
+    res.setHeader(
+      'Content-Disposition',
+      `inline; filename="${file.originalName}"`
+    )
+    res.setHeader('Content-Type', file.mimeType)
+    
+    // Security headers to prevent download
+    res.setHeader('X-Content-Type-Options', 'nosniff')
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'self'"
+    )
+
+    // Stream file to response
+    const fileStream = fs.createReadStream(file.filePath)
+    fileStream.pipe(res)
+
+  } catch (error) {
+    console.error('View file error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Failed to view file'
+    })
+  }
+}

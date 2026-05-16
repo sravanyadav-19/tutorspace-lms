@@ -3,6 +3,7 @@ import {
   uploadFile,
   getClassFiles,
   downloadFile,
+  viewFile,
   deleteFile,
   getTeacherFiles,
   getStudentFiles
@@ -44,5 +45,6 @@ router.get(
 // Shared routes
 router.get('/class/:classId', authenticate, getClassFiles)
 router.get('/download/:fileId', authenticate, downloadFile)
+router.get('/view/:fileId', authenticate, viewFile)
 
 export default router
