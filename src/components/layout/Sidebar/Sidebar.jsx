@@ -35,12 +35,6 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             label: 'Create Class',
             path: '/admin/classes/new',
             description: 'Add new class'
-          },
-          {
-            icon: '⚙️',
-            label: 'Settings',
-            path: '/admin/settings',
-            description: 'System settings'
           }
         ]
 
@@ -59,12 +53,6 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             description: 'Your classes'
           },
           {
-            icon: '📢',
-            label: 'Announcements',
-            path: '/teacher/announcements',
-            description: 'Post updates'
-          },
-          {
             icon: '📄',
             label: 'Files',
             path: '/teacher/files',
@@ -75,12 +63,6 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             label: 'Quizzes',
             path: '/teacher/quizzes',
             description: 'Create quizzes'
-          },
-          {
-            icon: '👥',
-            label: 'Students',
-            path: '/teacher/students',
-            description: 'View students'
           }
         ]
 
@@ -93,12 +75,6 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             description: 'Your overview'
           },
           {
-            icon: '📚',
-            label: 'My Classes',
-            path: '/student/classes',
-            description: 'Enrolled classes'
-          },
-          {
             icon: '📢',
             label: 'Announcements',
             path: '/student/announcements',
@@ -108,7 +84,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             icon: '📄',
             label: 'Files',
             path: '/student/files',
-            description: 'Download files'
+            description: 'View files'
           },
           {
             icon: '📝',
@@ -136,17 +112,18 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
   }
 
   const isActivePath = (path) => {
-    return location.pathname === path
+    return location.pathname === path ||
+      location.pathname.startsWith(path + '/')
   }
 
   return (
     <div className={`
-      ${styles.sidebar} 
+      ${styles.sidebar}
       ${isCollapsed ? styles.collapsed : ''}
     `}>
       {/* Sidebar Header */}
       <div className={styles.sidebarHeader}>
-        <div className={styles.logo}>
+        <div className={styles.logo} onClick={() => navigate('/dashboard')}>
           <span className={styles.logoIcon}>🎓</span>
           {!isCollapsed && (
             <span className={styles.logoText}>TutorSpace</span>
@@ -156,8 +133,9 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
           className={styles.toggleBtn}
           onClick={onToggle}
           aria-label="Toggle sidebar"
+          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {isCollapsed ? '→' : '←'}
+          {isCollapsed ? '☰' : '✕'}
         </button>
       </div>
 
@@ -218,7 +196,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
       <div className={styles.sidebarFooter}>
         {!isCollapsed && (
           <p className={styles.footerText}>
-            Day 6/50 • Teacher Dashboard
+            Day 8/50 • Quiz System
           </p>
         )}
       </div>
