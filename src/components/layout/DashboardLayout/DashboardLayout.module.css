@@ -6,6 +6,11 @@
   grid-template-areas:
     "sidebar topbar"
     "sidebar main";
+  transition: grid-template-columns 0.25s ease;
+}
+
+.sidebarCollapsed {
+  grid-template-columns: 88px 1fr;
 }
 
 .dashboardMain {
@@ -26,7 +31,11 @@
       "sidebar"
       "main";
   }
-  
+
+  .sidebarCollapsed {
+    grid-template-columns: 1fr;
+  }
+
   .dashboardMain {
     max-height: none;
     padding: var(--space-lg);

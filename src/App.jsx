@@ -17,9 +17,11 @@ import TeacherDashboard from './pages/teacher/Dashboard/TeacherDashboard'
 import TeacherClasses from './pages/teacher/Classes/TeacherClasses'
 import NewAnnouncement from './pages/teacher/Announcements/New/NewAnnouncement'
 import TeacherFiles from './pages/teacher/Files/TeacherFiles'
+import TeacherQuiz from './pages/teacher/Quiz/TeacherQuiz'
 
 // Student Pages
 import StudentDashboard from './pages/student/Dashboard/StudentDashboard'
+import StudentClasses from './pages/student/Classes/StudentClasses'
 import StudentAnnouncements from './pages/student/Announcements/StudentAnnouncements'
 import AnnouncementDetail from './pages/student/Announcements/Detail/AnnouncementDetail'
 import StudentFiles from './pages/student/Files/StudentFiles'
@@ -87,6 +89,7 @@ function App() {
 
   return (
     <Routes>
+      {/* Public Routes */}
       <Route
         path="/login"
         element={
@@ -103,6 +106,7 @@ function App() {
             : <Register />
         }
       />
+
       <Route
         path="/dashboard"
         element={
@@ -179,6 +183,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/teacher/quizzes"
+        element={
+          <ProtectedRoute allowedRoles={['teacher', 'admin']}>
+            <TeacherQuiz />
+          </ProtectedRoute>
+        }
+      />
 
       {/* STUDENT ROUTES */}
       <Route
@@ -186,6 +198,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
             <StudentDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/classes"
+        element={
+          <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
+            <StudentClasses />
           </ProtectedRoute>
         }
       />

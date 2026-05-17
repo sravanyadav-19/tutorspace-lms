@@ -96,3 +96,17 @@ export const fileAPI = {
 }
 
 export default api
+
+export const quizAPI = {
+  createQuiz: (data) => api.post('/quizzes', data),
+  getClassQuizzes: (classId) => api.get(`/quizzes/class/${classId}`),
+  getQuizById: (quizId) => api.get(`/quizzes/${quizId}`),
+  togglePublish: (quizId) => api.patch(`/quizzes/${quizId}/publish`),
+  deleteQuiz: (quizId) => api.delete(`/quizzes/${quizId}`),
+  getSubmissions: (quizId) => api.get(`/quizzes/${quizId}/submissions`),
+  releaseResults: (quizId) => api.patch(`/quizzes/${quizId}/release`),
+  getStudentQuizzes: () => api.get('/quizzes/student/all'),
+  getStudentResults: () => api.get('/quizzes/student/results'),
+  getQuizForStudent: (quizId) => api.get(`/quizzes/student/${quizId}/take`),
+  submitQuiz: (quizId, data) => api.post(`/quizzes/student/${quizId}/submit`, data)
+}
