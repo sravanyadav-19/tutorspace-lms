@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
@@ -16,7 +16,35 @@ const TakeQuiz = () => {
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
+  // Timer state
+  const [timeLeft, setTimeLeft] = useState(null)
+  const [timerWarning, setTimerWarning] = useState(false)
+  const timerRef = useRef(null)
+
   useEffect(() => { fetchQuiz() }, [quizId])
+
+  // Start timer when quiz loads
+  useEffect(() => {
+    if (quiz?.timeLimit && !submitted) {
+      setTimeLeft(quiz.timeLimit * 60) // convert minutes to seconds
+    }
+  }, [quiz])
+
+  // Timer countdown
+  useEffect(() => {
+    if (timeLeft === null) return
+    if (timeLeft <= 0) {
+      handleAutoSubmit()
+      return
+    }
+    if (timeLeft <= 60) setTimerWarning(true)
+
+    timerRef.current = setTimeout(() => {
+      setTimeLeft(prev => prev - 1)
+    }, 1000)
+
+    return () => clearTimeout(timerRef.current)
+  }, [timeLeft])
 
   const fetchQuiz = async () => {
     try {
@@ -35,6 +63,26 @@ const TakeQuiz = () => {
     setAnswers(prev => ({ ...prev, [questionId]: value }))
   }
 
+  const handleAutoSubmit = async () => {
+    clearTimeout(timerRef.current)
+    if (!quiz) return
+    setSubmitting(true)
+    try {
+      const payload = {
+        answers: quiz.questions.map(q => ({
+          questionId: q.id,
+          studentAnswer: answers[q.id] || ''
+        }))
+      }
+      await quizAPI.submitQuiz(quizId, payload)
+      setSubmitted(true)
+    } catch (err) {
+      setError('Time is up! Auto-submission failed. Please contact your teacher.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   const handleSubmitQuiz = async () => {
     if (!quiz) return
 
@@ -51,6 +99,7 @@ const TakeQuiz = () => {
       'Submit this quiz? You cannot change answers after submission.'
     )) return
 
+    clearTimeout(timerRef.current)
     setSubmitting(true)
     setError('')
 
@@ -69,6 +118,17 @@ const TakeQuiz = () => {
       setSubmitting(false)
     }
   }
+
+  const formatTime = (seconds) => {
+    if (seconds === null) return ''
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+  }
+
+  const answeredCount = Object.keys(answers).filter(
+    key => String(answers[key]).trim()
+  ).length
 
   if (loading) {
     return (
@@ -123,17 +183,35 @@ const TakeQuiz = () => {
 
         {/* Header */}
         <div className={styles.quizHeader}>
-          <button
-            className={styles.backBtn}
-            onClick={() => navigate('/student/quizzes')}
-          >
-            ← Back to Quizzes
-          </button>
+          <div className={styles.quizHeaderTop}>
+            <button
+              className={styles.backBtn}
+              onClick={() => navigate('/student/quizzes')}
+            >
+              ← Back to Quizzes
+            </button>
+
+            {/* Timer */}
+            {timeLeft !== null && (
+              <div className={`
+                ${styles.timerBox}
+                ${timerWarning ? styles.timerWarning : ''}
+                ${timeLeft <= 30 ? styles.timerDanger : ''}
+              `}>
+                <span className={styles.timerIcon}>⏱️</span>
+                <span className={styles.timerText}>{formatTime(timeLeft)}</span>
+                {timerWarning && (
+                  <span className={styles.timerLabel}>Less than 1 min!</span>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className={styles.quizTitleBlock}>
             <h1 className={styles.quizTitle}>{quiz?.title}</h1>
             <p className={styles.quizMeta}>
               {quiz?.class?.name} • {quiz?.class?.subject}
-              {quiz?.timeLimit && ` • ⏱️ ${quiz.timeLimit} min`}
+              {quiz?.timeLimit && ` • ⏱️ ${quiz.timeLimit} min limit`}
             </p>
             {quiz?.description && (
               <p className={styles.quizDescription}>{quiz.description}</p>
@@ -148,14 +226,22 @@ const TakeQuiz = () => {
         {/* Questions */}
         <div className={styles.questionsList}>
           {quiz?.questions?.map((question, index) => (
-            <div key={question.id} className={styles.questionCard}>
+            <div key={question.id} className={`
+              ${styles.questionCard}
+              ${answers[question.id] ? styles.questionAnswered : ''}
+            `}>
               <div className={styles.questionHeader}>
                 <span className={styles.questionNumber}>
                   Question {index + 1}
                 </span>
-                <span className={styles.pointsBadge}>
-                  {question.points} pt{question.points > 1 ? 's' : ''}
-                </span>
+                <div className={styles.questionHeaderRight}>
+                  {answers[question.id] && (
+                    <span className={styles.answeredBadge}>✓ Answered</span>
+                  )}
+                  <span className={styles.pointsBadge}>
+                    {question.points} pt{question.points > 1 ? 's' : ''}
+                  </span>
+                </div>
               </div>
 
               <h3 className={styles.questionText}>
@@ -167,7 +253,14 @@ const TakeQuiz = () => {
               question.options.length > 0 ? (
                 <div className={styles.optionsList}>
                   {question.options.map((option, optIndex) => (
-                    <label key={optIndex} className={styles.optionItem}>
+                    <label
+                      key={optIndex}
+                      className={`
+                        ${styles.optionItem}
+                        ${answers[question.id] === option
+                          ? styles.optionSelected : ''}
+                      `}
+                    >
                       <input
                         type="radio"
                         name={`question-${question.id}`}
@@ -198,13 +291,18 @@ const TakeQuiz = () => {
 
         {/* Submit Footer */}
         <div className={styles.submitSection}>
-          <div className={styles.progressText}>
-            Answered{' '}
-            {Object.keys(answers).filter(
-              key => String(answers[key]).trim()
-            ).length}
-            {' / '}
-            {quiz?.questions?.length || 0} questions
+          <div className={styles.submitLeft}>
+            <div className={styles.progressBar}>
+              <div
+                className={styles.progressFill}
+                style={{
+                  width: `${(answeredCount / (quiz?.questions?.length || 1)) * 100}%`
+                }}
+              />
+            </div>
+            <p className={styles.progressText}>
+              {answeredCount} / {quiz?.questions?.length || 0} questions answered
+            </p>
           </div>
           <Button
             variant="primary"
