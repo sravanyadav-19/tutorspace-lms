@@ -13,19 +13,19 @@ import userRoutes from './routes/user.routes.js'
 import classRoutes from './routes/class.routes.js'
 import announcementRoutes from './routes/announcement.routes.js'
 import fileRoutes from './routes/file.routes.js'
+import quizRoutes from './routes/quiz.routes.js'
 
 const app = express()
 
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }))
 
 app.options('*', cors())
 
-// Helmet - explicitly disable X-Frame-Options
 app.use(helmet({
   frameguard: false,
   crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -64,6 +64,7 @@ app.use('/api/users', userRoutes)
 app.use('/api/classes', classRoutes)
 app.use('/api/announcements', announcementRoutes)
 app.use('/api/files', fileRoutes)
+app.use('/api/quizzes', quizRoutes)
 
 app.use('*', (req, res) => {
   res.status(404).json({
