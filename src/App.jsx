@@ -23,6 +23,7 @@ import AnnouncementDetail from './pages/student/Announcements/Detail/Announcemen
 import StudentFiles from './pages/student/Files/StudentFiles'
 import StudentQuiz from './pages/student/Quiz/StudentQuiz'
 import TakeQuiz from './pages/student/Quiz/TakeQuiz'
+import StudentResults from './pages/student/Results/StudentResults'
 
 import ProtectedRoute from './components/shared/ProtectedRoute'
 import './App.css'
@@ -87,6 +88,7 @@ function App() {
       <Route path="/student/files" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentFiles /></ProtectedRoute>} />
       <Route path="/student/quizzes" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentQuiz /></ProtectedRoute>} />
       <Route path="/student/quizzes/:quizId/take" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><TakeQuiz /></ProtectedRoute>} />
+      <Route path="/student/results" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentResults /></ProtectedRoute>} />
 
       {/* UTILITY */}
       <Route path="/unauthorized" element={<Unauthorized />} />
