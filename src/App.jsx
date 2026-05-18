@@ -15,6 +15,7 @@ import TeacherClasses from './pages/teacher/Classes/TeacherClasses'
 import NewAnnouncement from './pages/teacher/Announcements/New/NewAnnouncement'
 import TeacherFiles from './pages/teacher/Files/TeacherFiles'
 import TeacherQuiz from './pages/teacher/Quiz/TeacherQuiz'
+import TeacherAnalytics from './pages/teacher/Analytics/TeacherAnalytics'
 
 import StudentDashboard from './pages/student/Dashboard/StudentDashboard'
 import StudentClasses from './pages/student/Classes/StudentClasses'
@@ -79,6 +80,7 @@ function App() {
       <Route path="/teacher/classes/:classId/announcements/new" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><NewAnnouncement /></ProtectedRoute>} />
       <Route path="/teacher/files" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherFiles /></ProtectedRoute>} />
       <Route path="/teacher/quizzes" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherQuiz /></ProtectedRoute>} />
+      <Route path="/teacher/analytics" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherAnalytics /></ProtectedRoute>} />
 
       {/* STUDENT */}
       <Route path="/student/dashboard" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentDashboard /></ProtectedRoute>} />
