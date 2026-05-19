@@ -126,7 +126,7 @@ export const getClassById = async (req, res) => {
         },
         announcements: {
           include: {
-            user: {
+            author: {
               select: {
                 id: true,
                 name: true
