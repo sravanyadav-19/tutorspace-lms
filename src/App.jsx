@@ -9,9 +9,11 @@ import AdminDashboard from './pages/admin/Dashboard'
 import AdminUsers from './pages/admin/Users'
 import AdminClasses from './pages/admin/Classes'
 import NewClass from './pages/admin/Classes/NewClass'
+import AdminClassDetail from './pages/admin/Classes/AdminClassDetail'
 
 import TeacherDashboard from './pages/teacher/Dashboard/TeacherDashboard'
 import TeacherClasses from './pages/teacher/Classes/TeacherClasses'
+import TeacherClassDetail from './pages/teacher/Classes/TeacherClassDetail'
 import NewAnnouncement from './pages/teacher/Announcements/New/NewAnnouncement'
 import TeacherFiles from './pages/teacher/Files/TeacherFiles'
 import TeacherQuiz from './pages/teacher/Quiz/TeacherQuiz'
@@ -73,10 +75,12 @@ function App() {
       <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><AdminUsers /></ProtectedRoute>} />
       <Route path="/admin/classes" element={<ProtectedRoute allowedRoles={['admin']}><AdminClasses /></ProtectedRoute>} />
       <Route path="/admin/classes/new" element={<ProtectedRoute allowedRoles={['admin']}><NewClass /></ProtectedRoute>} />
+      <Route path="/admin/classes/:classId" element={<ProtectedRoute allowedRoles={['admin']}><AdminClassDetail /></ProtectedRoute>} />
 
       {/* TEACHER */}
       <Route path="/teacher/dashboard" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherDashboard /></ProtectedRoute>} />
       <Route path="/teacher/classes" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherClasses /></ProtectedRoute>} />
+      <Route path="/teacher/classes/:classId" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherClassDetail /></ProtectedRoute>} />
       <Route path="/teacher/classes/:classId/announcements/new" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><NewAnnouncement /></ProtectedRoute>} />
       <Route path="/teacher/files" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherFiles /></ProtectedRoute>} />
       <Route path="/teacher/quizzes" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherQuiz /></ProtectedRoute>} />
