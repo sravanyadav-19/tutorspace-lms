@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -99,20 +100,93 @@ export const getUserById = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params
-    const { name, status } = req.body
+    const { name, email, status, currentPassword, newPassword } = req.body
+    const userId = parseInt(id)
 
-    // Only admin can update status
-    if (status && req.user.role.name !== 'admin') {
+    if (req.user.id !== userId && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only update your own account'
+      })
+    }
+
+    if (status && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'Only admin can update user status'
       })
     }
 
+    // Password change flow
+    if (currentPassword || newPassword) {
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Both current and new password are required'
+        })
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: 'New password must be at least 6 characters'
+        })
+      }
+
+      const existingUser = await prisma.user.findUnique({
+        where: { id: userId }
+      })
+
+      if (!existingUser) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        })
+      }
+
+      const passwordMatch = await bcrypt.compare(
+        currentPassword,
+        existingUser.passwordHash
+      )
+
+      if (!passwordMatch) {
+        return res.status(401).json({
+          success: false,
+          message: 'Current password is incorrect'
+        })
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 12)
+
+      await prisma.user.update({
+        where: { id: userId },
+        data: { passwordHash: hashedPassword }
+      })
+
+      return res.json({
+        success: true,
+        message: 'Password updated successfully'
+      })
+    }
+
+    // Email uniqueness check
+    if (email) {
+      const existing = await prisma.user.findUnique({
+        where: { email }
+      })
+      if (existing && existing.id !== userId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email is already in use'
+        })
+      }
+    }
+
     const user = await prisma.user.update({
-      where: { id: parseInt(id) },
+      where: { id: userId },
       data: {
         ...(name && { name }),
+        ...(email && { email }),
         ...(status && { status })
       },
       select: {
@@ -141,7 +215,6 @@ export const updateUser = async (req, res) => {
   }
 }
 
-// ================================
 // DELETE USER - Admin Only
 // DELETE /api/users/:id
 // ================================

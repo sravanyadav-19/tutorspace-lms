@@ -4,6 +4,7 @@ import { useAuth } from './context/AuthContext'
 
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Settings from './pages/Settings/Settings'
 
 import AdminDashboard from './pages/admin/Dashboard'
 import AdminUsers from './pages/admin/Users'
@@ -69,6 +70,9 @@ function App() {
       <Route path="/login" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/register" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Register />} />
       <Route path="/dashboard" element={<ProtectedRoute><SmartDashboard /></ProtectedRoute>} />
+
+      {/* SETTINGS - available to all authenticated users */}
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
       {/* ADMIN */}
       <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
