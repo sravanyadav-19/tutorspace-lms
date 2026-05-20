@@ -1,0 +1,17 @@
+.barWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  z-index: 10001;
+  pointer-events: none;
+}
+
+.bar {
+  height: 100%;
+  background: var(--color-primary);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px var(--color-primary);
+}

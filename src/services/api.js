@@ -25,7 +25,8 @@ api.interceptors.response.use(
       message: error.response?.data?.message,
       token: localStorage.getItem('tutorspace_token') ? 'Present' : 'Missing'
     })
-    if (error.response?.status === 401) {
+    const isUserUpdate = error.config?.url?.includes("/users/") && error.config?.method === "put"
+    if (error.response?.status === 401 && !isUserUpdate) {
       localStorage.removeItem('tutorspace_token')
       localStorage.removeItem('tutorspace_user')
       window.location.href = '/login'

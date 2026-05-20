@@ -1,28 +1,46 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from '../Sidebar'
 import TopBar from '../TopBar'
 import styles from './DashboardLayout.module.css'
 
 const DashboardLayout = ({ children, userRole = 'student' }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
 
-  const handleToggle = () => {
-    setIsCollapsed(prev => !prev)
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768
+      setIsMobile(mobile)
+      if (!mobile) setMobileOpen(false)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const handleMenuClick = () => {
+    if (isMobile) {
+      setMobileOpen(prev => !prev)
+    } else {
+      setIsCollapsed(prev => !prev)
+    }
   }
 
+  const handleClose = () => setMobileOpen(false)
+
   return (
-    <div
-      className={`
-        ${styles.dashboardLayout}
-        ${isCollapsed ? styles.sidebarCollapsed : ''}
-      `}
-    >
+    <div className={`
+      ${styles.dashboardLayout}
+      ${!isMobile && isCollapsed ? styles.sidebarCollapsed : ''}
+    `}>
       <Sidebar
         userRole={userRole}
+        isOpen={mobileOpen}
+        isMobile={isMobile}
         isCollapsed={isCollapsed}
-        onToggle={handleToggle}
+        onClose={handleClose}
       />
-      <TopBar />
+      <TopBar onMenuClick={handleMenuClick} />
       <main className={styles.dashboardMain}>
         {children}
       </main>
