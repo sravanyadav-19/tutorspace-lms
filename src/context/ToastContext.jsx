@@ -1,0 +1,36 @@
+import React, { createContext, useContext, useState, useCallback } from 'react'
+import ToastContainer from '../components/shared/Toast/ToastContainer'
+
+const ToastContext = createContext(null)
+
+export const ToastProvider = ({ children }) => {
+  const [toasts, setToasts] = useState([])
+
+  const addToast = useCallback((message, type = 'success') => {
+    const id = Date.now() + Math.random()
+    setToasts(prev => [...prev, { id, message, type }])
+  }, [])
+
+  const removeToast = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }, [])
+
+  const toast = {
+    success: (msg) => addToast(msg, 'success'),
+    error: (msg) => addToast(msg, 'error'),
+    warning: (msg) => addToast(msg, 'warning')
+  }
+
+  return (
+    <ToastContext.Provider value={toast}>
+      {children}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+    </ToastContext.Provider>
+  )
+}
+
+export const useToast = () => {
+  const ctx = useContext(ToastContext)
+  if (!ctx) throw new Error('useToast must be used within ToastProvider')
+  return ctx
+}

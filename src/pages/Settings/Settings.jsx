@@ -3,23 +3,21 @@ import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import Button from '../../components/shared/Button'
 import { useAuth } from '../../context/AuthContext'
-import { authAPI, userAPI } from '../../services/api'
+import { useToast } from '../../context/ToastContext'
+import { userAPI } from '../../services/api'
 import styles from './Settings.module.css'
 
 const Settings = () => {
   const navigate = useNavigate()
   const { user, login } = useAuth()
+  const toast = useToast()
 
   const [activeTab, setActiveTab] = useState('profile')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
 
-  // Profile form
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
 
-  // Password form
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -56,15 +54,13 @@ const Settings = () => {
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault()
-    setError('')
-    setSuccess('')
 
     if (!name.trim()) {
-      setError('Name cannot be empty')
+      toast.error('Name cannot be empty')
       return
     }
     if (!email.trim()) {
-      setError('Email cannot be empty')
+      toast.error('Email cannot be empty')
       return
     }
 
@@ -77,10 +73,9 @@ const Settings = () => {
         { ...user, name: updatedUser.name, email: updatedUser.email },
         token
       )
-      setSuccess('Profile updated successfully!')
-      setTimeout(() => setSuccess(''), 3000)
+      toast.success('Profile updated successfully!')
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update profile')
+      toast.error(err.response?.data?.message || 'Failed to update profile')
     } finally {
       setLoading(false)
     }
@@ -88,37 +83,31 @@ const Settings = () => {
 
   const handleUpdatePassword = async (e) => {
     e.preventDefault()
-    setError('')
-    setSuccess('')
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      setError('All password fields are required')
+      toast.error('All password fields are required')
       return
     }
 
     if (newPassword.length < 6) {
-      setError('New password must be at least 6 characters')
+      toast.error('New password must be at least 6 characters')
       return
     }
 
     if (newPassword !== confirmPassword) {
-      setError('New password and confirm password do not match')
+      toast.error('Passwords do not match')
       return
     }
 
     setLoading(true)
     try {
-      await userAPI.updateUser(user.id, {
-        currentPassword,
-        newPassword
-      })
-      setSuccess('Password updated successfully!')
+      await userAPI.updateUser(user.id, { currentPassword, newPassword })
+      toast.success('Password updated successfully!')
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
-      setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update password')
+      toast.error(err.response?.data?.message || 'Failed to update password')
     } finally {
       setLoading(false)
     }
@@ -128,7 +117,6 @@ const Settings = () => {
     <DashboardLayout userRole={user?.role}>
       <div className={styles.settingsPage}>
 
-        {/* Header */}
         <div className={styles.pageHeader}>
           <div>
             <h1 className={styles.pageTitle}>⚙️ Settings</h1>
@@ -136,20 +124,13 @@ const Settings = () => {
               Manage your account information and security
             </p>
           </div>
-          <Button
-            variant="secondary"
-            onClick={() => navigate('/dashboard')}
-          >
+          <Button variant="secondary" onClick={() => navigate('/dashboard')}>
             ← Back to Dashboard
           </Button>
         </div>
 
-        {success && <div className={styles.successBanner}>✅ {success}</div>}
-        {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
-
         <div className={styles.contentLayout}>
 
-          {/* Left: Profile Summary */}
           <div className={styles.profileSummary}>
             <div className={`${styles.bigAvatar} ${getAvatarClass(user?.role)}`}>
               <span className={styles.bigInitials}>{getInitials(user?.name)}</span>
@@ -159,7 +140,6 @@ const Settings = () => {
             <p className={styles.profileEmail}>{user?.email}</p>
             <span className={styles.profileRole}>{user?.role}</span>
 
-            {/* Tabs Vertical */}
             <div className={styles.tabsVertical}>
               <button
                 className={`${styles.vTab} ${activeTab === 'profile' ? styles.vTabActive : ''}`}
@@ -176,7 +156,6 @@ const Settings = () => {
             </div>
           </div>
 
-          {/* Right: Forms */}
           <div className={styles.mainContent}>
 
             {activeTab === 'profile' && (
@@ -218,11 +197,7 @@ const Settings = () => {
                   </div>
 
                   <div className={styles.formActions}>
-                    <Button
-                      type="submit"
-                      variant="primary"
-                      disabled={loading}
-                    >
+                    <Button type="submit" variant="primary" disabled={loading}>
                       {loading ? '⏳ Updating...' : '💾 Save Changes'}
                     </Button>
                   </div>
@@ -278,11 +253,7 @@ const Settings = () => {
                   </div>
 
                   <div className={styles.formActions}>
-                    <Button
-                      type="submit"
-                      variant="primary"
-                      disabled={loading}
-                    >
+                    <Button type="submit" variant="primary" disabled={loading}>
                       {loading ? '⏳ Updating...' : '🔒 Update Password'}
                     </Button>
                   </div>
