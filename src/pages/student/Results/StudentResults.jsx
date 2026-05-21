@@ -3,6 +3,7 @@ import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import { quizAPI } from '../../../services/api'
 import styles from './StudentResults.module.css'
+import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 
 const StudentResults = () => {
   const [submissions, setSubmissions] = useState([])
@@ -75,9 +76,7 @@ const StudentResults = () => {
         )}
 
         {loading ? (
-          <div className={styles.loadingState}>
-            <p>Loading your results...</p>
-          </div>
+          <SkeletonGrid count={3} type="card" />
         ) : submissions.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>📊</div>

@@ -4,6 +4,7 @@ import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import { classAPI, announcementAPI } from '../../../services/api'
 import styles from './StudentAnnouncements.module.css'
+import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 
 const StudentAnnouncements = () => {
   const navigate = useNavigate()
@@ -92,9 +93,7 @@ const StudentAnnouncements = () => {
         )}
 
         {loading ? (
-          <div className={styles.loadingState}>
-            <p>Loading your classes...</p>
-          </div>
+          <SkeletonCard />
         ) : classes.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>📚</div>
@@ -149,9 +148,7 @@ const StudentAnnouncements = () => {
               )}
 
               {announcementsLoading ? (
-                <div className={styles.loadingState}>
-                  <p>Loading announcements...</p>
-                </div>
+                <SkeletonGrid count={3} type="card" />
               ) : announcements.length === 0 ? (
                 <div className={styles.emptyAnnouncements}>
                   <div className={styles.emptyIcon}>📢</div>

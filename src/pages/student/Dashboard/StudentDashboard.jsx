@@ -6,6 +6,7 @@ import Button from '../../../components/shared/Button'
 import { useAuth } from '../../../context/AuthContext'
 import { classAPI } from '../../../services/api'
 import styles from './StudentDashboard.module.css'
+import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 
 const StudentDashboard = () => {
   const { user } = useAuth()
@@ -55,9 +56,9 @@ const StudentDashboard = () => {
   if (loading) {
     return (
       <DashboardLayout userRole="student">
-        <div className={styles.loadingState}>
-          <div className={styles.loadingSpinner}>⏳</div>
-          <p>Loading your dashboard...</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <SkeletonGrid count={4} type="stat" />
+          <SkeletonGrid count={2} type="card" />
         </div>
       </DashboardLayout>
     )

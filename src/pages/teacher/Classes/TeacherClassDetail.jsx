@@ -4,6 +4,7 @@ import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import { classAPI, announcementAPI } from '../../../services/api'
 import styles from './TeacherClassDetail.module.css'
+import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 
 const TeacherClassDetail = () => {
   const { classId } = useParams()
@@ -56,7 +57,10 @@ const TeacherClassDetail = () => {
   if (loading) {
     return (
       <DashboardLayout userRole="teacher">
-        <div className={styles.loadingState}><p>Loading class...</p></div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <SkeletonCard />
+          <SkeletonGrid count={2} type="card" />
+        </div>
       </DashboardLayout>
     )
   }

@@ -3,6 +3,7 @@ import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import { classAPI, fileAPI } from '../../../services/api'
 import styles from './TeacherFiles.module.css'
+import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 
 const TeacherFiles = () => {
   const [classes, setClasses] = useState([])
@@ -243,7 +244,7 @@ const TeacherFiles = () => {
         {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
 
         {loading ? (
-          <div className={styles.loadingState}><p>Loading your classes...</p></div>
+          <SkeletonCard />
         ) : classes.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>📚</div>
@@ -383,7 +384,7 @@ const TeacherFiles = () => {
                 </h2>
 
                 {filesLoading ? (
-                  <div className={styles.loadingState}><p>Loading files...</p></div>
+                  <SkeletonGrid count={3} type="card" />
                 ) : files.length === 0 ? (
                   <div className={styles.emptyFiles}>
                     <div className={styles.emptyIcon}>📭</div>

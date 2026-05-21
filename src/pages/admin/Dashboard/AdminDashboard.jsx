@@ -6,6 +6,7 @@ import ActivityFeed from '../../../components/dashboard/ActivityFeed'
 import Button from '../../../components/shared/Button'
 import { useAuth } from '../../../context/AuthContext'
 import { userAPI, classAPI } from '../../../services/api'
+import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 import styles from './AdminDashboard.module.css'
 
 const AdminDashboard = () => {
@@ -102,11 +103,17 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <DashboardLayout userRole="admin">
-        <div className={styles.loadingState}>
-          <div className={styles.loadingSpinner}>⏳</div>
-          <p className={styles.loadingText}>
-            Loading dashboard...
-          </p>
+        <div className={styles.adminDashboard}>
+          <div className={styles.pageHeader}>
+            <div style={{ width: '100%' }}>
+              <div style={{ height: '32px', width: '300px', background: 'rgba(0,0,0,0.06)', borderRadius: '6px', marginBottom: '12px' }} />
+              <div style={{ height: '16px', width: '400px', background: 'rgba(0,0,0,0.04)', borderRadius: '6px' }} />
+            </div>
+          </div>
+          <SkeletonGrid count={4} type="stat" />
+          <div style={{ marginTop: '24px' }}>
+            <SkeletonGrid count={2} type="card" />
+          </div>
         </div>
       </DashboardLayout>
     )

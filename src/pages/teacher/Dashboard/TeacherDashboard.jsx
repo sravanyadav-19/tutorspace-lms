@@ -7,6 +7,7 @@ import Button from '../../../components/shared/Button'
 import { useAuth } from '../../../context/AuthContext'
 import { classAPI } from '../../../services/api'
 import styles from './TeacherDashboard.module.css'
+import { SkeletonGrid } from '../../../components/shared/Skeleton/Skeleton'
 
 const TeacherDashboard = () => {
   const { user } = useAuth()
@@ -85,8 +86,10 @@ const TeacherDashboard = () => {
   if (loading) {
     return (
       <DashboardLayout userRole="teacher">
-        <div className={styles.loadingState}>
-          <div className={styles.loadingSpinner}>⏳</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <SkeletonGrid count={4} type="stat" />
+          <SkeletonGrid count={2} type="card" />
+        </div>
           <p className={styles.loadingText}>
             Loading your dashboard...
           </p>
