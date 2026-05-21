@@ -5,6 +5,7 @@ import Button from '../../../components/shared/Button'
 import Input from '../../../components/shared/Input'
 import { classAPI } from '../../../services/api'
 import styles from './TeacherClasses.module.css'
+import { SkeletonGrid } from '../../../components/shared/Skeleton/Skeleton'
 
 const TeacherClasses = () => {
   const navigate = useNavigate()
@@ -71,9 +72,7 @@ const TeacherClasses = () => {
         {error && <div className={styles.errorState}>⚠️ {error}</div>}
 
         {loading ? (
-          <div className={styles.loadingState}>
-            <p>Loading your classes...</p>
-          </div>
+          <SkeletonGrid count={4} type="card" />
         ) : filteredClasses.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>📚</div>

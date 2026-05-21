@@ -5,6 +5,7 @@ import Button from '../../../components/shared/Button'
 import { classAPI, fileAPI } from '../../../services/api'
 import { useAuth } from '../../../context/AuthContext'
 import styles from './StudentFiles.module.css'
+import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 
 const StudentFiles = () => {
   const navigate = useNavigate()
@@ -225,7 +226,7 @@ const StudentFiles = () => {
         {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
 
         {loading ? (
-          <div className={styles.loadingState}><p>Loading your classes...</p></div>
+          <SkeletonCard />
         ) : classes.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>📚</div>
@@ -264,7 +265,7 @@ const StudentFiles = () => {
                 </div>
 
                 {filesLoading ? (
-                  <div className={styles.loadingState}><p>Loading files...</p></div>
+                  <SkeletonGrid count={3} type="card" />
                 ) : files.length === 0 ? (
                   <div className={styles.emptyFiles}>
                     <div className={styles.emptyIcon}>📭</div>

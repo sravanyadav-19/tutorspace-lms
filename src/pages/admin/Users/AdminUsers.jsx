@@ -3,6 +3,7 @@ import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import Input from '../../../components/shared/Input'
 import { userAPI } from '../../../services/api'
+import { SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 import styles from './AdminUsers.module.css'
 
 const AdminUsers = () => {
@@ -239,8 +240,11 @@ const AdminUsers = () => {
 
         {/* Loading State */}
         {loading ? (
-          <div className={styles.loadingState}>
-            <p>Loading users...</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
           </div>
         ) : (
           <>

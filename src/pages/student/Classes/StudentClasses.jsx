@@ -3,6 +3,7 @@ import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import { classAPI } from '../../../services/api'
 import styles from './StudentClasses.module.css'
+import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 
 const StudentClasses = () => {
   const [classes, setClasses] = useState([])
@@ -48,9 +49,7 @@ const StudentClasses = () => {
         )}
 
         {loading ? (
-          <div className={styles.loadingState}>
-            <p>Loading your classes...</p>
-          </div>
+          <SkeletonGrid count={4} type="card" />
         ) : classes.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>📚</div>

@@ -4,6 +4,7 @@ import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import { quizAPI } from '../../../services/api'
 import styles from './TakeQuiz.module.css'
+import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 
 const TakeQuiz = () => {
   const navigate = useNavigate()
@@ -133,8 +134,10 @@ const TakeQuiz = () => {
   if (loading) {
     return (
       <DashboardLayout userRole="student">
-        <div className={styles.loadingState}>
-          <p>Loading quiz...</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
         </div>
       </DashboardLayout>
     )

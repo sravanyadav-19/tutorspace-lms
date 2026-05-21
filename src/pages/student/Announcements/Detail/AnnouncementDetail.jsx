@@ -6,6 +6,7 @@ import { Textarea } from '../../../../components/shared/Input'
 import { useAuth } from '../../../../context/AuthContext'
 import { announcementAPI } from '../../../../services/api'
 import styles from './AnnouncementDetail.module.css'
+import { SkeletonGrid, SkeletonCard } from '../../../../components/shared/Skeleton/Skeleton'
 
 const AnnouncementDetail = () => {
   const { announcementId } = useParams()
@@ -85,9 +86,7 @@ const AnnouncementDetail = () => {
   if (loading) {
     return (
       <DashboardLayout userRole="student">
-        <div className={styles.loadingState}>
-          <p>Loading announcement...</p>
-        </div>
+        <SkeletonCard />
       </DashboardLayout>
     )
   }

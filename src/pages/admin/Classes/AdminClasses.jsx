@@ -4,6 +4,7 @@ import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import Input from '../../../components/shared/Input'
 import { classAPI } from '../../../services/api'
+import { SkeletonGrid } from '../../../components/shared/Skeleton/Skeleton'
 import styles from './AdminClasses.module.css'
 
 const AdminClasses = () => {
@@ -103,9 +104,7 @@ const AdminClasses = () => {
 
         {/* Loading */}
         {loading ? (
-          <div className={styles.loadingState}>
-            Loading classes...
-          </div>
+          <SkeletonGrid count={4} type="card" />
         ) : filteredClasses.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>📚</div>

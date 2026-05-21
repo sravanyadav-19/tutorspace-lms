@@ -4,6 +4,7 @@ import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import { quizAPI } from '../../../services/api'
 import styles from './StudentQuiz.module.css'
+import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 
 const StudentQuiz = () => {
   const navigate = useNavigate()
@@ -56,7 +57,7 @@ const StudentQuiz = () => {
         {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
 
         {loading ? (
-          <div className={styles.loadingState}><p>Loading quizzes...</p></div>
+          <SkeletonGrid count={3} type="card" />
         ) : quizzes.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>📝</div>

@@ -3,6 +3,7 @@ import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import { classAPI, quizAPI } from '../../../services/api'
 import styles from './TeacherAnalytics.module.css'
+import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 
 const TeacherAnalytics = () => {
   const [classes, setClasses] = useState([])
@@ -128,7 +129,10 @@ const TeacherAnalytics = () => {
         {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
 
         {loading ? (
-          <div className={styles.loadingState}><p>Loading...</p></div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <SkeletonGrid count={2} type="card" />
+            <SkeletonGrid count={4} type="stat" />
+          </div>
         ) : classes.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>📚</div>
@@ -278,9 +282,7 @@ const TeacherAnalytics = () => {
                     </h3>
 
                     {submissionsLoading ? (
-                      <div className={styles.loadingState}>
-                        <p>Loading submissions...</p>
-                      </div>
+                      <SkeletonCard />
                     ) : submissions.length === 0 ? (
                       <div className={styles.emptySubmissions}>
                         <p>No submissions yet for this quiz.</p>
