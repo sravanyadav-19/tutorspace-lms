@@ -139,3 +139,21 @@
     align-items: flex-start;
   }
 }
+@media (max-width: 480px) {
+  .brandSide {
+    padding: var(--space-xl) var(--space-lg);
+    min-height: 140px;
+  }
+
+  .brandName {
+    font-size: 26px;
+  }
+
+  .brandTagline {
+    font-size: var(--text-body-sm);
+  }
+
+  .formSide {
+    padding: var(--space-lg) var(--space-md);
+  }
+}

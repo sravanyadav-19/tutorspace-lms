@@ -335,3 +335,22 @@
     font-size: var(--text-display-lg);
   }
 }
+@media (max-width: 480px) {
+  .announcementCard {
+    padding: var(--space-lg);
+  }
+
+  .authorAvatar {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .feedHeader {
+    padding: var(--space-lg);
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

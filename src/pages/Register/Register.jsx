@@ -13,8 +13,7 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    role: 'student'
+    confirmPassword: ''
   })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
@@ -80,7 +79,7 @@ const Register = () => {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        role: formData.role
+        role: 'student'
       })
 
       if (response.data.success) {
@@ -105,32 +104,26 @@ const Register = () => {
             Registration Successful!
           </h2>
           <p className={styles.successText}>
-            Please check your email to verify your account.
-            After verification, an admin will approve your access.
+            Your student account has been created.
+            Once approved by admin, you can login and start learning!
           </p>
           <div className={styles.successSteps}>
             <div className={styles.step}>
               <span className={styles.stepNum}>1</span>
               <span className={styles.stepText}>
-                Check your email inbox
+                Wait for admin to approve your account
               </span>
             </div>
             <div className={styles.step}>
               <span className={styles.stepNum}>2</span>
               <span className={styles.stepText}>
-                Click the verification link
+                Login with your email and password
               </span>
             </div>
             <div className={styles.step}>
               <span className={styles.stepNum}>3</span>
               <span className={styles.stepText}>
-                Wait for admin approval
-              </span>
-            </div>
-            <div className={styles.step}>
-              <span className={styles.stepNum}>4</span>
-              <span className={styles.stepText}>
-                Login and start learning!
+                Start your learning journey!
               </span>
             </div>
           </div>
@@ -152,9 +145,9 @@ const Register = () => {
       <div className={styles.registerContainer}>
         {/* Header */}
         <div className={styles.registerHeader}>
-          <h2 className={styles.registerTitle}>Create Account</h2>
+          <h2 className={styles.registerTitle}>Create Student Account</h2>
           <p className={styles.registerSubtitle}>
-            Join TutorSpace and start your learning journey
+            Register as a student to start your learning journey
           </p>
         </div>
 
@@ -165,6 +158,27 @@ const Register = () => {
             <span>{apiError}</span>
           </div>
         )}
+
+        {/* Student info badge */}
+        <div style={{
+          background: 'rgba(21, 101, 192, 0.06)',
+          border: '1px solid rgba(21, 101, 192, 0.15)',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span style={{ fontSize: '20px' }}>🎓</span>
+          <span style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: '14px',
+            color: '#1565c0',
+            fontWeight: 600
+          }}>
+            Registering as a Student — Teachers are added by Admin
+          </span>
+        </div>
 
         {/* Register Form */}
         <form
@@ -197,43 +211,6 @@ const Register = () => {
             required
             disabled={loading}
           />
-
-          {/* Role Selection */}
-          <div className={styles.roleSection}>
-            <label className={styles.roleLabel}>
-              I am a: <span className={styles.required}>*</span>
-            </label>
-            <div className={styles.roleOptions}>
-              <button
-                type="button"
-                className={`${styles.roleOption} ${
-                  formData.role === 'student' 
-                    ? styles.roleOptionActive 
-                    : ''
-                }`}
-                onClick={() => setFormData(
-                  prev => ({ ...prev, role: 'student' })
-                )}
-              >
-                <span className={styles.roleOptionIcon}>🎓</span>
-                <span className={styles.roleOptionText}>Student</span>
-              </button>
-              <button
-                type="button"
-                className={`${styles.roleOption} ${
-                  formData.role === 'teacher' 
-                    ? styles.roleOptionActive 
-                    : ''
-                }`}
-                onClick={() => setFormData(
-                  prev => ({ ...prev, role: 'teacher' })
-                )}
-              >
-                <span className={styles.roleOptionIcon}>👨‍🏫</span>
-                <span className={styles.roleOptionText}>Teacher</span>
-              </button>
-            </div>
-          </div>
 
           {/* Password */}
           <Input
@@ -269,7 +246,7 @@ const Register = () => {
             disabled={loading}
             className={styles.submitButton}
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? 'Creating Account...' : 'Create Student Account'}
           </Button>
         </form>
 

@@ -94,3 +94,21 @@
   .skeletonGrid { grid-template-columns: 1fr; }
   .statGrid { grid-template-columns: repeat(2, 1fr); }
 }
+@media (max-width: 480px) {
+  .statGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  .skeletonGrid {
+    gap: var(--space-md);
+  }
+
+  .skeletonCard {
+    padding: var(--space-lg);
+  }
+
+  .skeletonStatCard {
+    padding: var(--space-lg);
+  }
+}

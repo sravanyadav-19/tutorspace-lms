@@ -301,3 +301,25 @@
   .profileSummary { position: static; }
   .pageTitle { font-size: var(--text-display-lg); }
 }
+@media (max-width: 480px) {
+  .formCard {
+    padding: var(--space-lg);
+  }
+
+  .profileSummary {
+    padding: var(--space-lg);
+  }
+
+  .bigAvatar {
+    width: 72px;
+    height: 72px;
+  }
+
+  .bigInitials {
+    font-size: 28px;
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

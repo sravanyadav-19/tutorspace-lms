@@ -300,3 +300,22 @@
   .infoGrid { grid-template-columns: 1fr; }
   .pageTitle { font-size: var(--text-display-lg); }
 }
+@media (max-width: 480px) {
+  .overviewCard,
+  .userSection {
+    padding: var(--space-lg);
+  }
+
+  .tab {
+    font-size: 12px;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .userCard {
+    padding: var(--space-md);
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

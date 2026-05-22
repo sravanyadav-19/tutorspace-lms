@@ -166,3 +166,18 @@
     flex-direction: column;
   }
 }
+@media (max-width: 480px) {
+  .classCard {
+    padding: var(--space-lg);
+  }
+
+  .classIcon {
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

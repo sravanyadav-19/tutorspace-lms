@@ -448,3 +448,33 @@
   .pageTitle { font-size: var(--text-display-lg); }
   .quizAnalyticsHeader { flex-direction: column; align-items: flex-start; }
 }
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  .submissionsSection {
+    padding: var(--space-lg);
+  }
+
+  .quizAnalyticsHeader {
+    padding: var(--space-lg);
+  }
+
+  .tableHeader,
+  .tableRow {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+
+  .tableHeader span:nth-child(4),
+  .tableHeader span:nth-child(5),
+  .tableRow span:nth-child(4),
+  .tableRow span:nth-child(5) {
+    display: none;
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

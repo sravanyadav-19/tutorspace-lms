@@ -4,9 +4,15 @@ import Button from '../../../components/shared/Button'
 import Input from '../../../components/shared/Input'
 import { userAPI } from '../../../services/api'
 import { SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
+import { useToast } from '../../../context/ToastContext'
 import styles from './AdminUsers.module.css'
 
 const AdminUsers = () => {
+  const toast = useToast()
+  const [showTeacherModal, setShowTeacherModal] = useState(false)
+  const [teacherForm, setTeacherForm] = useState({ name: '', email: '', password: '' })
+  const [teacherLoading, setTeacherLoading] = useState(false)
+
   const [users, setUsers] = useState([])
   const [filteredUsers, setFilteredUsers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -145,6 +151,32 @@ const AdminUsers = () => {
     u => u.status === 'pending'
   ).length
 
+
+  const handleCreateTeacher = async (e) => {
+    e.preventDefault()
+    if (!teacherForm.name || !teacherForm.email || !teacherForm.password) {
+      toast.error('All fields are required')
+      return
+    }
+    if (teacherForm.password.length < 6) {
+      toast.error('Password must be at least 6 characters')
+      return
+    }
+
+    setTeacherLoading(true)
+    try {
+      await userAPI.createTeacher(teacherForm)
+      toast.success('Teacher created successfully!')
+      setShowTeacherModal(false)
+      setTeacherForm({ name: '', email: '', password: '' })
+      fetchUsers()
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to create teacher')
+    } finally {
+      setTeacherLoading(false)
+    }
+  }
+
   return (
     <DashboardLayout userRole="admin">
       <div className={styles.usersPage}>
@@ -164,12 +196,14 @@ const AdminUsers = () => {
               )}
             </p>
           </div>
-          <Button
-            variant="secondary"
-            onClick={fetchUsers}
-          >
-            🔄 Refresh
-          </Button>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <Button variant="secondary" onClick={fetchUsers}>
+              🔄 Refresh
+            </Button>
+            <Button variant="primary" onClick={() => setShowTeacherModal(true)}>
+              + Create Teacher
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
@@ -423,6 +457,33 @@ const AdminUsers = () => {
               </table>
             </div>
           </>
+        )}
+        {showTeacherModal && (
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "16px" }} onClick={() => setShowTeacherModal(false)}>
+            <div style={{ background: "var(--color-surface-card)", borderRadius: "12px", padding: "32px", maxWidth: "480px", width: "100%", boxShadow: "var(--shadow-lg)" }} onClick={(e) => e.stopPropagation()}>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "24px", fontWeight: "bold", margin: "0 0 8px 0", color: "var(--color-ink)" }}>👨‍🏫 Create New Teacher</h2>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "var(--color-muted)", margin: "0 0 24px 0" }}>Set up a teacher account. They will use these credentials to login.</p>
+              <form onSubmit={handleCreateTeacher} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "6px", color: "var(--color-ink)" }}>Full Name</label>
+                  <input type="text" value={teacherForm.name} onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })} placeholder="Jane Doe" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "6px", color: "var(--color-ink)" }}>Email</label>
+                  <input type="email" value={teacherForm.email} onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })} placeholder="jane@school.com" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "6px", color: "var(--color-ink)" }}>Password (min 6 chars)</label>
+                  <input type="text" value={teacherForm.password} onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })} placeholder="Type a secure password" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} />
+                  <p style={{ fontSize: "12px", color: "var(--color-muted)", margin: "6px 0 0 0" }}>💡 Share this password with the teacher securely</p>
+                </div>
+                <div style={{ display: "flex", gap: "12px", marginTop: "16px", justifyContent: "flex-end" }}>
+                  <Button type="button" variant="secondary" onClick={() => setShowTeacherModal(false)}>Cancel</Button>
+                  <Button type="submit" variant="primary" disabled={teacherLoading}>{teacherLoading ? "⏳ Creating..." : "✅ Create Teacher"}</Button>
+                </div>
+              </form>
+            </div>
+          </div>
         )}
       </div>
     </DashboardLayout>

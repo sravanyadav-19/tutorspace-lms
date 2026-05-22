@@ -20,3 +20,11 @@
     left: var(--space-md);
   }
 }
+@media (max-width: 480px) {
+  .container {
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    max-width: unset;
+  }
+}

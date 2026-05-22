@@ -342,3 +342,24 @@
   .questionCard { padding: var(--space-xl); }
   .progressBar { max-width: 100%; }
 }
+@media (max-width: 480px) {
+  .questionCard {
+    padding: var(--space-lg);
+  }
+
+  .questionText {
+    font-size: var(--text-display-sm);
+  }
+
+  .optionItem {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .quizTitle {
+    font-size: var(--text-display-md);
+  }
+
+  .submitSection {
+    padding: var(--space-lg);
+  }
+}

@@ -97,3 +97,18 @@
     font-size: var(--text-display-md);
   }
 }
+@media (max-width: 480px) {
+  .statCard {
+    padding: var(--space-lg);
+  }
+
+  .statValue {
+    font-size: var(--text-display-md);
+  }
+
+  .statIcon {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+}

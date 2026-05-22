@@ -28,11 +28,11 @@ export const register = async (req, res) => {
     }
 
     // Validate role
-    const validRoles = ['teacher', 'student']
+    const validRoles = ['student']
     if (!validRoles.includes(role)) {
       return res.status(400).json({
         success: false,
-        message: 'Role must be either teacher or student'
+        message: 'Role must be student'
       })
     }
 

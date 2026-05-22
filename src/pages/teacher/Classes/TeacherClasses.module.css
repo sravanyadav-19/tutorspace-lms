@@ -259,3 +259,17 @@
     font-size: var(--text-display-lg);
   }
 }
+@media (max-width: 480px) {
+  .classCard {
+    padding: var(--space-lg);
+  }
+
+  .classStats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

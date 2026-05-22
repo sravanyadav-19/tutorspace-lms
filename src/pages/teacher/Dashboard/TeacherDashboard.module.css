@@ -349,3 +349,35 @@
     font-size: var(--text-display-lg);
   }
 }
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  .actionButtons {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  .actionBtn {
+    padding: var(--space-lg);
+    min-height: 80px;
+  }
+
+  .actionIcon {
+    font-size: 22px;
+  }
+
+  .quickActions {
+    padding: var(--space-lg);
+  }
+
+  .classesSection {
+    padding: var(--space-lg);
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

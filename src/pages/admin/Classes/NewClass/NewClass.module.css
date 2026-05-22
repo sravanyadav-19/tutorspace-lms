@@ -257,3 +257,24 @@
     font-size: var(--text-display-lg);
   }
 }
+@media (max-width: 480px) {
+  .formSection {
+    padding: var(--space-lg);
+  }
+
+  .userCard {
+    padding: var(--space-md);
+  }
+
+  .successCard {
+    padding: var(--space-xl);
+  }
+
+  .successActions {
+    flex-direction: column;
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

@@ -204,3 +204,29 @@
 .loginBtn {
   width: 100% !important;
 }
+/* ======== RESPONSIVE ======== */
+
+@media (max-width: 768px) {
+  .registerTitle {
+    font-size: var(--text-display-md);
+  }
+
+  .registerHeader {
+    margin-bottom: var(--space-xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .roleOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .errorAlert {
+    font-size: 12px;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .successSteps {
+    gap: var(--space-sm);
+  }
+}
