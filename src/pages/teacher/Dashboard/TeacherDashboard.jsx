@@ -90,10 +90,6 @@ const TeacherDashboard = () => {
           <SkeletonGrid count={4} type="stat" />
           <SkeletonGrid count={2} type="card" />
         </div>
-          <p className={styles.loadingText}>
-            Loading your dashboard...
-          </p>
-        </div>
       </DashboardLayout>
     )
   }
