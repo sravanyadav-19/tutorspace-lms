@@ -575,3 +575,25 @@
   .pageTitle { font-size: var(--text-display-lg); }
   .quizActions { flex-wrap: wrap; }
 }
+@media (max-width: 480px) {
+  .questionCard {
+    padding: var(--space-lg);
+  }
+
+  .quizCard {
+    padding: var(--space-lg);
+  }
+
+  .quizActions {
+    flex-wrap: wrap;
+  }
+
+  .actionBtn {
+    font-size: 12px;
+    padding: var(--space-xs) var(--space-md);
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

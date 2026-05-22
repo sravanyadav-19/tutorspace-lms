@@ -45,7 +45,8 @@ export const userAPI = {
   getAllUsers: () => api.get('/users'),
   getUserById: (id) => api.get(`/users/${id}`),
   updateUser: (id, data) => api.put(`/users/${id}`, data),
-  deleteUser: (id) => api.delete(`/users/${id}`)
+  deleteUser: (id) => api.delete(`/users/${id}`),
+  createTeacher: (data) => api.post("/users/create-teacher", data)
 }
 
 export const classAPI = {

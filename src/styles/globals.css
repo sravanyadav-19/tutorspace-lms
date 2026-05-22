@@ -205,3 +205,15 @@ input, textarea {
               color 200ms ease,
               opacity 200ms ease;
 }
+/* Prevent iOS auto-zoom on input focus */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}

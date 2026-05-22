@@ -80,5 +80,6 @@
   --transition-fast: 150ms ease;
   --transition-base: 200ms ease;
   --transition-slow: 300ms ease;
-}
   --sidebar-collapsed-width: 80px;
+  --shadow-lg: 0 8px 24px rgba(20, 20, 19, 0.12);
+}

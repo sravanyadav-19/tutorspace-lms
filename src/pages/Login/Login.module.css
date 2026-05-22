@@ -156,3 +156,13 @@
     font-size: var(--text-display-md);
   }
 }
+@media (max-width: 480px) {
+  .demoAccounts {
+    flex-direction: column;
+  }
+
+  .errorAlert {
+    font-size: 12px;
+    padding: var(--space-sm) var(--space-md);
+  }
+}

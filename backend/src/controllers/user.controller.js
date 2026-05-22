@@ -247,3 +247,78 @@ export const deleteUser = async (req, res) => {
     })
   }
 }
+
+// ================================
+// CREATE TEACHER - Admin Only
+// POST /api/users/create-teacher
+// ================================
+export const createTeacher = async (req, res) => {
+  try {
+    const { email, password, name } = req.body
+
+    if (!email || !password || !name) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email, password and name are required'
+      })
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters'
+      })
+    }
+
+    const existing = await prisma.user.findUnique({ where: { email } })
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        message: 'Email already registered'
+      })
+    }
+
+    const teacherRole = await prisma.role.findUnique({
+      where: { name: 'teacher' }
+    })
+
+    if (!teacherRole) {
+      return res.status(500).json({
+        success: false,
+        message: 'Teacher role not found in database'
+      })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12)
+
+    const teacher = await prisma.user.create({
+      data: {
+        email,
+        passwordHash: hashedPassword,
+        name,
+        roleId: teacherRole.id,
+        status: 'active',
+        emailVerified: true
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        status: true,
+        role: { select: { name: true } }
+      }
+    })
+
+    res.status(201).json({
+      success: true,
+      message: 'Teacher created successfully',
+      data: { user: teacher }
+    })
+  } catch (error) {
+    console.error('Create teacher error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create teacher'
+    })
+  }
+}

@@ -309,3 +309,29 @@
   .resultScore { flex-direction: row; align-items: center; }
   .pageTitle { font-size: var(--text-display-lg); }
 }
+@media (max-width: 480px) {
+  .resultHeader {
+    padding: var(--space-lg);
+  }
+
+  .answerReview {
+    padding: var(--space-lg);
+  }
+
+  .scoreCircle {
+    width: 64px;
+    height: 64px;
+  }
+
+  .answerComparison {
+    flex-direction: column;
+  }
+
+  .answerLabel {
+    min-width: unset;
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

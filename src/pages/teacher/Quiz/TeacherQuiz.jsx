@@ -463,9 +463,7 @@ const TeacherQuiz = () => {
                 </div>
 
                 {quizzesLoading ? (
-                  <div className={styles.loadingState}>
-                    <p>Loading quizzes...</p>
-                  </div>
+                  <SkeletonGrid count={3} type="card" />
                 ) : quizzes.length === 0 ? (
                   <div className={styles.emptyQuizzes}>
                     <div className={styles.emptyIcon}>📝</div>

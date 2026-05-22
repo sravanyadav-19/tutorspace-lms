@@ -229,3 +229,44 @@
   margin: 0;
   line-height: 1.5;
 }
+
+/* ======== RESPONSIVE ======== */
+
+@media (max-width: 768px) {
+  .announcementCard {
+    padding: var(--space-lg);
+  }
+
+  .commentsSection {
+    padding: var(--space-lg);
+  }
+
+  .announcementTitle {
+    font-size: var(--text-display-md);
+  }
+
+  .authorAvatar {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .announcementCard {
+    padding: var(--space-md);
+  }
+
+  .commentsSection {
+    padding: var(--space-md);
+  }
+
+  .commentCard {
+    padding: var(--space-md);
+  }
+
+  .commentHeader {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+}

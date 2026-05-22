@@ -229,3 +229,26 @@
 @media (max-width: 1024px) { .contentLayout { grid-template-columns: 220px 1fr; } .filesGrid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 768px) { .contentLayout { grid-template-columns: 1fr; } .classSidebar { position: static; } .filesGrid { grid-template-columns: repeat(2, 1fr); } .pageTitle { font-size: var(--text-display-lg); } }
 @media (max-width: 480px) { .filesGrid { grid-template-columns: 1fr; } }
+@media (max-width: 480px) {
+  .filesSection {
+    padding: var(--space-lg);
+  }
+
+  .viewerHeader {
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .viewerTitle {
+    font-size: var(--text-body-sm);
+    white-space: normal;
+    text-align: left;
+  }
+
+  .imageContainer {
+    padding: var(--space-lg);
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

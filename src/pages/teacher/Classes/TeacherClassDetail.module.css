@@ -347,3 +347,29 @@
   .headerRow { flex-direction: column; }
   .pageTitle { font-size: var(--text-display-lg); }
 }
+@media (max-width: 480px) {
+  .overviewCard,
+  .announcementsSection,
+  .studentsSection {
+    padding: var(--space-lg);
+  }
+
+  .tab {
+    font-size: 12px;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .announcementHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .studentCard {
+    padding: var(--space-md);
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}

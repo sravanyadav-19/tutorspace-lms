@@ -212,3 +212,12 @@
   .pageTitle { font-size: var(--text-display-lg); }
   .quizCardHeader { flex-direction: column; }
 }
+@media (max-width: 480px) {
+  .quizCard {
+    padding: var(--space-lg);
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-md);
+  }
+}
