@@ -403,7 +403,7 @@ export const deleteClass = async (req, res) => {
     })
 
     // 6. Delete file uploads
-    await prisma.fileUpload.deleteMany({
+    await prisma.file.deleteMany({
       where: { classId: parseInt(id) }
     })
 
