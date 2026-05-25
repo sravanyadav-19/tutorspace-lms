@@ -13,22 +13,24 @@ import {
   getStudentResults
 } from '../controllers/quiz.controller.js'
 import { authenticate, authorize } from '../middleware/auth.middleware.js'
+import { validate } from '../middleware/validate.middleware.js'
+import {
+  createQuizSchema,
+  submitQuizSchema
+} from '../schemas/validation.schema.js'
 
 const router = express.Router()
 
-// Teacher Routes
-router.post('/', authenticate, authorize('teacher', 'admin'), createQuiz)
+router.post('/', authenticate, authorize('teacher', 'admin'), validate(createQuizSchema), createQuiz)
 router.get('/class/:classId', authenticate, authorize('teacher', 'admin'), getClassQuizzes)
 router.get('/:quizId', authenticate, authorize('teacher', 'admin'), getQuizById)
 router.patch('/:quizId/publish', authenticate, authorize('teacher', 'admin'), togglePublishQuiz)
 router.delete('/:quizId', authenticate, authorize('teacher', 'admin'), deleteQuiz)
 router.get('/:quizId/submissions', authenticate, authorize('teacher', 'admin'), getQuizSubmissions)
 router.patch('/:quizId/release', authenticate, authorize('teacher', 'admin'), releaseResults)
-
-// Student Routes
 router.get('/student/all', authenticate, authorize('student'), getStudentQuizzes)
 router.get('/student/results', authenticate, authorize('student'), getStudentResults)
 router.get('/student/:quizId/take', authenticate, authorize('student'), getQuizForStudent)
-router.post('/student/:quizId/submit', authenticate, authorize('student'), submitQuiz)
+router.post('/student/:quizId/submit', authenticate, authorize('student'), validate(submitQuizSchema), submitQuiz)
 
 export default router

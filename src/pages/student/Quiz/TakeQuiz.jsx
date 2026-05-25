@@ -3,12 +3,14 @@ import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import { quizAPI } from '../../../services/api'
+import { useToast } from '../../../context/ToastContext'
 import styles from './TakeQuiz.module.css'
 import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 
 const TakeQuiz = () => {
   const navigate = useNavigate()
   const { quizId } = useParams()
+  const toast = useToast()
 
   const [quiz, setQuiz] = useState(null)
   const [answers, setAnswers] = useState({})
@@ -27,7 +29,7 @@ const TakeQuiz = () => {
   // Start timer when quiz loads
   useEffect(() => {
     if (quiz?.timeLimit && !submitted) {
-      setTimeLeft(quiz.timeLimit * 60) // convert minutes to seconds
+      setTimeLeft(quiz.timeLimit * 60)
     }
   }, [quiz])
 
@@ -77,6 +79,7 @@ const TakeQuiz = () => {
       }
       await quizAPI.submitQuiz(quizId, payload)
       setSubmitted(true)
+      toast.warning('Time is up! Your quiz has been auto-submitted.')
     } catch (err) {
       setError('Time is up! Auto-submission failed. Please contact your teacher.')
     } finally {

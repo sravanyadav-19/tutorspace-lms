@@ -9,20 +9,21 @@ import {
   deleteComment
 } from '../controllers/announcement.controller.js'
 import { authenticate, authorize } from '../middleware/auth.middleware.js'
+import { validate } from '../middleware/validate.middleware.js'
+import {
+  createAnnouncementSchema,
+  updateAnnouncementSchema,
+  createCommentSchema
+} from '../schemas/validation.schema.js'
 
 const router = express.Router()
 
-// Anyone enrolled can view announcements
 router.get('/class/:classId', authenticate, getClassAnnouncements)
-
-// Teachers AND admins can create/update/delete
-router.post('/class/:classId', authenticate, authorize('teacher', 'admin'), createAnnouncement)
-router.put('/:id', authenticate, authorize('teacher', 'admin'), updateAnnouncement)
+router.post('/class/:classId', authenticate, authorize('teacher', 'admin'), validate(createAnnouncementSchema), createAnnouncement)
+router.put('/:id', authenticate, authorize('teacher', 'admin'), validate(updateAnnouncementSchema), updateAnnouncement)
 router.delete('/:id', authenticate, authorize('teacher', 'admin'), deleteAnnouncement)
-
-// Anyone can comment
 router.get('/:announcementId/comments', authenticate, getAnnouncementComments)
-router.post('/:announcementId/comments', authenticate, addComment)
+router.post('/:announcementId/comments', authenticate, validate(createCommentSchema), addComment)
 router.delete('/comments/:commentId', authenticate, deleteComment)
 
 export default router

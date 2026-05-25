@@ -54,6 +54,9 @@ const AdminUsers = () => {
       )
     }
 
+    // Hide admin users from the list
+    result = result.filter(u => u.role.name !== 'admin')
+
     setFilteredUsers(result)
   }, [users, searchTerm, filterRole, filterStatus])
 
@@ -76,21 +79,22 @@ const AdminUsers = () => {
       await userAPI.updateUser(userId, { 
         status: 'active' 
       })
-      // Update local state
       setUsers(prev => prev.map(u =>
         u.id === userId
           ? { ...u, status: 'active' }
           : u
       ))
+      toast.success('User approved successfully')
     } catch (err) {
-      alert('Failed to approve user')
+      console.error('Approve error:', err.response?.data || err.message)
+      toast.error(err.response?.data?.message || 'Failed to approve user')
     } finally {
       setActionLoading(null)
     }
   }
 
   // Deactivate user
-  const handleDeactivate = async (userId) => {
+    const handleDeactivate = async (userId) => {
     if (!window.confirm(
       'Are you sure you want to deactivate this user?'
     )) return
@@ -105,8 +109,10 @@ const AdminUsers = () => {
           ? { ...u, status: 'inactive' }
           : u
       ))
+      toast.success('User deactivated')
     } catch (err) {
-      alert('Failed to deactivate user')
+      console.error('Deactivate error:', err.response?.data || err.message)
+      toast.error(err.response?.data?.message || 'Failed to deactivate user')
     } finally {
       setActionLoading(null)
     }
@@ -122,8 +128,10 @@ const AdminUsers = () => {
       setActionLoading(userId)
       await userAPI.deleteUser(userId)
       setUsers(prev => prev.filter(u => u.id !== userId))
+      toast.success('User deleted successfully')
     } catch (err) {
-      alert('Failed to delete user')
+      console.error('Delete error:', err.response?.data || err.message)
+      toast.error(err.response?.data?.message || 'Failed to delete user')
     } finally {
       setActionLoading(null)
     }
@@ -221,7 +229,7 @@ const AdminUsers = () => {
             {/* Role Filter */}
             <div className={styles.filterGroup}>
               <span className={styles.filterLabel}>Role:</span>
-              {['all', 'admin', 'teacher', 'student'].map(
+              {['all', 'teacher', 'student'].map(
                 role => (
                   <button
                     key={role}
@@ -309,7 +317,35 @@ const AdminUsers = () => {
                         colSpan={6}
                         className={styles.emptyRow}
                       >
-                        No users found matching filters
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '48px 24px',
+                          gap: '12px'
+                        }}>
+                          <span style={{ fontSize: '48px' }}>👥</span>
+                          <span style={{
+                            fontFamily: 'var(--font-display)',
+                            fontSize: '18px',
+                            fontWeight: 'bold',
+                            color: 'var(--color-ink)'
+                          }}>
+                            {searchTerm || filterRole !== 'all' || filterStatus !== 'all'
+                              ? 'No users match your filters'
+                              : 'No users registered yet'}
+                          </span>
+                          <span style={{
+                            fontFamily: 'var(--font-body)',
+                            fontSize: '14px',
+                            color: 'var(--color-muted)'
+                          }}>
+                            {searchTerm || filterRole !== 'all' || filterStatus !== 'all'
+                              ? 'Try adjusting your search or filters'
+                              : 'Users will appear here once they register'}
+                          </span>
+                        </div>
                       </td>
                     </tr>
                   ) : (

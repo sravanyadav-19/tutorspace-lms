@@ -4,6 +4,7 @@ import DashboardLayout from '../../../../components/layout/DashboardLayout'
 import Button from '../../../../components/shared/Button'
 import { Textarea } from '../../../../components/shared/Input'
 import { useAuth } from '../../../../context/AuthContext'
+import { useToast } from '../../../../context/ToastContext'
 import { announcementAPI } from '../../../../services/api'
 import styles from './AnnouncementDetail.module.css'
 import { SkeletonGrid, SkeletonCard } from '../../../../components/shared/Skeleton/Skeleton'
@@ -12,6 +13,7 @@ const AnnouncementDetail = () => {
   const { announcementId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const toast = useToast()
 
   const [announcement, setAnnouncement] = useState(null)
   const [comments, setComments] = useState([])
@@ -54,9 +56,10 @@ const AnnouncementDetail = () => {
       )
       setComments(prev => [...prev, res.data.data.comment])
       setNewComment('')
+      toast.success('Comment posted')
     } catch (err) {
       console.error('Add comment error:', err)
-      alert('Failed to add comment')
+      toast.error('Failed to add comment')
     } finally {
       setCommentLoading(false)
     }
@@ -68,8 +71,9 @@ const AnnouncementDetail = () => {
     try {
       await announcementAPI.deleteComment(commentId)
       setComments(prev => prev.filter(c => c.id !== commentId))
+      toast.success('Comment deleted')
     } catch (err) {
-      alert('Failed to delete comment')
+      toast.error('Failed to delete comment')
     }
   }
 

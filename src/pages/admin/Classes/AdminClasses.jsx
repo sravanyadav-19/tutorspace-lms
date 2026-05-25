@@ -5,10 +5,12 @@ import Button from '../../../components/shared/Button'
 import Input from '../../../components/shared/Input'
 import { classAPI } from '../../../services/api'
 import { SkeletonGrid } from '../../../components/shared/Skeleton/Skeleton'
+import { useToast } from '../../../context/ToastContext'
 import styles from './AdminClasses.module.css'
 
 const AdminClasses = () => {
   const navigate = useNavigate()
+  const toast = useToast()
   const [classes, setClasses] = useState([])
   const [filteredClasses, setFilteredClasses] = useState([])
   const [loading, setLoading] = useState(true)
@@ -52,8 +54,9 @@ const AdminClasses = () => {
       setClasses(prev => 
         prev.filter(c => c.id !== classId)
       )
+      toast.success('Class deleted successfully')
     } catch (err) {
-      alert('Failed to delete class')
+      toast.error('Failed to delete class')
     }
   }
 
