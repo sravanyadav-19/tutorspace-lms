@@ -93,7 +93,7 @@ const TeacherClassDetail = () => {
           </div>
         </div>
 
-        {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
+        {error && <div className={styles.errorBanner} role="alert">⚠️ {error}</div>}
 
         {/* Stats */}
         <div className={styles.statsRow}>
