@@ -1,5 +1,6 @@
 import React from 'react'
 import { User } from 'lucide-react'
+import PageIcon from '../components/shared/PageIcon/PageIcon'
 import styles from './ActivityFeed.module.css'
 
 const ActivityFeed = ({ 
@@ -20,7 +21,9 @@ const ActivityFeed = ({
           {items.map((item, index) => (
             <div key={index} className={styles.feedItem}>
               <div className={styles.feedIcon}>
-                {typeof item.icon === 'string' ? (
+                {item.iconName ? (
+                  <PageIcon name={item.iconName} size={18} />
+                ) : typeof item.icon === 'string' && item.icon.length <= 2 ? (
                   <span role="img" aria-label="activity">{item.icon}</span>
                 ) : (
                   <User size={18} strokeWidth={2} />

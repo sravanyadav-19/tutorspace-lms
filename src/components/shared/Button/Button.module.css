@@ -138,3 +138,13 @@
     min-height: 48px;
   }
 }
+
+/* Icon inside button */
+.button-withIcon {
+  gap: 8px;
+}
+
+.buttonIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
