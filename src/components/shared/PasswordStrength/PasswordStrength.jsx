@@ -7,8 +7,16 @@ const PasswordStrength = ({ password }) => {
   if (!password) return null
   const segments = [0, 1, 2, 3]
   return (
-    <div className={styles.container}>
-      <div className={styles.bars}>
+    <div
+      className={styles.container}
+      role="progressbar"
+      aria-valuenow={score}
+      aria-valuemin={0}
+      aria-valuemax={4}
+      aria-label={`Password strength: ${label}`}
+      aria-valuetext={label}
+    >
+      <div className={styles.bars} aria-hidden="true">
         {segments.map((i) => (
           <div
             key={i}
