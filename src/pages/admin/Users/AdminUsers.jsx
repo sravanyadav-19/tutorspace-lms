@@ -325,7 +325,7 @@ const AdminUsers = () => {
                           padding: '48px 24px',
                           gap: '12px'
                         }}>
-                          <span style={{ fontSize: '48px' }}>👥</span>
+                          <span style={{ fontSize: "48px" }}><PageIcon name="users" size={48} /></span>
                           <span style={{
                             fontFamily: 'var(--font-display)',
                             fontSize: '18px',
@@ -407,7 +407,7 @@ const AdminUsers = () => {
                               ? styles.verifiedYes
                               : styles.verifiedNo
                           }>
-                            {user.emailVerified ? '✅' : '❌'}
+                            {user.emailVerified ? <PageIcon name="checkCircle" size={16} /> : <PageIcon name="xCircle" size={16} />}
                           </span>
                         </td>
 
@@ -434,7 +434,7 @@ const AdminUsers = () => {
                               >
                                 {actionLoading === user.id
                                   ? '...'
-                                  : '✅ Approve'
+                                  : 'Approve'
                                 }
                               </button>
                             )}
@@ -451,7 +451,7 @@ const AdminUsers = () => {
                               >
                                 {actionLoading === user.id
                                   ? '...'
-                                  : '🚫 Deactivate'
+                                  : 'Deactivate'
                                 }
                               </button>
                             )}
@@ -468,7 +468,7 @@ const AdminUsers = () => {
                               >
                                 {actionLoading === user.id
                                   ? '...'
-                                  : '✅ Activate'
+                                  : 'Activate'
                                 }
                               </button>
                             )}
@@ -482,7 +482,7 @@ const AdminUsers = () => {
                                 actionLoading === user.id
                               }
                             >
-                              🗑️
+                              <PageIcon name="delete" />
                             </button>
                           </div>
                         </td>
@@ -497,7 +497,7 @@ const AdminUsers = () => {
         {showTeacherModal && (
           <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "16px" }} onClick={() => setShowTeacherModal(false)}>
             <div style={{ background: "var(--color-surface-card)", borderRadius: "12px", padding: "32px", maxWidth: "480px", width: "100%", boxShadow: "var(--shadow-lg)" }} onClick={(e) => e.stopPropagation()}>
-              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "24px", fontWeight: "bold", margin: "0 0 8px 0", color: "var(--color-ink)" }}>👨‍🏫 Create New Teacher</h2>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "24px", fontWeight: "bold", margin: "0 0 8px 0", color: "var(--color-ink)" }}>Create New Teacher</h2>
               <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "var(--color-muted)", margin: "0 0 24px 0" }}>Set up a teacher account. They will use these credentials to login.</p>
               <form onSubmit={handleCreateTeacher} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div>
@@ -511,11 +511,11 @@ const AdminUsers = () => {
                 <div>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "6px", color: "var(--color-ink)" }}>Password (min 6 chars)</label>
                   <input type="text" value={teacherForm.password} onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })} placeholder="Type a secure password" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} />
-                  <p style={{ fontSize: "12px", color: "var(--color-muted)", margin: "6px 0 0 0" }}>💡 Share this password with the teacher securely</p>
+                  <p style={{ fontSize: "12px", color: "var(--color-muted)", margin: "6px 0 0 0" }}>Share this password with the teacher securely</p>
                 </div>
                 <div style={{ display: "flex", gap: "12px", marginTop: "16px", justifyContent: "flex-end" }}>
                   <Button type="button" variant="secondary" onClick={() => setShowTeacherModal(false)}>Cancel</Button>
-                  <Button type="submit" variant="primary" disabled={teacherLoading}>{teacherLoading ? "⏳ Creating..." : "✅ Create Teacher"}</Button>
+                  <Button type="submit" variant="primary" disabled={teacherLoading}>{teacherLoading ? "Creating..." : "Create Teacher"}</Button>
                 </div>
               </form>
             </div>

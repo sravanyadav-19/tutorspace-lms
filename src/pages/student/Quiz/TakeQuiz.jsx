@@ -150,7 +150,7 @@ const TakeQuiz = () => {
     return (
       <DashboardLayout userRole="student">
         <div className={styles.successState}>
-          <div className={styles.successIcon}>✅</div>
+          <div className={styles.successIcon}><PageIcon name="success" size={64} /></div>
           <h1 className={styles.successTitle}>Quiz Submitted!</h1>
           <p className={styles.successText}>
             Your answers have been submitted successfully.
@@ -171,7 +171,7 @@ const TakeQuiz = () => {
     return (
       <DashboardLayout userRole="student">
         <div className={styles.errorState}>
-          <p>⚠️ {error}</p>
+          <p><PageIcon name="alert" className={styles.inlineIcon} /> {error}</p>
           <Button
             variant="secondary"
             onClick={() => navigate('/student/quizzes')}
@@ -204,7 +204,7 @@ const TakeQuiz = () => {
                 ${timerWarning ? styles.timerWarning : ''}
                 ${timeLeft <= 30 ? styles.timerDanger : ''}
               `}>
-                <span className={styles.timerIcon}>⏱️</span>
+                <span className={styles.timerIcon}><PageIcon name="clock" /></span>
                 <span className={styles.timerText}>{formatTime(timeLeft)}</span>
                 {timerWarning && (
                   <span className={styles.timerLabel}>Less than 1 min!</span>
@@ -242,7 +242,7 @@ const TakeQuiz = () => {
                 </span>
                 <div className={styles.questionHeaderRight}>
                   {answers[question.id] && (
-                    <span className={styles.answeredBadge}>✓ Answered</span>
+                    <span className={styles.answeredBadge}><PageIcon name="check" size={14} /> Answered</span>
                   )}
                   <span className={styles.pointsBadge}>
                     {question.points} pt{question.points > 1 ? 's' : ''}
@@ -316,7 +316,7 @@ const TakeQuiz = () => {
             onClick={handleSubmitQuiz}
             disabled={submitting}
           >
-            {submitting ? '⏳ Submitting...' : '✅ Submit Quiz'}
+            {submitting ? 'Submitting...' : '✅ Submit Quiz'}
           </Button>
         </div>
 

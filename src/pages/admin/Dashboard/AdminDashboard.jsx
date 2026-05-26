@@ -48,7 +48,7 @@ const AdminDashboard = () => {
       })
 
       const formattedUsers = users.slice(0, 5).map(u => ({
-        icon: u.role.name === 'teacher' ? '👨‍🏫' : '🎓',
+        icon: u.role.name === 'teacher' ? <PageIcon name="teacher" /> : <PageIcon name="student" />,
         name: u.name,
         meta: `${u.email} • ${u.role.name}`,
         badge: u.status,

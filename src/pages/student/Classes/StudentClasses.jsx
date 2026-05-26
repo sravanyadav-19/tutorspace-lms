@@ -52,7 +52,7 @@ const StudentClasses = () => {
           <SkeletonGrid count={4} type="card" />
         ) : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📚</div>
+            <div className={styles.emptyIcon}><PageIcon name="book" size={64} /></div>
             <h3 className={styles.emptyTitle}>No Classes Found</h3>
             <p className={styles.emptyText}>
               You are not enrolled in any classes yet.
@@ -62,7 +62,7 @@ const StudentClasses = () => {
           <div className={styles.classesGrid}>
             {classes.map(cls => (
               <div key={cls.id} className={styles.classCard}>
-                <div className={styles.classIcon}>📚</div>
+                <div className={styles.classIcon}><PageIcon name="book" size={24} /></div>
 
                 <div className={styles.classInfo}>
                   <h3 className={styles.className}>{cls.name}</h3>

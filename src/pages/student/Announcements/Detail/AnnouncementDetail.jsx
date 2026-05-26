@@ -99,7 +99,7 @@ const AnnouncementDetail = () => {
     return (
       <DashboardLayout userRole="student">
         <div className={styles.errorState}>
-          <p>⚠️ {error}</p>
+          <p><PageIcon name="alert" className={styles.inlineIcon} /> {error}</p>
           <Button
             variant="secondary"
             onClick={() => navigate(-1)}
@@ -127,7 +127,7 @@ const AnnouncementDetail = () => {
         <div className={styles.announcementCard}>
           <div className={styles.announcementHeader}>
             <div className={styles.authorInfo}>
-              <div className={styles.authorAvatar}>👨‍🏫</div>
+              <div className={styles.authorAvatar}><PageIcon name="teacher" /></div>
               <div className={styles.authorDetails}>
                 <p className={styles.authorName}>Teacher</p>
                 <p className={styles.postTime}>
@@ -147,7 +147,7 @@ const AnnouncementDetail = () => {
         {/* Comments Section */}
         <div className={styles.commentsSection}>
           <h2 className={styles.commentsTitle}>
-            💬 Comments ({comments.length})
+            Comments ({comments.length})
           </h2>
 
           {/* Add Comment Form */}
@@ -167,7 +167,7 @@ const AnnouncementDetail = () => {
                 variant="primary"
                 disabled={commentLoading || !newComment.trim()}
               >
-                {commentLoading ? 'Posting...' : '💬 Post Comment'}
+                {commentLoading ? 'Posting...' : 'Post Comment'}
               </Button>
             </div>
           </form>
@@ -185,8 +185,8 @@ const AnnouncementDetail = () => {
                     <div className={styles.commentAuthor}>
                       <div className={styles.commentAvatar}>
                         {comment.author?.role?.name === 'teacher'
-                          ? '👨‍🏫'
-                          : '🎓'}
+                          ? <PageIcon name="teacher" />
+                          : <PageIcon name="student" />}
                       </div>
                       <div className={styles.commentAuthorInfo}>
                         <p className={styles.commentAuthorName}>
@@ -207,7 +207,7 @@ const AnnouncementDetail = () => {
                         className={styles.deleteCommentBtn}
                         onClick={() => handleDeleteComment(comment.id)}
                       >
-                        🗑️
+                        <PageIcon name="delete" />
                       </button>
                     )}
                   </div>

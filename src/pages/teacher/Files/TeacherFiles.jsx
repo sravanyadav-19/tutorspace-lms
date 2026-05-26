@@ -177,7 +177,7 @@ const TeacherFiles = () => {
             {previewFile.description || previewFile.originalName}
           </h1>
           <div className={styles.viewerRight}>
-            <span className={styles.teacherBadge}>👨‍🏫 Teacher Preview</span>
+            <span className={styles.teacherBadge}><PageIcon name="teacher" /> Teacher Preview</span>
           </div>
         </div>
 
@@ -210,8 +210,8 @@ const TeacherFiles = () => {
                   ${zoomed ? styles.viewerImageZoomed : ''}
                 `}
               />
-              {!zoomed && <div className={styles.zoomHint}>🔍 Click to zoom</div>}
-              {zoomed && <div className={styles.zoomHint}>🔍 Click to zoom out</div>}
+              {!zoomed && <div className={styles.zoomHint}>Click to zoom</div>}
+              {zoomed && <div className={styles.zoomHint}>Click to zoom out</div>}
             </div>
           )}
 
@@ -247,7 +247,7 @@ const TeacherFiles = () => {
           <SkeletonCard />
         ) : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📚</div>
+            <div className={styles.emptyIcon}><PageIcon name="book" size={64} /></div>
             <h3 className={styles.emptyTitle}>No Classes Assigned</h3>
             <p className={styles.emptyText}>
               You need to be assigned to a class before uploading files.
@@ -270,7 +270,7 @@ const TeacherFiles = () => {
                     `}
                     onClick={() => setSelectedClass(cls)}
                   >
-                    <span className={styles.classItemIcon}>📚</span>
+                    <span className={styles.classItemIcon}><PageIcon name="book" size={18} /></span>
                     <div className={styles.classItemInfo}>
                       <p className={styles.classItemName}>{cls.name}</p>
                       <p className={styles.classItemSubject}>{cls.subject}</p>
@@ -286,13 +286,13 @@ const TeacherFiles = () => {
               {/* Upload Section */}
               <div className={styles.uploadSection}>
                 <h2 className={styles.sectionTitle}>
-                  ⬆️ Upload to {selectedClass?.name}
+                  Upload to {selectedClass?.name}
                 </h2>
 
                 <div className={styles.fileTypeNotice}>
-                  <span>📄 PDF</span>
+                  <span><PageIcon name="pdf" /> PDF</span>
                   <span>and</span>
-                  <span>🖼️ PNG</span>
+                  <span><PageIcon name="image" /> PNG</span>
                   <span>files only • Max 10MB</span>
                 </div>
 
@@ -342,8 +342,8 @@ const TeacherFiles = () => {
                   ) : (
                     <div className={styles.dropZoneContent}>
                       <div className={styles.dropZoneIcons}>
-                        <span>📄</span>
-                        <span>🖼️</span>
+                        <span><PageIcon name="pdf" /></span>
+                        <span><PageIcon name="image" /></span>
                       </div>
                       <p className={styles.dropZoneText}>
                         Drag & drop a PDF or PNG here, or{' '}
@@ -372,14 +372,14 @@ const TeacherFiles = () => {
                   onClick={handleUpload}
                   disabled={uploading || !selectedFile}
                 >
-                  {uploading ? '⏳ Uploading...' : '⬆️ Upload File'}
+                  {uploading ? 'Uploading...' : 'Upload File'}
                 </Button>
               </div>
 
               {/* Files List */}
               <div className={styles.filesSection}>
                 <h2 className={styles.sectionTitle}>
-                  📁 Uploaded Files
+                  Uploaded Files
                   <span className={styles.fileCount}>{files.length} files</span>
                 </h2>
 
@@ -387,7 +387,7 @@ const TeacherFiles = () => {
                   <SkeletonGrid count={3} type="card" />
                 ) : files.length === 0 ? (
                   <div className={styles.emptyFiles}>
-                    <div className={styles.emptyIcon}>📭</div>
+                    <div className={styles.emptyIcon}><PageIcon name="inbox" size={64} /></div>
                     <p className={styles.emptyText}>No files uploaded yet.</p>
                   </div>
                 ) : (

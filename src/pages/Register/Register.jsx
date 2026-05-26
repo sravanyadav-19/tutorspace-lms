@@ -70,7 +70,7 @@ const Register = () => {
     return (
       <AuthLayout>
         <div className={styles.successContainer}>
-          <div className={styles.successIcon}>🎉</div>
+          <div className={styles.successIcon}><PageIcon name="success" size={64} /></div>
           <h2 className={styles.successTitle}>Registration Successful!</h2>
           <p className={styles.successText}>
             Your student account has been created. Once approved by admin, you can login and start learning!
@@ -95,7 +95,7 @@ const Register = () => {
         </div>
         {apiError && <div className={styles.errorAlert} role="alert"><span>⚠️</span><span>{apiError}</span></div>}
         <div style={{ background: 'rgba(21, 101, 192, 0.06)', border: '1px solid rgba(21, 101, 192, 0.15)', borderRadius: '8px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '20px' }}>🎓</span>
+          <span style={{ fontSize: "20px" }}><PageIcon name="graduationCap" size={20} /></span>
           <span style={{ fontFamily: 'var(--font-body)', fontSize: '14px', color: '#1565c0', fontWeight: 600 }}>Registering as a Student — Teachers are added by Admin</span>
         </div>
         <form className={styles.registerForm} onSubmit={handleSubmit} noValidate>

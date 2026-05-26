@@ -131,7 +131,7 @@ const StudentFiles = () => {
             {selectedFile.description || selectedFile.originalName}
           </h1>
           <div className={styles.viewerRight}>
-            <span className={styles.protectedBadge}>🔒 Protected</span>
+            <span className={styles.protectedBadge}><PageIcon name="lock" /> Protected</span>
           </div>
         </div>
 
@@ -199,8 +199,8 @@ const StudentFiles = () => {
                 </div>
               </div>
 
-              {!zoomed && <div className={styles.zoomHint}>🔍 Click to zoom</div>}
-              {zoomed && <div className={styles.zoomHint}>🔍 Click to zoom out</div>}
+              {!zoomed && <div className={styles.zoomHint}>Click to zoom</div>}
+              {zoomed && <div className={styles.zoomHint}>Click to zoom out</div>}
             </div>
           )}
 
@@ -220,7 +220,7 @@ const StudentFiles = () => {
             <h1 className={styles.pageTitle}>📄 Class Files</h1>
             <p className={styles.pageSubtitle}>View files shared by your teachers</p>
           </div>
-          <Button variant="secondary" onClick={fetchClasses}>🔄 Refresh</Button>
+          <Button icon="refresh">Refresh</Button>
         </div>
 
         {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
@@ -229,7 +229,7 @@ const StudentFiles = () => {
           <SkeletonCard />
         ) : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📚</div>
+            <div className={styles.emptyIcon}><PageIcon name="book" size={64} /></div>
             <h3 className={styles.emptyTitle}>No Classes Found</h3>
             <p className={styles.emptyText}>You are not enrolled in any classes yet.</p>
           </div>
@@ -247,7 +247,7 @@ const StudentFiles = () => {
                     `}
                     onClick={() => setSelectedClass(cls)}
                   >
-                    <span className={styles.classItemIcon}>📚</span>
+                    <span className={styles.classItemIcon}><PageIcon name="book" size={18} /></span>
                     <div className={styles.classItemInfo}>
                       <p className={styles.classItemName}>{cls.name}</p>
                       <p className={styles.classItemSubject}>{cls.subject}</p>
@@ -268,7 +268,7 @@ const StudentFiles = () => {
                   <SkeletonGrid count={3} type="card" />
                 ) : files.length === 0 ? (
                   <div className={styles.emptyFiles}>
-                    <div className={styles.emptyIcon}>📭</div>
+                    <div className={styles.emptyIcon}><PageIcon name="inbox" size={64} /></div>
                     <h3 className={styles.emptyTitle}>No Files Yet</h3>
                     <p className={styles.emptyText}>Your teacher hasn't uploaded any files yet.</p>
                   </div>
@@ -292,7 +292,7 @@ const StudentFiles = () => {
                           </p>
                           <p className={styles.fileCardDate}>{formatDate(file.uploadedAt)}</p>
                         </div>
-                        <div className={styles.viewBtn}>👁️ View</div>
+                        <div className={styles.viewBtn}><PageIcon name="eye" /> View/div>
                       </button>
                     ))}
                   </div>

@@ -200,13 +200,13 @@ const TeacherQuiz = () => {
             <h1 className={styles.pageTitle}>📝 Quiz Management</h1>
             <p className={styles.pageSubtitle}>Create and manage quizzes for your classes</p>
           </div>
-          <Button variant="primary" onClick={() => setShowCreateForm(!showCreateForm)}>{showCreateForm ? '✕ Cancel' : '+ Create Quiz'}</Button>
+          <Button variant="primary" onClick={() => setShowCreateForm(!showCreateForm)}>{showCreateForm ? 'Cancel' : '+ Create Quiz'}</Button>
         </div>
         {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
         {success && <div className={styles.successBanner}>✅ {success}</div>}
         {loading ? <SkeletonCard /> : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📚</div>
+            <div className={styles.emptyIcon}><PageIcon name="book" size={64} /></div>
             <h3 className={styles.emptyTitle}>No Classes Assigned</h3>
             <p className={styles.emptyText}>You need to be assigned to a class first.</p>
           </div>
@@ -217,7 +217,7 @@ const TeacherQuiz = () => {
               <div className={styles.classList}>
                 {classes.map(cls => (
                   <button key={cls.id} className={`${styles.classItem} ${selectedClass?.id === cls.id ? styles.classItemActive : ''}`} onClick={() => { setSelectedClass(cls); setShowCreateForm(false) }}>
-                    <span className={styles.classItemIcon}>📚</span>
+                    <span className={styles.classItemIcon}><PageIcon name="book" size={18} /></span>
                     <div className={styles.classItemInfo}>
                       <p className={styles.classItemName}>{cls.name}</p>
                       <p className={styles.classItemSubject}>{cls.subject}</p>
@@ -290,7 +290,7 @@ const TeacherQuiz = () => {
                   </div>
                   <div className={styles.formActions}>
                     <Button variant="secondary" onClick={() => setShowCreateForm(false)}>Cancel</Button>
-                    <Button variant="primary" onClick={handleCreateQuiz} disabled={creating || !quizFormValid}>{creating ? '⏳ Creating...' : '✅ Create Quiz'}</Button>
+                    <Button variant="primary" onClick={handleCreateQuiz} disabled={creating || !quizFormValid}>{creating ? 'Creating...' : 'Create Quiz'}</Button>
                   </div>
                 </div>
               )}
@@ -301,7 +301,7 @@ const TeacherQuiz = () => {
                 </div>
                 {quizzesLoading ? <SkeletonGrid count={3} type="card" /> : quizzes.length === 0 ? (
                   <div className={styles.emptyQuizzes}>
-                    <div className={styles.emptyIcon}>📝</div>
+                    <div className={styles.emptyIcon}><PageIcon name="clipboard" size={64} /></div>
                     <h3 className={styles.emptyTitle}>No Quizzes Yet</h3>
                     <p className={styles.emptyText}>Click "Create Quiz" to add your first quiz.</p>
                   </div>
@@ -312,7 +312,7 @@ const TeacherQuiz = () => {
                         <div className={styles.quizInfo}>
                           <div className={styles.quizTitleRow}>
                             <h3 className={styles.quizTitle}>{quiz.title}</h3>
-                            <span className={`${styles.publishBadge} ${quiz.isPublished ? styles.publishedBadge : styles.draftBadge}`}>{quiz.isPublished ? '🟢 Published' : '⚪ Draft'}</span>
+                            <span className={`${styles.publishBadge} ${quiz.isPublished ? styles.publishedBadge : styles.draftBadge}`}>{quiz.isPublished ? 'Published' : 'Draft'}</span>
                           </div>
                           <div className={styles.quizMeta}>
                             <span>❓ {quiz._count?.questions || 0} questions</span>
@@ -324,9 +324,9 @@ const TeacherQuiz = () => {
                           </div>
                         </div>
                         <div className={styles.quizActions}>
-                          <button className={`${styles.actionBtn} ${quiz.isPublished ? styles.unpublishBtn : styles.publishBtn}`} onClick={() => handleTogglePublish(quiz.id, quiz.isPublished)}>{quiz.isPublished ? '⏸ Unpublish' : '▶ Publish'}</button>
-                          <button className={`${styles.actionBtn} ${styles.resultsBtn}`} onClick={() => handleReleaseResults(quiz.id)}>📊 Release Results</button>
-                          <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => handleDeleteQuiz(quiz.id, quiz.title)}>🗑️ Delete</button>
+                          <button className={`${styles.actionBtn} ${quiz.isPublished ? styles.unpublishBtn : styles.publishBtn}`} onClick={() => handleTogglePublish(quiz.id, quiz.isPublished)}>{quiz.isPublished ? 'Unpublish' : 'Publish'}</button>
+                          <button className={`${styles.actionBtn} ${styles.resultsBtn}`} onClick={() => handleReleaseResults(quiz.id)}>Release Results</button>
+                          <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => handleDeleteQuiz(quiz.id, quiz.title)}><PageIcon name="delete" /> Delete/button>
                         </div>
                       </div>
                     ))}
