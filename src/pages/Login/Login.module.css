@@ -166,3 +166,38 @@
     padding: var(--space-sm) var(--space-md);
   }
 }
+/* Demo Toggle — Commit 6 addition */
+.demoToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  background: none;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: var(--space-xl);
+}
+
+.demoToggle:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(204, 120, 92, 0.04);
+}
+
+.demoToggleOpen {
+  transform: rotate(180deg);
+}
+
+.demoAccounts {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}

@@ -4,14 +4,16 @@ import styles from './StatCard.module.css'
 const StatCard = ({ 
   title, 
   value, 
-  icon, 
+  Icon, 
   color = 'default',
   subtitle 
 }) => {
   return (
     <div className={`${styles.statCard} ${styles[color]}`}>
       <div className={styles.statHeader}>
-        <span className={styles.statIcon}>{icon}</span>
+        <span className={styles.statIcon}>
+          {Icon && <Icon size={20} strokeWidth={2} />}
+        </span>
         <span className={styles.statTitle}>{title}</span>
       </div>
       <div className={styles.statValue}>{value}</div>

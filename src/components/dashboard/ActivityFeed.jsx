@@ -1,4 +1,5 @@
 import React from 'react'
+import { User } from 'lucide-react'
 import styles from './ActivityFeed.module.css'
 
 const ActivityFeed = ({ 
@@ -19,28 +20,23 @@ const ActivityFeed = ({
           {items.map((item, index) => (
             <div key={index} className={styles.feedItem}>
               <div className={styles.feedIcon}>
-                {item.icon || '👤'}
+                {typeof item.icon === 'string' ? (
+                  <span role="img" aria-label="activity">{item.icon}</span>
+                ) : (
+                  <User size={18} strokeWidth={2} />
+                )}
               </div>
               <div className={styles.feedContent}>
                 <p className={styles.feedName}>{item.name}</p>
-                <p className={styles.feedMeta}>
-                  {item.meta}
-                </p>
+                <p className={styles.feedMeta}>{item.meta}</p>
               </div>
               <div className={styles.feedRight}>
                 {item.badge && (
-                  <span className={`
-                    ${styles.badge} 
-                    ${styles[`badge-${item.badgeColor}`]}
-                  `}>
+                  <span className={`${styles.badge} ${styles[`badge-${item.badgeColor}`]}`}>
                     {item.badge}
                   </span>
                 )}
-                {item.time && (
-                  <span className={styles.feedTime}>
-                    {item.time}
-                  </span>
-                )}
+                {item.time && <span className={styles.feedTime}>{item.time}</span>}
               </div>
             </div>
           ))}
