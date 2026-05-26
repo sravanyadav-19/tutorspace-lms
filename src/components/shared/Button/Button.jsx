@@ -9,6 +9,7 @@ const Button = ({
   onClick,
   type = 'button',
   className = '',
+  ariaLabel,
   ...props 
 }) => {
   const buttonClass = [
@@ -24,6 +25,8 @@ const Button = ({
       type={type}
       className={buttonClass}
       disabled={disabled}
+      aria-disabled={disabled || undefined}
+      aria-label={ariaLabel}
       onClick={onClick}
       {...props}
     >
