@@ -241,7 +241,7 @@ const TeacherFiles = () => {
         </div>
 
         {success && <div className={styles.successBanner}>✅ {success}</div>}
-        {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
+        {error && <div className={styles.errorBanner} role="alert">⚠️ {error}</div>}
 
         {loading ? (
           <SkeletonCard />

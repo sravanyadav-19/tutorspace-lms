@@ -202,7 +202,7 @@ const TeacherQuiz = () => {
           </div>
           <Button variant="primary" onClick={() => setShowCreateForm(!showCreateForm)}>{showCreateForm ? '✕ Cancel' : '+ Create Quiz'}</Button>
         </div>
-        {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
+        {error && <div className={styles.errorBanner} role="alert">⚠️ {error}</div>}
         {success && <div className={styles.successBanner}>✅ {success}</div>}
         {loading ? <SkeletonCard /> : classes.length === 0 ? (
           <div className={styles.emptyState}>
