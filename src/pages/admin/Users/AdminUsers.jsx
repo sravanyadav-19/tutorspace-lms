@@ -240,6 +240,7 @@ const AdminUsers = () => {
                         : ''}
                     `}
                     onClick={() => setFilterRole(role)}
+                    aria-pressed={filterRole === role}
                   >
                     {role.charAt(0).toUpperCase() + role.slice(1)}
                   </button>
@@ -263,6 +264,7 @@ const AdminUsers = () => {
                         : ''}
                     `}
                     onClick={() => setFilterStatus(status)}
+                    aria-pressed={filterStatus === status}
                   >
                     {status.charAt(0).toUpperCase() + 
                       status.slice(1)}
@@ -275,7 +277,7 @@ const AdminUsers = () => {
 
         {/* Error State */}
         {error && (
-          <div className={styles.errorState}>
+          <div className={styles.errorState} role="alert">
             ⚠️ {error}
           </div>
         )}
@@ -297,7 +299,7 @@ const AdminUsers = () => {
 
             {/* Users Table */}
             <div className={styles.tableWrapper}>
-              <table className={styles.table}>
+              <table className={styles.table} aria-label="Data table">
                 <thead>
                   <tr>
                     <th className={styles.th}>User</th>
@@ -322,15 +324,15 @@ const AdminUsers = () => {
                           flexDirection: 'column',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          padding: '48px 24px',
-                          gap: '12px'
+                          padding: '48px 16px',
+                          gap: '8px'
                         }}>
-                          <span style={{ fontSize: '48px' }}>👥</span>
+                          <span style={{ fontSize: '40px' }}>📭</span>
                           <span style={{
-                            fontFamily: 'var(--font-display)',
-                            fontSize: '18px',
-                            fontWeight: 'bold',
-                            color: 'var(--color-ink)'
+                            fontFamily: 'var(--font-body)',
+                            fontSize: '14px',
+                            color: 'var(--color-ink)',
+                            fontWeight: 'bold'
                           }}>
                             {searchTerm || filterRole !== 'all' || filterStatus !== 'all'
                               ? 'No users match your filters'
@@ -495,22 +497,29 @@ const AdminUsers = () => {
           </>
         )}
         {showTeacherModal && (
-          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "16px" }} onClick={() => setShowTeacherModal(false)}>
+          <div
+            style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "16px" }}
+            onClick={() => setShowTeacherModal(false)}
+            onKeyDown={(e) => { if (e.key === "Escape") setShowTeacherModal(false) }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Create new teacher"
+          >
             <div style={{ background: "var(--color-surface-card)", borderRadius: "12px", padding: "32px", maxWidth: "480px", width: "100%", boxShadow: "var(--shadow-lg)" }} onClick={(e) => e.stopPropagation()}>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: "24px", fontWeight: "bold", margin: "0 0 8px 0", color: "var(--color-ink)" }}>👨‍🏫 Create New Teacher</h2>
               <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "var(--color-muted)", margin: "0 0 24px 0" }}>Set up a teacher account. They will use these credentials to login.</p>
               <form onSubmit={handleCreateTeacher} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "6px", color: "var(--color-ink)" }}>Full Name</label>
-                  <input type="text" value={teacherForm.name} onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })} placeholder="Jane Doe" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} />
+                  <input type="text" value={teacherForm.name} aria-label="Teacher full name" onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })} placeholder="Jane Doe" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} />
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "6px", color: "var(--color-ink)" }}>Email</label>
-                  <input type="email" value={teacherForm.email} onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })} placeholder="jane@school.com" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} />
+                  <input type="email" value={teacherForm.email} aria-label="Teacher email address" onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })} placeholder="jane@school.com" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} />
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "6px", color: "var(--color-ink)" }}>Password (min 6 chars)</label>
-                  <input type="text" value={teacherForm.password} onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })} placeholder="Type a secure password" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} />
+                  <input type="password" value={teacherForm.password} aria-label="Teacher password" onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })} placeholder="Type a secure password" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} />
                   <p style={{ fontSize: "12px", color: "var(--color-muted)", margin: "6px 0 0 0" }}>💡 Share this password with the teacher securely</p>
                 </div>
                 <div style={{ display: "flex", gap: "12px", marginTop: "16px", justifyContent: "flex-end" }}>
