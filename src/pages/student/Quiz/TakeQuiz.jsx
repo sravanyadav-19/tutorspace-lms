@@ -170,7 +170,7 @@ const TakeQuiz = () => {
   if (error && !quiz) {
     return (
       <DashboardLayout userRole="student">
-        <div className={styles.errorState}>
+        <div className={styles.errorState} role="alert">
           <p>⚠️ {error}</p>
           <Button
             variant="secondary"
@@ -226,7 +226,7 @@ const TakeQuiz = () => {
         </div>
 
         {error && (
-          <div className={styles.errorBanner}>⚠️ {error}</div>
+          <div className={styles.errorBanner} role="alert">⚠️ {error}</div>
         )}
 
         {/* Questions */}

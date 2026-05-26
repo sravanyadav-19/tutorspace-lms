@@ -80,7 +80,7 @@ const StudentDashboard = () => {
           </div>
         </div>
 
-        {error && <div className={styles.errorBanner}>{error}</div>}
+        {error && <div className={styles.errorBanner} role="alert">{error}</div>}
 
         <div className={styles.statsGrid}>
           <StatCard title="My Classes" value={stats.totalClasses} Icon={BookOpen} color="primary" subtitle="Enrolled classes" />

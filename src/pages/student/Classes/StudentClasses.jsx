@@ -45,7 +45,7 @@ const StudentClasses = () => {
         </div>
 
         {error && (
-          <div className={styles.errorBanner}>⚠️ {error}</div>
+          <div className={styles.errorBanner} role="alert">⚠️ {error}</div>
         )}
 
         {loading ? (

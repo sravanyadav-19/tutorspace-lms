@@ -29,10 +29,19 @@ const TopLoadingBar = ({ loading }) => {
   if (!visible) return null
 
   return (
-    <div className={styles.barWrapper}>
+    <div
+      className={styles.barWrapper}
+      role="progressbar"
+      aria-valuenow={Math.round(progress)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label="Page loading progress"
+      aria-busy={loading}
+    >
       <div
         className={styles.bar}
         style={{ width: `${progress}%` }}
+        aria-hidden="true"
       />
     </div>
   )

@@ -13,7 +13,11 @@ const AuthLayout = ({ children }) => {
   return (
     <div className={styles.authLayout}>
       {/* Left Side — Branding */}
-      <aside className={styles.brandSide}>
+      <aside
+        className={styles.brandSide}
+        role="complementary"
+        aria-label="Platform branding"
+      >
         <div className={styles.brandContent}>
           <h1 className={styles.brandName}>TutorSpace</h1>
           <p className={styles.brandTagline}>
@@ -22,7 +26,7 @@ const AuthLayout = ({ children }) => {
           <div className={styles.brandFeatures}>
             {features.map(({ Icon, text }, i) => (
               <div key={i} className={styles.feature}>
-                <span className={styles.featureIcon}>
+                <span className={styles.featureIcon} aria-hidden="true">
                   <Icon size={20} strokeWidth={2} />
                 </span>
                 <span className={styles.featureText}>{text}</span>
@@ -36,7 +40,13 @@ const AuthLayout = ({ children }) => {
       </aside>
 
       {/* Right Side — Form */}
-      <main className={styles.formSide}>
+      <main
+        className={styles.formSide}
+        id="main-content"
+        role="main"
+        aria-label="Authentication form"
+        tabIndex={-1}
+      >
         <div className={styles.formContainer}>
           {children}
         </div>

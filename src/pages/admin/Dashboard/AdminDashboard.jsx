@@ -115,7 +115,7 @@ const AdminDashboard = () => {
         </div>
 
         {error && (
-          <div className={styles.errorBanner}>
+          <div className={styles.errorBanner} role="alert">
             {error}
             <button className={styles.retryBtn} onClick={fetchDashboardData}>Retry</button>
           </div>

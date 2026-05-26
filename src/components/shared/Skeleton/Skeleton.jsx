@@ -6,13 +6,14 @@ export const SkeletonBox = ({ width = '100%', height = '20px' }) => {
     <div
       className={styles.skeleton}
       style={{ width, height }}
+      aria-hidden="true"
     />
   )
 }
 
 export const SkeletonCard = () => {
   return (
-    <div className={styles.skeletonCard}>
+    <div className={styles.skeletonCard} aria-hidden="true" role="presentation">
       <div className={styles.skeletonHeader}>
         <div className={styles.skeletonCircle} />
         <div className={styles.skeletonHeaderText}>
@@ -31,7 +32,7 @@ export const SkeletonCard = () => {
 
 export const SkeletonStatCard = () => {
   return (
-    <div className={styles.skeletonStatCard}>
+    <div className={styles.skeletonStatCard} aria-hidden="true" role="presentation">
       <SkeletonBox width="40px" height="40px" />
       <div className={styles.skeletonStatContent}>
         <SkeletonBox width="60px" height="32px" />
@@ -43,7 +44,12 @@ export const SkeletonStatCard = () => {
 
 export const SkeletonGrid = ({ count = 4, type = 'card' }) => {
   return (
-    <div className={`${styles.skeletonGrid} ${type === 'stat' ? styles.statGrid : ''}`}>
+    <div
+      className={`${styles.skeletonGrid} ${type === 'stat' ? styles.statGrid : ''}`}
+      role="status"
+      aria-label="Loading content"
+      aria-busy="true"
+    >
       {Array.from({ length: count }).map((_, i) => (
         type === 'stat' ? <SkeletonStatCard key={i} /> : <SkeletonCard key={i} />
       ))}

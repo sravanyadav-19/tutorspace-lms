@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Users, BookOpen, PlusCircle,
@@ -12,6 +12,7 @@ const Sidebar = ({ isOpen, onClose, isMobile, isCollapsed }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const { user } = useAuth()
+  const navListRef = useRef(null)
 
   const getMenuItems = () => {
     switch (user?.role) {
@@ -55,47 +56,121 @@ const Sidebar = ({ isOpen, onClose, isMobile, isCollapsed }) => {
     if (isMobile) onClose()
   }
 
+  const handleKeyDown = useCallback((e) => {
+    const current = document.activeElement
+    const items = navListRef.current?.querySelectorAll('button') || []
+    const currentIndex = Array.from(items).indexOf(current)
+
+    switch (e.key) {
+      case 'ArrowDown':
+      case 'ArrowRight':
+        e.preventDefault()
+        if (currentIndex < items.length - 1) {
+          items[currentIndex + 1].focus()
+        } else {
+          items[0]?.focus()
+        }
+        break
+      case 'ArrowUp':
+      case 'ArrowLeft':
+        e.preventDefault()
+        if (currentIndex > 0) {
+          items[currentIndex - 1].focus()
+        } else {
+          items[items.length - 1]?.focus()
+        }
+        break
+      case 'Home':
+        e.preventDefault()
+        items[0]?.focus()
+        break
+      case 'End':
+        e.preventDefault()
+        items[items.length - 1]?.focus()
+        break
+      case 'Escape':
+        if (isMobile && isOpen) {
+          e.preventDefault()
+          onClose()
+        }
+        break
+      default:
+        break
+    }
+  }, [isMobile, isOpen, onClose])
+
   return (
     <>
       {isMobile && isOpen && (
-        <div className={styles.overlay} onClick={onClose} />
+        <div
+          className={styles.overlay}
+          onClick={onClose}
+          role="presentation"
+          aria-hidden="true"
+        />
       )}
 
-      <aside className={`
-        ${styles.sidebar}
-        ${isMobile ? styles.mobileSidebar : ''}
-        ${isMobile && isOpen ? styles.mobileOpen : ''}
-        ${!isMobile && isCollapsed ? styles.collapsed : ''}
-      `}>
+      <aside
+        className={`
+          ${styles.sidebar}
+          ${isMobile ? styles.mobileSidebar : ''}
+          ${isMobile && isOpen ? styles.mobileOpen : ''}
+          ${!isMobile && isCollapsed ? styles.collapsed : ''}
+        `}
+        aria-label="Main navigation"
+        role="complementary"
+      >
         {/* Header */}
         <div className={styles.sidebarHeader}>
-          <div className={styles.logo} onClick={() => navigate('/dashboard')}>
-            <span className={styles.logoIcon}>🎓</span>
+          <div
+            className={styles.logo}
+            onClick={() => navigate('/dashboard')}
+            role="button"
+            tabIndex={0}
+            aria-label="TutorSpace home"
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/dashboard') } }}
+          >
+            <span className={styles.logoIcon} aria-hidden="true">🎓</span>
             {!isCollapsed && (
               <span className={styles.logoText}>TutorSpace</span>
             )}
           </div>
           {isMobile && (
-            <button className={styles.closeBtn} onClick={onClose}>
-              <X size={20} />
+            <button
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label="Close navigation menu"
+            >
+              <X size={20} aria-hidden="true" />
             </button>
           )}
         </div>
 
         {/* Navigation */}
-        <nav className={styles.nav}>
-          <ul className={styles.navList}>
+        <nav
+          className={styles.nav}
+          aria-label={`${user?.role || 'User'} navigation`}
+        >
+          <ul
+            className={styles.navList}
+            ref={navListRef}
+            role="list"
+          >
             {menuItems.map((item) => {
               const Icon = item.Icon
               const active = isActivePath(item.path)
               return (
-                <li key={item.path} className={styles.navItem}>
+                <li key={item.path} className={styles.navItem} role="none">
                   <button
                     className={`${styles.navLink} ${active ? styles.navLinkActive : ''}`}
                     onClick={() => handleNavigation(item.path)}
+                    onKeyDown={handleKeyDown}
                     title={isCollapsed ? item.label : ''}
+                    aria-current={active ? 'page' : undefined}
+                    aria-label={isCollapsed ? item.label : undefined}
+                    role="menuitem"
                   >
-                    <span className={styles.navIcon}>
+                    <span className={styles.navIcon} aria-hidden="true">
                       <Icon size={18} />
                     </span>
                     {!isCollapsed && (
@@ -104,7 +179,7 @@ const Sidebar = ({ isOpen, onClose, isMobile, isCollapsed }) => {
                         <span className={styles.navDescription}>{item.description}</span>
                       </div>
                     )}
-                    {active && !isCollapsed && <span className={styles.activeIndicator} />}
+                    {active && !isCollapsed && <span className={styles.activeIndicator} aria-hidden="true" />}
                   </button>
                 </li>
               )

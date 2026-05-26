@@ -41,7 +41,13 @@ const DashboardLayout = ({ children, userRole = 'student' }) => {
         onClose={handleClose}
       />
       <TopBar onMenuClick={handleMenuClick} />
-      <main className={styles.dashboardMain}>
+      <main
+        className={styles.dashboardMain}
+        id="main-content"
+        role="main"
+        aria-label="Main content"
+        tabIndex={-1}
+      >
         {children}
       </main>
     </div>

@@ -69,7 +69,7 @@ const TeacherClasses = () => {
           />
         </div>
 
-        {error && <div className={styles.errorState}>⚠️ {error}</div>}
+        {error && <div className={styles.errorState} role="alert">⚠️ {error}</div>}
 
         {loading ? (
           <SkeletonGrid count={4} type="card" />

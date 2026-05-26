@@ -8,7 +8,11 @@ const ActivityFeed = ({
   emptyMessage = 'No activity yet' 
 }) => {
   return (
-    <div className={styles.feedContainer}>
+    <div
+      className={styles.feedContainer}
+      role="region"
+      aria-label={title}
+    >
       <h3 className={styles.feedTitle}>{title}</h3>
 
       {items.length === 0 ? (
@@ -16,12 +20,12 @@ const ActivityFeed = ({
           <p className={styles.emptyText}>{emptyMessage}</p>
         </div>
       ) : (
-        <div className={styles.feedList}>
+        <ul className={styles.feedList} role="list">
           {items.map((item, index) => (
-            <div key={index} className={styles.feedItem}>
-              <div className={styles.feedIcon}>
+            <li key={index} className={styles.feedItem}>
+              <div className={styles.feedIcon} aria-hidden="true">
                 {typeof item.icon === 'string' ? (
-                  <span role="img" aria-label="activity">{item.icon}</span>
+                  <span>{item.icon}</span>
                 ) : (
                   <User size={18} strokeWidth={2} />
                 )}
@@ -38,9 +42,9 @@ const ActivityFeed = ({
                 )}
                 {item.time && <span className={styles.feedTime}>{item.time}</span>}
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   )

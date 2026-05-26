@@ -9,9 +9,13 @@ const StatCard = ({
   subtitle 
 }) => {
   return (
-    <div className={`${styles.statCard} ${styles[color]}`}>
+    <div
+      className={`${styles.statCard} ${styles[color]}`}
+      role="region"
+      aria-label={`${title}: ${value}`}
+    >
       <div className={styles.statHeader}>
-        <span className={styles.statIcon}>
+        <span className={styles.statIcon} aria-hidden="true">
           {Icon && <Icon size={20} strokeWidth={2} />}
         </span>
         <span className={styles.statTitle}>{title}</span>

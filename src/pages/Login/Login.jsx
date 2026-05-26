@@ -134,13 +134,13 @@ const Login = () => {
           <button
             type="button"
             className={styles.demoToggle}
-            onClick={() => setShowDemo(!showDemo)}
+            onClick={() => setShowDemo(!showDemo)} aria-expanded={showDemo} aria-controls="demo-accounts"
           >
             <ChevronDown size={16} className={showDemo ? styles.demoToggleOpen : ''} />
             <span>Demo Accounts</span>
           </button>
           {showDemo && (
-            <div className={styles.demoAccounts}>
+            <div className={styles.demoAccounts} id="demo-accounts">
               <button type="button" className={styles.demoBtn} onClick={() => setDemo('admin@tutorspace.com', 'admin123')}>Admin</button>
               <button type="button" className={styles.demoBtn} onClick={() => setDemo('teacher@tutorspace.com', 'teacher123')}>Teacher</button>
               <button type="button" className={styles.demoBtn} onClick={() => setDemo('student@tutorspace.com', 'student123')}>Student</button>

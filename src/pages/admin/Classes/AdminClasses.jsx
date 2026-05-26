@@ -102,7 +102,7 @@ const AdminClasses = () => {
 
         {/* Error */}
         {error && (
-          <div className={styles.errorState}>⚠️ {error}</div>
+          <div className={styles.errorState} role="alert">⚠️ {error}</div>
         )}
 
         {/* Loading */}

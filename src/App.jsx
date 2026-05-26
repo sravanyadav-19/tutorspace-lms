@@ -33,12 +33,18 @@ import ProtectedRoute from './components/shared/ProtectedRoute'
 import './App.css'
 
 const Unauthorized = () => (
-  <div style={{
-    display: 'flex', flexDirection: 'column', alignItems: 'center',
-    justifyContent: 'center', minHeight: '100vh',
-    background: 'var(--color-canvas)', gap: '16px',
-    padding: '24px', textAlign: 'center'
-  }}>
+  <main
+    id="main-content"
+    role="main"
+    aria-label="Access denied"
+    tabIndex={-1}
+    style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      justifyContent: 'center', minHeight: '100vh',
+      background: 'var(--color-canvas)', gap: '16px',
+      padding: '24px', textAlign: 'center'
+    }}
+  >
     <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '64px',
       color: 'var(--color-primary)', margin: 0 }}>403</h1>
     <h2 style={{ fontFamily: 'var(--font-display)',
@@ -47,11 +53,15 @@ const Unauthorized = () => (
       color: 'var(--color-muted)', margin: 0 }}>
       You don't have permission to view this page.
     </p>
-    <a href="/dashboard" style={{ color: 'var(--color-primary)',
-      fontFamily: 'var(--font-body)', fontWeight: 'bold' }}>
-      ← Go to Dashboard
+    <a
+      href="/dashboard"
+      style={{ color: 'var(--color-primary)',
+      fontFamily: 'var(--font-body)', fontWeight: 'bold' }}
+      aria-label="Go to dashboard"
+    >
+      &#8592; Go to Dashboard
     </a>
-  </div>
+  </main>
 )
 
 const SmartDashboard = () => {

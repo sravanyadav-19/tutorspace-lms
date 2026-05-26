@@ -4,7 +4,12 @@ import styles from './ToastContainer.module.css'
 
 const ToastContainer = ({ toasts, removeToast }) => {
   return (
-    <div className={styles.container}>
+    <div
+      className={styles.container}
+      aria-label="Notifications"
+      aria-live="polite"
+      role="region"
+    >
       {toasts.map(toast => (
         <Toast
           key={toast.id}

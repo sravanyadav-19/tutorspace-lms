@@ -10,19 +10,34 @@ const Toast = ({ id, type = 'success', message, onClose }) => {
 
   const getIcon = () => {
     switch (type) {
-      case 'success': return <CheckCircle size={20} />
-      case 'error': return <XCircle size={20} />
-      case 'warning': return <AlertCircle size={20} />
-      default: return <CheckCircle size={20} />
+      case 'success': return <CheckCircle size={20} aria-hidden="true" />
+      case 'error': return <XCircle size={20} aria-hidden="true" />
+      case 'warning': return <AlertCircle size={20} aria-hidden="true" />
+      default: return <CheckCircle size={20} aria-hidden="true" />
     }
   }
 
+  const roleMap = {
+    success: 'status',
+    error: 'alert',
+    warning: 'alert',
+    info: 'status'
+  }
+
   return (
-    <div className={`${styles.toast} ${styles[type]}`}>
-      <span className={styles.toastIcon}>{getIcon()}</span>
+    <div
+      className={`${styles.toast} ${styles[type]}`}
+      role={roleMap[type] || 'status'}
+      aria-live="polite"
+    >
+      <span className={styles.toastIcon} aria-hidden="true">{getIcon()}</span>
       <p className={styles.toastMessage}>{message}</p>
-      <button className={styles.toastClose} onClick={() => onClose(id)}>
-        <X size={16} />
+      <button
+        className={styles.toastClose}
+        onClick={() => onClose(id)}
+        aria-label="Dismiss notification"
+      >
+        <X size={16} aria-hidden="true" />
       </button>
     </div>
   )

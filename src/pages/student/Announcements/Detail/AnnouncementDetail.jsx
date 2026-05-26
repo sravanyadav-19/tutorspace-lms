@@ -98,7 +98,7 @@ const AnnouncementDetail = () => {
   if (error) {
     return (
       <DashboardLayout userRole="student">
-        <div className={styles.errorState}>
+        <div className={styles.errorState} role="alert">
           <p>⚠️ {error}</p>
           <Button
             variant="secondary"

@@ -144,7 +144,7 @@ const Settings = () => {
             <h2 className={styles.profileName}>{user?.name}</h2>
             <p className={styles.profileEmail}>{user?.email}</p>
             <span className={styles.profileRole}>{user?.role}</span>
-            <div className={styles.tabsVertical}>
+            <div className={styles.tabsVertical} role="tablist" aria-label="Settings sections">
               <button className={`${styles.vTab} ${activeTab === 'profile' ? styles.vTabActive : ''}`} onClick={() => setActiveTab('profile')}>👤 Profile Info</button>
               <button className={`${styles.vTab} ${activeTab === 'password' ? styles.vTabActive : ''}`} onClick={() => setActiveTab('password')}>🔒 Change Password</button>
             </div>

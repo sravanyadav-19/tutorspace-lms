@@ -223,7 +223,7 @@ const StudentFiles = () => {
           <Button variant="secondary" onClick={fetchClasses}>🔄 Refresh</Button>
         </div>
 
-        {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
+        {error && <div className={styles.errorBanner} role="alert">⚠️ {error}</div>}
 
         {loading ? (
           <SkeletonCard />
