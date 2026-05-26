@@ -54,7 +54,7 @@ const StudentQuiz = () => {
           </Button>
         </div>
 
-        {error && <div className={styles.errorBanner}>⚠️ {error}</div>}
+        {error && <div className={styles.errorBanner} role="alert">⚠️ {error}</div>}
 
         {loading ? (
           <SkeletonGrid count={3} type="card" />
