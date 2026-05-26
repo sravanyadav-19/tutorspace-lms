@@ -144,3 +144,6 @@ vite.config.ts.timestamp-*
 backend/uploads/
 backend/test.txt
 backend/downloaded_test.txt
+
+#bash commands
+*.sh
