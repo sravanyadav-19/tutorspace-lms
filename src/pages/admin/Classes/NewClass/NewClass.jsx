@@ -94,7 +94,7 @@ const NewClass = () => {
       <DashboardLayout userRole="admin">
         <div className={styles.successPage}>
           <div className={styles.successCard}>
-            <div className={styles.successIcon}><PageIcon name="success" size={64} /></div>
+            <div className={styles.successIcon}>🎉</div>
             <h2 className={styles.successTitle}>Class Created Successfully!</h2>
             <p className={styles.successText}>Your new class is ready with {selectedTeachers.length} teacher(s) and {selectedStudents.length} student(s) enrolled.</p>
             <div className={styles.successActions}>
@@ -112,14 +112,14 @@ const NewClass = () => {
       <div className={styles.newClassPage}>
         <div className={styles.pageHeader}>
           <div>
-            <button className={styles.backBtn} onClick={() => navigate('/admin/classes')}><PageIcon name="back" /> Back to Classes/button>
+            <button className={styles.backBtn} onClick={() => navigate('/admin/classes')}>← Back to Classes</button>
             <h1 className={styles.pageTitle}>Create New Class</h1>
             <p className={styles.pageSubtitle}>Set up a new class and assign teachers and students</p>
           </div>
         </div>
         <form onSubmit={handleSubmit} className={styles.createForm}>
           <div className={styles.formSection}>
-            <h2 className={styles.sectionTitle}>Class Details</h2>
+            <h2 className={styles.sectionTitle}>📋 Class Details</h2>
             <div className={styles.formFields}>
               <Input label="Class Name" name="name" placeholder="e.g. Introduction to Python" value={formData.name} onChange={handleChange} onBlur={handleBlur} error={touched.name ? errors.name : ''} required disabled={loading} />
               <Input label="Subject" name="subject" placeholder="e.g. Computer Science" value={formData.subject} onChange={handleChange} onBlur={handleBlur} error={touched.subject ? errors.subject : ''} required disabled={loading} />
@@ -127,7 +127,7 @@ const NewClass = () => {
             </div>
           </div>
           <div className={styles.formSection}>
-            <h2 className={styles.sectionTitle}>Assign Teachers <span className={styles.sectionCount}>{selectedTeachers.length} selected</span></h2>
+            <h2 className={styles.sectionTitle}>👨‍🏫 Assign Teachers <span className={styles.sectionCount}>{selectedTeachers.length} selected</span></h2>
             {teachers.length === 0 ? <p className={styles.noUsers}>No teachers registered yet</p> : (
               <div className={styles.userGrid}>
                 {teachers.map(teacher => (
@@ -137,14 +137,14 @@ const NewClass = () => {
                       <p className={styles.userName}>{teacher.name}</p>
                       <p className={styles.userEmail}>{teacher.email}</p>
                     </div>
-                    {selectedTeachers.includes(teacher.id) && <span className={styles.checkmark}><PageIcon name="check" size={16} /></span>}
+                    {selectedTeachers.includes(teacher.id) && <span className={styles.checkmark}>✓</span>}
                   </button>
                 ))}
               </div>
             )}
           </div>
           <div className={styles.formSection}>
-            <h2 className={styles.sectionTitle}>Assign Students <span className={styles.sectionCount}>{selectedStudents.length} selected</span></h2>
+            <h2 className={styles.sectionTitle}>🎓 Assign Students <span className={styles.sectionCount}>{selectedStudents.length} selected</span></h2>
             {students.length === 0 ? <p className={styles.noUsers}>No students registered yet</p> : (
               <div className={styles.userGrid}>
                 {students.map(student => (
@@ -154,7 +154,7 @@ const NewClass = () => {
                       <p className={styles.userName}>{student.name}</p>
                       <p className={styles.userEmail}>{student.email}</p>
                     </div>
-                    {selectedStudents.includes(student.id) && <span className={styles.checkmark}><PageIcon name="check" size={16} /></span>}
+                    {selectedStudents.includes(student.id) && <span className={styles.checkmark}>✓</span>}
                   </button>
                 ))}
               </div>
@@ -162,7 +162,7 @@ const NewClass = () => {
           </div>
           <div className={styles.formActions}>
             <Button type="button" variant="secondary" onClick={() => navigate('/admin/classes')} disabled={loading}>Cancel</Button>
-            <Button type="submit" variant="primary" size="lg" disabled={loading || !isValid}>{loading ? 'Creating Class...' : 'Create Class'}</Button>
+            <Button type="submit" variant="primary" size="lg" disabled={loading || !isValid}>{loading ? 'Creating Class...' : '✅ Create Class'}</Button>
           </div>
         </form>
       </div>

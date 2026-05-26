@@ -133,7 +133,7 @@ const TeacherDashboard = () => {
 
         {classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}><PageIcon name="book" size={64} /></div>
+            <div className={styles.emptyIcon}>📚</div>
             <h3 className={styles.emptyTitle}>No Classes Assigned</h3>
             <p className={styles.emptyText}>
               You haven't been assigned to any classes yet.
@@ -152,7 +152,7 @@ const TeacherDashboard = () => {
             <div className={styles.classesGrid}>
               {classes.slice(0, 3).map(cls => (
                 <div key={cls.id} className={styles.classCard} onClick={() => navigate(`/teacher/classes/${cls.id}`)}>
-                  <div className={styles.classIcon}><PageIcon name="book" size={24} /></div>
+                  <div className={styles.classIcon}>📚</div>
                   <div className={styles.classInfo}>
                     <h3 className={styles.className}>{cls.name}</h3>
                     <p className={styles.classSubject}>{cls.subject}</p>

@@ -60,7 +60,7 @@ const StudentQuiz = () => {
           <SkeletonGrid count={3} type="card" />
         ) : quizzes.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}><PageIcon name="clipboard" size={64} /></div>
+            <div className={styles.emptyIcon}>📝</div>
             <h3 className={styles.emptyTitle}>No Quizzes Available</h3>
             <p className={styles.emptyText}>
               Your teachers haven't published any quizzes yet.
@@ -86,7 +86,7 @@ const StudentQuiz = () => {
                         ? styles.submittedBadge
                         : styles.availableBadge}
                     `}>
-                      {status === 'submitted' ? '✅ Submitted' : 'Available'}
+                      {status === 'submitted' ? '✅ Submitted' : '🟢 Available'}
                     </span>
                   </div>
 
@@ -100,7 +100,7 @@ const StudentQuiz = () => {
                       <><span>•</span><span>⏱️ {quiz.timeLimit} min</span></>
                     )}
                     <span>•</span>
-                    <span>{formatDate(quiz.createdAt)}</span>
+                    <span>📅 {formatDate(quiz.createdAt)}</span>
                   </div>
 
                   {submission && (
@@ -110,7 +110,7 @@ const StudentQuiz = () => {
                       </p>
                       {submission.isReleased && (
                         <p className={styles.resultsReleased}>
-                          Results have been released
+                          📊 Results have been released
                         </p>
                       )}
                     </div>
@@ -129,7 +129,7 @@ const StudentQuiz = () => {
                         className={`${styles.actionBtn} ${styles.takeBtn}`}
                         onClick={() => navigate(`/student/quizzes/${quiz.id}/take`)}
                       >
-                        Take Quiz
+                        ▶ Take Quiz
                       </button>
                     )}
                   </div>

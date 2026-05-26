@@ -79,10 +79,10 @@ const Settings = () => {
 
   const getRoleBadge = (role) => {
     switch (role) {
-      case 'admin': return <PageIcon name='crown' />
-      case 'teacher': return <PageIcon name='target' />
-      case 'student': return <PageIcon name='graduationCap' />
-      default: return <PageIcon name='user' />
+      case 'admin': return '👑'
+      case 'teacher': return '🎯'
+      case 'student': return '🎓'
+      default: return '👤'
     }
   }
 
@@ -130,10 +130,10 @@ const Settings = () => {
       <div className={styles.settingsPage}>
         <div className={styles.pageHeader}>
           <div>
-            <h1 className={styles.pageTitle}>Settings</h1>
+            <h1 className={styles.pageTitle}>⚙️ Settings</h1>
             <p className={styles.pageSubtitle}>Manage your account information and security</p>
           </div>
-          <Button variant="secondary" onClick={() => navigate('/dashboard')}><PageIcon name="back" /> Back to Dashboard/Button>
+          <Button variant="secondary" onClick={() => navigate('/dashboard')}>← Back to Dashboard</Button>
         </div>
         <div className={styles.contentLayout}>
           <div className={styles.profileSummary}>
@@ -145,14 +145,14 @@ const Settings = () => {
             <p className={styles.profileEmail}>{user?.email}</p>
             <span className={styles.profileRole}>{user?.role}</span>
             <div className={styles.tabsVertical}>
-              <button className={`${styles.vTab} ${activeTab === 'profile' ? styles.vTabActive : ''}`} onClick={() => setActiveTab('profile')}>Profile Info</button>
-              <button className={`${styles.vTab} ${activeTab === 'password' ? styles.vTabActive : ''}`} onClick={() => setActiveTab('password')}>Change Password</button>
+              <button className={`${styles.vTab} ${activeTab === 'profile' ? styles.vTabActive : ''}`} onClick={() => setActiveTab('profile')}>👤 Profile Info</button>
+              <button className={`${styles.vTab} ${activeTab === 'password' ? styles.vTabActive : ''}`} onClick={() => setActiveTab('password')}>🔒 Change Password</button>
             </div>
           </div>
           <div className={styles.mainContent}>
             {activeTab === 'profile' && (
               <div className={styles.formCard}>
-                <h3 className={styles.cardTitle}>Profile Information</h3>
+                <h3 className={styles.cardTitle}>👤 Profile Information</h3>
                 <form onSubmit={handleUpdateProfile} className={styles.form} noValidate>
                   <Input label="Full Name" name="name" placeholder="Enter your full name" value={name} onChange={(e) => setName(e.target.value)} onBlur={() => setProfileTouched(p => ({ ...p, name: true }))} error={profileTouched.name ? profileErrors.name : ''} required disabled={loading} />
                   <Input label="Email Address" name="email" type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} onBlur={() => setProfileTouched(p => ({ ...p, email: true }))} error={profileTouched.email ? profileErrors.email : ''} required disabled={loading} />
@@ -162,21 +162,21 @@ const Settings = () => {
                     <p className={styles.formHint}>Role can only be changed by an admin</p>
                   </div>
                   <div className={styles.formActions}>
-                    <Button type="submit" variant="primary" disabled={loading || !profileValid}>{loading ? 'Updating...' : 'Save Changes'}</Button>
+                    <Button type="submit" variant="primary" disabled={loading || !profileValid}>{loading ? '⏳ Updating...' : '💾 Save Changes'}</Button>
                   </div>
                 </form>
               </div>
             )}
             {activeTab === 'password' && (
               <div className={styles.formCard}>
-                <h3 className={styles.cardTitle}>Change Password</h3>
+                <h3 className={styles.cardTitle}>🔒 Change Password</h3>
                 <form onSubmit={handleUpdatePassword} className={styles.form} noValidate>
                   <Input label="Current Password" name="currentPassword" type="password" placeholder="Enter current password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} onBlur={() => setPasswordTouched(p => ({ ...p, currentPassword: true }))} error={passwordTouched.currentPassword ? passwordErrors.currentPassword : ''} required disabled={loading} />
                   <Input label="New Password" name="newPassword" type="password" placeholder="Enter new password (min 6 characters)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} onBlur={() => setPasswordTouched(p => ({ ...p, newPassword: true }))} error={passwordTouched.newPassword ? passwordErrors.newPassword : ''} required disabled={loading} />
                   <PasswordStrength password={newPassword} />
                   <Input label="Confirm New Password" name="confirmPassword" type="password" placeholder="Re-enter new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} onBlur={() => setPasswordTouched(p => ({ ...p, confirmPassword: true }))} error={passwordTouched.confirmPassword ? passwordErrors.confirmPassword : ''} required disabled={loading} />
                   <div className={styles.passwordTips}>
-                    <p className={styles.tipsTitle}>Password Tips:</p>
+                    <p className={styles.tipsTitle}>🔐 Password Tips:</p>
                     <ul className={styles.tipsList}>
                       <li>At least 6 characters long</li>
                       <li>Mix of letters and numbers recommended</li>
@@ -184,7 +184,7 @@ const Settings = () => {
                     </ul>
                   </div>
                   <div className={styles.formActions}>
-                    <Button type="submit" variant="primary" disabled={loading || !passwordValid}>{loading ? 'Updating...' : 'Update Password'}</Button>
+                    <Button type="submit" variant="primary" disabled={loading || !passwordValid}>{loading ? '⏳ Updating...' : '🔒 Update Password'}</Button>
                   </div>
                 </form>
               </div>

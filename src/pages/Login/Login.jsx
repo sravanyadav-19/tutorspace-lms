@@ -85,7 +85,7 @@ const Login = () => {
 
         {apiError && (
           <div className={styles.errorAlert} role="alert">
-            <span className={styles.errorIcon}><PageIcon name="alert" /></span>
+            <span className={styles.errorIcon}>⚠️</span>
             <span>{apiError}</span>
           </div>
         )}

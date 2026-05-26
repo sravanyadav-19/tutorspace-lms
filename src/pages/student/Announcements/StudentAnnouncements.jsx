@@ -78,7 +78,7 @@ const StudentAnnouncements = () => {
         {/* Page Header */}
         <div className={styles.pageHeader}>
           <div>
-            <h1 className={styles.pageTitle}>Announcements</h1>
+            <h1 className={styles.pageTitle}>📢 Announcements</h1>
             <p className={styles.pageSubtitle}>
               Stay updated with your class announcements
             </p>
@@ -89,14 +89,14 @@ const StudentAnnouncements = () => {
         </div>
 
         {error && (
-          <div className={styles.errorState}><PageIcon name="alert" className={styles.bannerIcon} /> {error}</div>
+          <div className={styles.errorState}>⚠️ {error}</div>
         )}
 
         {loading ? (
           <SkeletonCard />
         ) : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}><PageIcon name="book" size={64} /></div>
+            <div className={styles.emptyIcon}>📚</div>
             <h3 className={styles.emptyTitle}>No Classes Found</h3>
             <p className={styles.emptyText}>
               You are not enrolled in any classes yet.
@@ -120,7 +120,7 @@ const StudentAnnouncements = () => {
                     `}
                     onClick={() => setSelectedClass(cls)}
                   >
-                    <span className={styles.classItemIcon}><PageIcon name="book" size={18} /></span>
+                    <span className={styles.classItemIcon}>📚</span>
                     <div className={styles.classItemInfo}>
                       <p className={styles.classItemName}>{cls.name}</p>
                       <p className={styles.classItemSubject}>{cls.subject}</p>
@@ -151,7 +151,7 @@ const StudentAnnouncements = () => {
                 <SkeletonGrid count={3} type="card" />
               ) : announcements.length === 0 ? (
                 <div className={styles.emptyAnnouncements}>
-                  <div className={styles.emptyIcon}><PageIcon name="megaphone" size={64} /></div>
+                  <div className={styles.emptyIcon}>📢</div>
                   <h3 className={styles.emptyTitle}>
                     No Announcements Yet
                   </h3>
@@ -187,7 +187,7 @@ const StudentAnnouncements = () => {
                         </div>
                         <div className={styles.announcementMeta}>
                           <span className={styles.commentCount}>
-                            {announcement._count?.comments || 0} comments
+                            💬 {announcement._count?.comments || 0} comments
                           </span>
                         </div>
                       </div>
@@ -207,7 +207,7 @@ const StudentAnnouncements = () => {
                       {/* Announcement Footer */}
                       <div className={styles.announcementFooter}>
                         <span className={styles.readMore}>
-                          Read more & comment
+                          Read more & comment →
                         </span>
                       </div>
                     </div>

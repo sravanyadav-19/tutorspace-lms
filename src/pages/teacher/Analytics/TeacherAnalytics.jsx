@@ -135,7 +135,7 @@ const TeacherAnalytics = () => {
           </div>
         ) : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}><PageIcon name="book" size={64} /></div>
+            <div className={styles.emptyIcon}>📚</div>
             <h3 className={styles.emptyTitle}>No Classes Assigned</h3>
             <p className={styles.emptyText}>
               You need to be assigned to a class first.
@@ -199,7 +199,7 @@ const TeacherAnalytics = () => {
                               ? styles.publishedStatus
                               : styles.draftStatus}
                           `}>
-                            {quiz.isPublished ? '' : ''}
+                            {quiz.isPublished ? '🟢' : '⚪'}
                           </span>
                         </div>
                       </button>
@@ -214,7 +214,7 @@ const TeacherAnalytics = () => {
 
               {!selectedQuiz ? (
                 <div className={styles.selectQuizPrompt}>
-                  <div className={styles.emptyIcon}><PageIcon name="clipboard" size={64} /></div>
+                  <div className={styles.emptyIcon}>📝</div>
                   <h3 className={styles.emptyTitle}>Select a Quiz</h3>
                   <p className={styles.emptyText}>
                     Choose a quiz from the left to view analytics
@@ -238,7 +238,7 @@ const TeacherAnalytics = () => {
                       className={styles.releaseBtn}
                       onClick={() => handleReleaseResults(selectedQuiz.id)}
                     >
-                      Release Results
+                      📊 Release Results
                     </button>
                   </div>
 
@@ -278,7 +278,7 @@ const TeacherAnalytics = () => {
                   {/* Submissions Table */}
                   <div className={styles.submissionsSection}>
                     <h3 className={styles.submissionsSectionTitle}>
-                      Student Submissions
+                      👥 Student Submissions
                     </h3>
 
                     {submissionsLoading ? (
@@ -342,8 +342,8 @@ const TeacherAnalytics = () => {
                                   : styles.notReleased}
                               `}>
                                 {submission.isReleased
-                                  ? 'Released'
-                                  : 'Pending'}
+                                  ? '✅ Released'
+                                  : '⏳ Pending'}
                               </span>
                             </div>
                           )

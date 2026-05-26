@@ -107,28 +107,28 @@ const AdminClassDetail = () => {
         {/* Stats Row */}
         <div className={styles.statsRow}>
           <div className={styles.statCard}>
-            <span className={styles.statIcon}><PageIcon name="teacher" /></span>
+            <span className={styles.statIcon}>👨‍🏫</span>
             <div>
               <p className={styles.statValue}>{enrolledTeachers.length}</p>
               <p className={styles.statLabel}>Teachers</p>
             </div>
           </div>
           <div className={styles.statCard}>
-            <span className={styles.statIcon}><PageIcon name="student" /></span>
+            <span className={styles.statIcon}>🎓</span>
             <div>
               <p className={styles.statValue}>{enrolledStudents.length}</p>
               <p className={styles.statLabel}>Students</p>
             </div>
           </div>
           <div className={styles.statCard}>
-            <span className={styles.statIcon}><PageIcon name="megaphone" /></span>
+            <span className={styles.statIcon}>📢</span>
             <div>
               <p className={styles.statValue}>{cls?._count?.announcements || 0}</p>
               <p className={styles.statLabel}>Announcements</p>
             </div>
           </div>
           <div className={styles.statCard}>
-            <span className={styles.statIcon}><PageIcon name="clipboard" /></span>
+            <span className={styles.statIcon}>📝</span>
             <div>
               <p className={styles.statValue}>{cls?._count?.quizzes || 0}</p>
               <p className={styles.statLabel}>Quizzes</p>
@@ -144,9 +144,9 @@ const AdminClassDetail = () => {
               className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
               onClick={() => setActiveTab(tab)}
             >
-              {tab === 'overview' && 'Overview'}
-              {tab === 'teachers' && `Teachers (${enrolledTeachers.length})`}
-              {tab === 'students' && `Students (${enrolledStudents.length})`}
+              {tab === 'overview' && '📋 Overview'}
+              {tab === 'teachers' && `👨‍🏫 Teachers (${enrolledTeachers.length})`}
+              {tab === 'students' && `🎓 Students (${enrolledStudents.length})`}
             </button>
           ))}
         </div>
@@ -155,7 +155,7 @@ const AdminClassDetail = () => {
         {activeTab === 'overview' && (
           <div className={styles.tabContent}>
             <div className={styles.overviewCard}>
-              <h3 className={styles.cardTitle}>Class Information</h3>
+              <h3 className={styles.cardTitle}>📋 Class Information</h3>
               <div className={styles.infoGrid}>
                 <div className={styles.infoItem}>
                   <p className={styles.infoLabel}>Class Name</p>
@@ -189,7 +189,7 @@ const AdminClassDetail = () => {
             {/* Enrolled Teachers */}
             <div className={styles.userSection}>
               <h3 className={styles.cardTitle}>
-                Enrolled Teachers ({enrolledTeachers.length})
+                👨‍🏫 Enrolled Teachers ({enrolledTeachers.length})
               </h3>
               {enrolledTeachers.length === 0 ? (
                 <p className={styles.emptyText}>No teachers assigned yet.</p>
@@ -219,7 +219,7 @@ const AdminClassDetail = () => {
             {/* Available Teachers */}
             {availableTeachers.length > 0 && (
               <div className={styles.userSection}>
-                <h3 className={styles.cardTitle}>Add Teacher</h3>
+                <h3 className={styles.cardTitle}>➕ Add Teacher</h3>
                 <div className={styles.userList}>
                   {availableTeachers.map(teacher => (
                     <div key={teacher.id} className={styles.userCard}>
@@ -249,7 +249,7 @@ const AdminClassDetail = () => {
             {/* Enrolled Students */}
             <div className={styles.userSection}>
               <h3 className={styles.cardTitle}>
-                Enrolled Students ({enrolledStudents.length})
+                🎓 Enrolled Students ({enrolledStudents.length})
               </h3>
               {enrolledStudents.length === 0 ? (
                 <p className={styles.emptyText}>No students enrolled yet.</p>
@@ -279,7 +279,7 @@ const AdminClassDetail = () => {
             {/* Available Students */}
             {availableStudents.length > 0 && (
               <div className={styles.userSection}>
-                <h3 className={styles.cardTitle}>Add Student</h3>
+                <h3 className={styles.cardTitle}>➕ Add Student</h3>
                 <div className={styles.userList}>
                   {availableStudents.map(student => (
                     <div key={student.id} className={styles.userCard}>

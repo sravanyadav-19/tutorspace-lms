@@ -98,28 +98,28 @@ const TeacherClassDetail = () => {
         {/* Stats */}
         <div className={styles.statsRow}>
           <div className={styles.statCard}>
-            <span className={styles.statIcon}><PageIcon name="student" /></span>
+            <span className={styles.statIcon}>🎓</span>
             <div>
               <p className={styles.statValue}>{enrolledStudents.length}</p>
               <p className={styles.statLabel}>Students</p>
             </div>
           </div>
           <div className={styles.statCard}>
-            <span className={styles.statIcon}><PageIcon name="megaphone" /></span>
+            <span className={styles.statIcon}>📢</span>
             <div>
               <p className={styles.statValue}>{announcements.length}</p>
               <p className={styles.statLabel}>Announcements</p>
             </div>
           </div>
           <div className={styles.statCard}>
-            <span className={styles.statIcon}><PageIcon name="clipboard" /></span>
+            <span className={styles.statIcon}>📝</span>
             <div>
               <p className={styles.statValue}>{cls?._count?.quizzes || 0}</p>
               <p className={styles.statLabel}>Quizzes</p>
             </div>
           </div>
           <div className={styles.statCard}>
-            <span className={styles.statIcon}><PageIcon name="file" /></span>
+            <span className={styles.statIcon}>📄</span>
             <div>
               <p className={styles.statValue}>{cls?._count?.files || 0}</p>
               <p className={styles.statLabel}>Files</p>
@@ -135,9 +135,9 @@ const TeacherClassDetail = () => {
               className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
               onClick={() => setActiveTab(tab)}
             >
-              {tab === 'overview' && 'Overview'}
-              {tab === 'announcements' && `Announcements (${announcements.length})`}
-              {tab === 'students' && `Students (${enrolledStudents.length})`}
+              {tab === 'overview' && '📋 Overview'}
+              {tab === 'announcements' && `📢 Announcements (${announcements.length})`}
+              {tab === 'students' && `🎓 Students (${enrolledStudents.length})`}
             </button>
           ))}
         </div>
@@ -146,7 +146,7 @@ const TeacherClassDetail = () => {
         {activeTab === 'overview' && (
           <div className={styles.tabContent}>
             <div className={styles.overviewCard}>
-              <h3 className={styles.cardTitle}>Class Information</h3>
+              <h3 className={styles.cardTitle}>📋 Class Information</h3>
               <div className={styles.infoGrid}>
                 <div className={styles.infoItem}>
                   <p className={styles.infoLabel}>Class Name</p>
@@ -213,7 +213,7 @@ const TeacherClassDetail = () => {
                               announcement.id
                             )}
                           >
-                            <PageIcon name="delete" />
+                            🗑️
                           </button>
                         </div>
                       </div>
@@ -223,7 +223,7 @@ const TeacherClassDetail = () => {
                           : announcement.content}
                       </p>
                       <p className={styles.announcementMeta}>
-                        {announcement._count?.comments || 0} comments
+                        💬 {announcement._count?.comments || 0} comments
                       </p>
                     </div>
                   ))}
