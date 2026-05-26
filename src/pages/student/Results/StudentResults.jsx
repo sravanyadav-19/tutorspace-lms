@@ -45,9 +45,9 @@ const StudentResults = () => {
 
   const getScoreLabel = (score, total) => {
     const percent = (score / total) * 100
-    if (percent >= 80) return '🏆 Excellent'
-    if (percent >= 50) return '👍 Good'
-    return '📚 Needs Work'
+    if (percent >= 80) return 'Excellent'
+    if (percent >= 50) return 'Good'
+    return 'Needs Work'
   }
 
   const toggleExpand = (id) => {
@@ -79,7 +79,7 @@ const StudentResults = () => {
           <SkeletonGrid count={3} type="card" />
         ) : submissions.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📊</div>
+            <div className={styles.emptyIcon}><PageIcon name="analytics" size={64} /></div>
             <h3 className={styles.emptyTitle}>No Results Yet</h3>
             <p className={styles.emptyText}>
               Your teacher hasn't released any quiz results yet.
@@ -129,7 +129,7 @@ const StudentResults = () => {
                         {getScoreLabel(submission.score, submission.totalPoints)}
                       </p>
                       <span className={styles.expandBtn}>
-                        {isExpanded ? '▲ Hide' : '▼ Details'}
+                        {isExpanded ? 'Hide' : 'Details'}
                       </span>
                     </div>
                   </div>
@@ -137,7 +137,7 @@ const StudentResults = () => {
                   {/* Expanded Answer Review */}
                   {isExpanded && (
                     <div className={styles.answerReview}>
-                      <h4 className={styles.reviewTitle}>📋 Answer Review</h4>
+                      <h4 className={styles.reviewTitle}>Answer Review</h4>
                       <div className={styles.answersList}>
                         {submission.answers?.map((answer, index) => (
                           <div
@@ -154,7 +154,7 @@ const StudentResults = () => {
                                 Q{index + 1}
                               </span>
                               <span className={styles.answerStatus}>
-                                {answer.isCorrect ? '✅ Correct' : '❌ Wrong'}
+                                {answer.isCorrect ? 'Correct' : 'Wrong'}
                               </span>
                               <span className={styles.answerPoints}>
                                 {answer.pointsEarned}/{answer.question?.points} pts

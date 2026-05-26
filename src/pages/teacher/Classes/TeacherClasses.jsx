@@ -69,13 +69,13 @@ const TeacherClasses = () => {
           />
         </div>
 
-        {error && <div className={styles.errorState}>⚠️ {error}</div>}
+        {error && <div className={styles.errorState}><PageIcon name="alert" className={styles.bannerIcon} /> {error}</div>}
 
         {loading ? (
           <SkeletonGrid count={4} type="card" />
         ) : filteredClasses.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📚</div>
+            <div className={styles.emptyIcon}><PageIcon name="book" size={64} /></div>
             <h3 className={styles.emptyTitle}>
               {searchTerm ? 'No classes found' : 'No classes assigned'}
             </h3>
@@ -95,7 +95,7 @@ const TeacherClasses = () => {
               {filteredClasses.map(cls => (
                 <div key={cls.id} className={styles.classCard}>
                   <div className={styles.cardHeader}>
-                    <div className={styles.classIcon}>📚</div>
+                    <div className={styles.classIcon}><PageIcon name="book" size={24} /></div>
                     <span className={`${styles.statusBadge} ${styles[`status-${cls.status}`]}`}>
                       {cls.status}
                     </span>
@@ -136,14 +136,14 @@ const TeacherClasses = () => {
                       size="sm"
                       onClick={() => navigate(`/teacher/classes/${cls.id}/announcements/new`)}
                     >
-                      📢 Post Announcement
+                      Post Announcement
                     </Button>
                     <Button
                       variant="secondary"
                       size="sm"
                       onClick={() => navigate(`/teacher/classes/${cls.id}`)}
                     >
-                      📄 View Details
+                      View Details
                     </Button>
                   </div>
                 </div>

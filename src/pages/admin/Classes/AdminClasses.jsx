@@ -102,7 +102,7 @@ const AdminClasses = () => {
 
         {/* Error */}
         {error && (
-          <div className={styles.errorState}>⚠️ {error}</div>
+          <div className={styles.errorState}><PageIcon name="alert" className={styles.bannerIcon} /> {error}</div>
         )}
 
         {/* Loading */}
@@ -110,7 +110,7 @@ const AdminClasses = () => {
           <SkeletonGrid count={4} type="card" />
         ) : filteredClasses.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📚</div>
+            <div className={styles.emptyIcon}><PageIcon name="book" size={64} /></div>
             <h3 className={styles.emptyTitle}>
               No classes found
             </h3>
