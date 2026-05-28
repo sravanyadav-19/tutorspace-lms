@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import DashboardLayout from '../../../../components/layout/DashboardLayout'
@@ -14,6 +14,7 @@ const NewAnnouncement = () => {
   const { classId } = useParams()
   const navigate = useNavigate()
   const toast = useToast()
+  const titleRef = useRef(null)
 
   const [className, setClassName] = useState('')
   const [formData, setFormData] = useState({ title: '', content: '' })
@@ -33,6 +34,11 @@ const NewAnnouncement = () => {
     }
     fetchClass()
   }, [classId])
+
+  // Auto-focus title input on mount
+  useEffect(() => {
+    setTimeout(() => titleRef.current?.focus(), 100)
+  }, [])
 
   useEffect(() => {
     const newErrors = {}
@@ -118,7 +124,7 @@ const NewAnnouncement = () => {
             </div>
             <div className={styles.formActions}>
               <Button type="button" variant="secondary" onClick={() => navigate('/teacher/classes')} disabled={loading}>Cancel</Button>
-              <Button type="submit" variant="primary" size="lg" disabled={loading || !isValid}>
+              <Button type="submit" variant="primary" size="lg" loading={loading} disabled={loading || !isValid}>
                 {loading ? 'Posting...' : 'Post Announcement'}
               </Button>
             </div>
