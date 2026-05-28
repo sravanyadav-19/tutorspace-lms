@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import Input from '../../../components/shared/Input'
+import ConfirmModal from '../../../components/shared/ConfirmModal'
 import { userAPI } from '../../../services/api'
 import { SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 import { useToast } from '../../../context/ToastContext'
@@ -22,41 +23,28 @@ const AdminUsers = () => {
   const [filterStatus, setFilterStatus] = useState('all')
   const [actionLoading, setActionLoading] = useState(null)
 
+  // Confirm modal state
+  const [confirmModal, setConfirmModal] = useState({ open: false, type: '', userId: null, userName: '' })
+
   useEffect(() => {
     fetchUsers()
   }, [])
 
-  // Filter users when search/filter changes
   useEffect(() => {
     let result = [...users]
-
-    // Search filter
     if (searchTerm) {
       result = result.filter(u =>
-        u.name.toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        u.email.toLowerCase()
-          .includes(searchTerm.toLowerCase())
+        u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
-
-    // Role filter
     if (filterRole !== 'all') {
-      result = result.filter(
-        u => u.role.name === filterRole
-      )
+      result = result.filter(u => u.role.name === filterRole)
     }
-
-    // Status filter
     if (filterStatus !== 'all') {
-      result = result.filter(
-        u => u.status === filterStatus
-      )
+      result = result.filter(u => u.status === filterStatus)
     }
-
-    // Hide admin users from the list
     result = result.filter(u => u.role.name !== 'admin')
-
     setFilteredUsers(result)
   }, [users, searchTerm, filterRole, filterStatus])
 
@@ -72,68 +60,47 @@ const AdminUsers = () => {
     }
   }
 
-  // Approve user (change status to active)
   const handleApprove = async (userId) => {
     try {
       setActionLoading(userId)
-      await userAPI.updateUser(userId, { 
-        status: 'active' 
-      })
-      setUsers(prev => prev.map(u =>
-        u.id === userId
-          ? { ...u, status: 'active' }
-          : u
-      ))
+      await userAPI.updateUser(userId, { status: 'active' })
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'active' } : u))
       toast.success('User approved successfully')
     } catch (err) {
-      console.error('Approve error:', err.response?.data || err.message)
       toast.error(err.response?.data?.message || 'Failed to approve user')
     } finally {
       setActionLoading(null)
     }
   }
 
-  // Deactivate user
-    const handleDeactivate = async (userId) => {
-    if (!window.confirm(
-      'Are you sure you want to deactivate this user?'
-    )) return
-
-    try {
-      setActionLoading(userId)
-      await userAPI.updateUser(userId, { 
-        status: 'inactive' 
-      })
-      setUsers(prev => prev.map(u =>
-        u.id === userId
-          ? { ...u, status: 'inactive' }
-          : u
-      ))
-      toast.success('User deactivated')
-    } catch (err) {
-      console.error('Deactivate error:', err.response?.data || err.message)
-      toast.error(err.response?.data?.message || 'Failed to deactivate user')
-    } finally {
-      setActionLoading(null)
-    }
+  const promptDeactivate = (userId, userName) => {
+    setConfirmModal({ open: true, type: 'deactivate', userId, userName })
   }
 
-  // Delete user
-  const handleDelete = async (userId, userName) => {
-    if (!window.confirm(
-      `Delete ${userName}? This cannot be undone.`
-    )) return
+  const promptDelete = (userId, userName) => {
+    setConfirmModal({ open: true, type: 'delete', userId, userName })
+  }
+
+  const handleConfirmAction = async () => {
+    const { type, userId } = confirmModal
+    if (!userId) return
+    setActionLoading(userId)
 
     try {
-      setActionLoading(userId)
-      await userAPI.deleteUser(userId)
-      setUsers(prev => prev.filter(u => u.id !== userId))
-      toast.success('User deleted successfully')
+      if (type === 'deactivate') {
+        await userAPI.updateUser(userId, { status: 'inactive' })
+        setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'inactive' } : u))
+        toast.success('User deactivated')
+      } else if (type === 'delete') {
+        await userAPI.deleteUser(userId)
+        setUsers(prev => prev.filter(u => u.id !== userId))
+        toast.success('User deleted successfully')
+      }
     } catch (err) {
-      console.error('Delete error:', err.response?.data || err.message)
-      toast.error(err.response?.data?.message || 'Failed to delete user')
+      toast.error(err.response?.data?.message || 'Failed')
     } finally {
       setActionLoading(null)
+      setConfirmModal({ open: false, type: '', userId: null, userName: '' })
     }
   }
 
@@ -155,10 +122,7 @@ const AdminUsers = () => {
     }
   }
 
-  const pendingCount = users.filter(
-    u => u.status === 'pending'
-  ).length
-
+  const pendingCount = users.filter(u => u.status === 'pending').length
 
   const handleCreateTeacher = async (e) => {
     e.preventDefault()
@@ -170,7 +134,6 @@ const AdminUsers = () => {
       toast.error('Password must be at least 6 characters')
       return
     }
-
     setTeacherLoading(true)
     try {
       await userAPI.createTeacher(teacherForm)
@@ -185,119 +148,63 @@ const AdminUsers = () => {
     }
   }
 
+  const getConfirmTitle = () => confirmModal.type === 'delete' ? 'Delete User' : 'Deactivate User'
+  const getConfirmMessage = () => confirmModal.type === 'delete'
+    ? `Delete "${confirmModal.userName}"? This permanently removes the user and all their data. This cannot be undone.`
+    : `Deactivate "${confirmModal.userName}"? They will no longer be able to log in until reactivated.`
+
   return (
     <DashboardLayout userRole="admin">
       <div className={styles.usersPage}>
-
-        {/* Page Header */}
         <div className={styles.pageHeader}>
           <div>
-            <h1 className={styles.pageTitle}>
-              User Management
-            </h1>
+            <h1 className={styles.pageTitle}>User Management</h1>
             <p className={styles.pageSubtitle}>
               {users.length} total users
               {pendingCount > 0 && (
-                <span className={styles.pendingBadge}>
-                  {pendingCount} pending approval
-                </span>
+                <span className={styles.pendingBadge}>{pendingCount} pending approval</span>
               )}
             </p>
           </div>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            <Button variant="secondary" onClick={fetchUsers}>
-              🔄 Refresh
-            </Button>
-            <Button variant="primary" onClick={() => setShowTeacherModal(true)}>
-              + Create Teacher
-            </Button>
+            <Button variant="secondary" onClick={fetchUsers}>🔄 Refresh</Button>
+            <Button variant="primary" onClick={() => setShowTeacherModal(true)}>+ Create Teacher</Button>
           </div>
         </div>
 
-        {/* Filters */}
         <div className={styles.filtersBar}>
           <div className={styles.searchWrapper}>
-            <Input
-              type="text"
-              placeholder="Search by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <Input type="text" placeholder="Search by name or email..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           </div>
-
           <div className={styles.filterButtons}>
-            {/* Role Filter */}
             <div className={styles.filterGroup}>
               <span className={styles.filterLabel}>Role:</span>
-              {['all', 'teacher', 'student'].map(
-                role => (
-                  <button
-                    key={role}
-                    className={`
-                      ${styles.filterBtn}
-                      ${filterRole === role 
-                        ? styles.filterBtnActive 
-                        : ''}
-                    `}
-                    onClick={() => setFilterRole(role)}
-                    aria-pressed={filterRole === role}
-                  >
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
-                  </button>
-                )
-              )}
+              {['all', 'teacher', 'student'].map(role => (
+                <button key={role} className={`${styles.filterBtn} ${filterRole === role ? styles.filterBtnActive : ''}`} onClick={() => setFilterRole(role)} aria-pressed={filterRole === role}>
+                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                </button>
+              ))}
             </div>
-
-            {/* Status Filter */}
             <div className={styles.filterGroup}>
-              <span className={styles.filterLabel}>
-                Status:
-              </span>
-              {['all', 'active', 'pending', 'inactive'].map(
-                status => (
-                  <button
-                    key={status}
-                    className={`
-                      ${styles.filterBtn}
-                      ${filterStatus === status
-                        ? styles.filterBtnActive
-                        : ''}
-                    `}
-                    onClick={() => setFilterStatus(status)}
-                    aria-pressed={filterStatus === status}
-                  >
-                    {status.charAt(0).toUpperCase() + 
-                      status.slice(1)}
-                  </button>
-                )
-              )}
+              <span className={styles.filterLabel}>Status:</span>
+              {['all', 'active', 'pending', 'inactive'].map(status => (
+                <button key={status} className={`${styles.filterBtn} ${filterStatus === status ? styles.filterBtnActive : ''}`} onClick={() => setFilterStatus(status)} aria-pressed={filterStatus === status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Error State */}
-        {error && (
-          <div className={styles.errorState} role="alert">
-            ⚠️ {error}
-          </div>
-        )}
+        {error && <div className={styles.errorState} role="alert">⚠️ {error}</div>}
 
-        {/* Loading State */}
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
+            <SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard />
           </div>
         ) : (
           <>
-            {/* Results Count */}
-            <p className={styles.resultsCount}>
-              Showing {filteredUsers.length} of {users.length} users
-            </p>
-
-            {/* Users Table */}
+            <p className={styles.resultsCount}>Showing {filteredUsers.length} of {users.length} users</p>
             <div className={styles.tableWrapper}>
               <table className={styles.table} aria-label="Data table">
                 <thead>
@@ -305,9 +212,7 @@ const AdminUsers = () => {
                     <th className={styles.th}>User</th>
                     <th className={styles.th}>Role</th>
                     <th className={styles.th}>Status</th>
-                    <th className={styles.th}>
-                      Email Verified
-                    </th>
+                    <th className={styles.th}>Email Verified</th>
                     <th className={styles.th}>Joined</th>
                     <th className={styles.th}>Actions</th>
                   </tr>
@@ -315,177 +220,60 @@ const AdminUsers = () => {
                 <tbody>
                   {filteredUsers.length === 0 ? (
                     <tr>
-                      <td
-                        colSpan={6}
-                        className={styles.emptyRow}
-                      >
-                        <div style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: '48px 16px',
-                          gap: '8px'
-                        }}>
+                      <td colSpan={6} className={styles.emptyRow}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 16px', gap: '8px' }}>
                           <span style={{ fontSize: '40px' }}>📭</span>
-                          <span style={{
-                            fontFamily: 'var(--font-body)',
-                            fontSize: '14px',
-                            color: 'var(--color-ink)',
-                            fontWeight: 'bold'
-                          }}>
-                            {searchTerm || filterRole !== 'all' || filterStatus !== 'all'
-                              ? 'No users match your filters'
-                              : 'No users registered yet'}
+                          <span style={{ fontFamily: 'var(--font-body)', fontSize: '14px', color: 'var(--color-ink)', fontWeight: 'bold' }}>
+                            {searchTerm || filterRole !== 'all' || filterStatus !== 'all' ? 'No users match your filters' : 'No users registered yet'}
                           </span>
-                          <span style={{
-                            fontFamily: 'var(--font-body)',
-                            fontSize: '14px',
-                            color: 'var(--color-muted)'
-                          }}>
-                            {searchTerm || filterRole !== 'all' || filterStatus !== 'all'
-                              ? 'Try adjusting your search or filters'
-                              : 'Users will appear here once they register'}
+                          <span style={{ fontFamily: 'var(--font-body)', fontSize: '14px', color: 'var(--color-muted)' }}>
+                            {searchTerm || filterRole !== 'all' || filterStatus !== 'all' ? 'Try adjusting your search or filters' : 'Users will appear here once they register'}
                           </span>
                         </div>
                       </td>
                     </tr>
                   ) : (
                     filteredUsers.map(user => (
-                      <tr
-                        key={user.id}
-                        className={styles.tr}
-                      >
-                        {/* User Info */}
+                      <tr key={user.id} className={styles.tr}>
                         <td className={styles.td}>
                           <div className={styles.userCell}>
-                            <div className={styles.avatar}>
-                              {user.name
-                                .split(' ')
-                                .map(n => n[0])
-                                .join('')
-                                .toUpperCase()
-                                .slice(0, 2)}
-                            </div>
+                            <div className={styles.avatar}>{user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}</div>
                             <div>
-                              <p className={styles.userName}>
-                                {user.name}
-                              </p>
-                              <p className={styles.userEmail}>
-                                {user.email}
-                              </p>
+                              <p className={styles.userName}>{user.name}</p>
+                              <p className={styles.userEmail}>{user.email}</p>
                             </div>
                           </div>
                         </td>
-
-                        {/* Role */}
                         <td className={styles.td}>
-                          <span className={`
-                            ${styles.badge}
-                            ${styles[`badge-${
-                              getRoleBadgeColor(user.role.name)
-                            }`]}
-                          `}>
-                            {user.role.name}
-                          </span>
+                          <span className={`${styles.badge} ${styles[`badge-${getRoleBadgeColor(user.role.name)}`]}`}>{user.role.name}</span>
                         </td>
-
-                        {/* Status */}
                         <td className={styles.td}>
-                          <span className={`
-                            ${styles.badge}
-                            ${styles[`badge-${
-                              getStatusBadgeColor(user.status)
-                            }`]}
-                          `}>
-                            {user.status}
-                          </span>
+                          <span className={`${styles.badge} ${styles[`badge-${getStatusBadgeColor(user.status)}`]}`}>{user.status}</span>
                         </td>
-
-                        {/* Email Verified */}
                         <td className={styles.td}>
-                          <span className={
-                            user.emailVerified
-                              ? styles.verifiedYes
-                              : styles.verifiedNo
-                          }>
-                            {user.emailVerified ? '✅' : '❌'}
-                          </span>
+                          <span className={user.emailVerified ? styles.verifiedYes : styles.verifiedNo}>{user.emailVerified ? '✅' : '❌'}</span>
                         </td>
-
-                        {/* Joined Date */}
                         <td className={styles.td}>
-                          <span className={styles.dateText}>
-                            {new Date(user.createdAt)
-                              .toLocaleDateString()}
-                          </span>
+                          <span className={styles.dateText}>{new Date(user.createdAt).toLocaleDateString()}</span>
                         </td>
-
-                        {/* Actions */}
                         <td className={styles.td}>
                           <div className={styles.actions}>
                             {user.status === 'pending' && (
-                              <button
-                                className={styles.approveBtn}
-                                onClick={() => 
-                                  handleApprove(user.id)
-                                }
-                                disabled={
-                                  actionLoading === user.id
-                                }
-                              >
-                                {actionLoading === user.id
-                                  ? '...'
-                                  : '✅ Approve'
-                                }
+                              <button className={styles.approveBtn} onClick={() => handleApprove(user.id)} disabled={actionLoading === user.id}>
+                                {actionLoading === user.id ? '...' : '✅ Approve'}
                               </button>
                             )}
-
                             {user.status === 'active' && (
-                              <button
-                                className={styles.deactivateBtn}
-                                onClick={() =>
-                                  handleDeactivate(user.id)
-                                }
-                                disabled={
-                                  actionLoading === user.id
-                                }
-                              >
-                                {actionLoading === user.id
-                                  ? '...'
-                                  : '🚫 Deactivate'
-                                }
+                              <button className={styles.deactivateBtn} onClick={() => promptDeactivate(user.id, user.name)} disabled={actionLoading === user.id}>
+                                {actionLoading === user.id ? '...' : '🚫 Deactivate'}
                               </button>
                             )}
-
                             {user.status === 'inactive' && (
-                              <button
-                                className={styles.approveBtn}
-                                onClick={() =>
-                                  handleApprove(user.id)
-                                }
-                                disabled={
-                                  actionLoading === user.id
-                                }
-                              >
-                                {actionLoading === user.id
-                                  ? '...'
-                                  : '✅ Activate'
-                                }
+                              <button className={styles.approveBtn} onClick={() => handleApprove(user.id)} disabled={actionLoading === user.id}>
+                                {actionLoading === user.id ? '...' : '✅ Activate'}
                               </button>
                             )}
-
-                            <button
-                              className={styles.deleteBtn}
-                              onClick={() =>
-                                handleDelete(user.id, user.name)
-                              }
-                              disabled={
-                                actionLoading === user.id
-                              }
-                            >
-                              🗑️
-                            </button>
+                            <button className={styles.deleteBtn} onClick={() => promptDelete(user.id, user.name)} disabled={actionLoading === user.id}>🗑️</button>
                           </div>
                         </td>
                       </tr>
@@ -496,15 +284,9 @@ const AdminUsers = () => {
             </div>
           </>
         )}
+
         {showTeacherModal && (
-          <div
-            style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "16px" }}
-            onClick={() => setShowTeacherModal(false)}
-            onKeyDown={(e) => { if (e.key === "Escape") setShowTeacherModal(false) }}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Create new teacher"
-          >
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "16px" }} onClick={() => setShowTeacherModal(false)} onKeyDown={(e) => { if (e.key === "Escape") setShowTeacherModal(false) }} role="dialog" aria-modal="true" aria-label="Create new teacher">
             <div style={{ background: "var(--color-surface-card)", borderRadius: "12px", padding: "32px", maxWidth: "480px", width: "100%", boxShadow: "var(--shadow-lg)" }} onClick={(e) => e.stopPropagation()}>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: "24px", fontWeight: "bold", margin: "0 0 8px 0", color: "var(--color-ink)" }}>👨‍🏫 Create New Teacher</h2>
               <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "var(--color-muted)", margin: "0 0 24px 0" }}>Set up a teacher account. They will use these credentials to login.</p>
@@ -530,6 +312,17 @@ const AdminUsers = () => {
             </div>
           </div>
         )}
+
+        <ConfirmModal
+          isOpen={confirmModal.open}
+          onClose={() => setConfirmModal({ open: false, type: '', userId: null, userName: '' })}
+          onConfirm={handleConfirmAction}
+          title={getConfirmTitle()}
+          message={getConfirmMessage()}
+          confirmLabel={confirmModal.type === 'delete' ? 'Delete User' : 'Deactivate User'}
+          confirmVariant={confirmModal.type === 'delete' ? 'danger' : 'warning'}
+          loading={!!actionLoading}
+        />
       </div>
     </DashboardLayout>
   )

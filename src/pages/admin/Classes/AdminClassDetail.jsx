@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
+import ConfirmModal from '../../../components/shared/ConfirmModal'
 import { classAPI, userAPI } from '../../../services/api'
 import styles from './AdminClassDetail.module.css'
 
@@ -15,6 +16,7 @@ const AdminClassDetail = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [activeTab, setActiveTab] = useState('overview')
+  const [confirmModal, setConfirmModal] = useState({ open: false, userId: null, userName: '' })
 
   useEffect(() => { fetchData() }, [classId])
 
@@ -46,8 +48,13 @@ const AdminClassDetail = () => {
     }
   }
 
-  const handleRemove = async (userId) => {
-    if (!window.confirm('Remove this user from class?')) return
+  const promptRemove = (userId, userName) => {
+    setConfirmModal({ open: true, userId, userName })
+  }
+
+  const handleRemove = async () => {
+    const { userId } = confirmModal
+    if (!userId) return
     try {
       await classAPI.removeStudent(classId, userId)
       setSuccess('User removed successfully!')
@@ -56,6 +63,8 @@ const AdminClassDetail = () => {
     } catch (err) {
       setError('Failed to remove user')
       setTimeout(() => setError(''), 3000)
+    } finally {
+      setConfirmModal({ open: false, userId: null, userName: '' })
     }
   }
 
@@ -85,65 +94,27 @@ const AdminClassDetail = () => {
     <DashboardLayout userRole="admin">
       <div className={styles.classDetailPage}>
 
-        {/* Header */}
         <div className={styles.pageHeader}>
-          <button
-            className={styles.backBtn}
-            onClick={() => navigate('/admin/classes')}
-          >
-            ← Back to Classes
-          </button>
+          <button className={styles.backBtn} onClick={() => navigate('/admin/classes')}>← Back to Classes</button>
           <div className={styles.headerInfo}>
             <h1 className={styles.pageTitle}>{cls?.name}</h1>
-            <p className={styles.pageSubtitle}>
-              {cls?.subject} • Created {formatDate(cls?.createdAt)}
-            </p>
+            <p className={styles.pageSubtitle}>{cls?.subject} • Created {formatDate(cls?.createdAt)}</p>
           </div>
         </div>
 
         {success && <div className={styles.successBanner}>✅ {success}</div>}
         {error && <div className={styles.errorBanner} role="alert">⚠️ {error}</div>}
 
-        {/* Stats Row */}
         <div className={styles.statsRow}>
-          <div className={styles.statCard}>
-            <span className={styles.statIcon}>👨‍🏫</span>
-            <div>
-              <p className={styles.statValue}>{enrolledTeachers.length}</p>
-              <p className={styles.statLabel}>Teachers</p>
-            </div>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statIcon}>🎓</span>
-            <div>
-              <p className={styles.statValue}>{enrolledStudents.length}</p>
-              <p className={styles.statLabel}>Students</p>
-            </div>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statIcon}>📢</span>
-            <div>
-              <p className={styles.statValue}>{cls?._count?.announcements || 0}</p>
-              <p className={styles.statLabel}>Announcements</p>
-            </div>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statIcon}>📝</span>
-            <div>
-              <p className={styles.statValue}>{cls?._count?.quizzes || 0}</p>
-              <p className={styles.statLabel}>Quizzes</p>
-            </div>
-          </div>
+          <div className={styles.statCard}><span className={styles.statIcon}>👨‍🏫</span><div><p className={styles.statValue}>{enrolledTeachers.length}</p><p className={styles.statLabel}>Teachers</p></div></div>
+          <div className={styles.statCard}><span className={styles.statIcon}>🎓</span><div><p className={styles.statValue}>{enrolledStudents.length}</p><p className={styles.statLabel}>Students</p></div></div>
+          <div className={styles.statCard}><span className={styles.statIcon}>📢</span><div><p className={styles.statValue}>{cls?._count?.announcements || 0}</p><p className={styles.statLabel}>Announcements</p></div></div>
+          <div className={styles.statCard}><span className={styles.statIcon}>📝</span><div><p className={styles.statValue}>{cls?._count?.quizzes || 0}</p><p className={styles.statLabel}>Quizzes</p></div></div>
         </div>
 
-        {/* Tabs */}
         <div className={styles.tabs}>
           {['overview', 'teachers', 'students'].map(tab => (
-            <button
-              key={tab}
-              className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
-              onClick={() => setActiveTab(tab)}
-            >
+            <button key={tab} className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`} onClick={() => setActiveTab(tab)}>
               {tab === 'overview' && '📋 Overview'}
               {tab === 'teachers' && `👨‍🏫 Teachers (${enrolledTeachers.length})`}
               {tab === 'students' && `🎓 Students (${enrolledStudents.length})`}
@@ -151,33 +122,17 @@ const AdminClassDetail = () => {
           ))}
         </div>
 
-        {/* Tab Content */}
         {activeTab === 'overview' && (
           <div className={styles.tabContent}>
             <div className={styles.overviewCard}>
               <h3 className={styles.cardTitle}>📋 Class Information</h3>
               <div className={styles.infoGrid}>
-                <div className={styles.infoItem}>
-                  <p className={styles.infoLabel}>Class Name</p>
-                  <p className={styles.infoValue}>{cls?.name}</p>
-                </div>
-                <div className={styles.infoItem}>
-                  <p className={styles.infoLabel}>Subject</p>
-                  <p className={styles.infoValue}>{cls?.subject}</p>
-                </div>
-                <div className={styles.infoItem}>
-                  <p className={styles.infoLabel}>Status</p>
-                  <p className={styles.infoValue}>{cls?.status}</p>
-                </div>
-                <div className={styles.infoItem}>
-                  <p className={styles.infoLabel}>Created</p>
-                  <p className={styles.infoValue}>{formatDate(cls?.createdAt)}</p>
-                </div>
+                <div className={styles.infoItem}><p className={styles.infoLabel}>Class Name</p><p className={styles.infoValue}>{cls?.name}</p></div>
+                <div className={styles.infoItem}><p className={styles.infoLabel}>Subject</p><p className={styles.infoValue}>{cls?.subject}</p></div>
+                <div className={styles.infoItem}><p className={styles.infoLabel}>Status</p><p className={styles.infoValue}>{cls?.status}</p></div>
+                <div className={styles.infoItem}><p className={styles.infoLabel}>Created</p><p className={styles.infoValue}>{formatDate(cls?.createdAt)}</p></div>
                 {cls?.description && (
-                  <div className={`${styles.infoItem} ${styles.infoItemFull}`}>
-                    <p className={styles.infoLabel}>Description</p>
-                    <p className={styles.infoValue}>{cls?.description}</p>
-                  </div>
+                  <div className={`${styles.infoItem} ${styles.infoItemFull}`}><p className={styles.infoLabel}>Description</p><p className={styles.infoValue}>{cls?.description}</p></div>
                 )}
               </div>
             </div>
@@ -186,11 +141,8 @@ const AdminClassDetail = () => {
 
         {activeTab === 'teachers' && (
           <div className={styles.tabContent}>
-            {/* Enrolled Teachers */}
             <div className={styles.userSection}>
-              <h3 className={styles.cardTitle}>
-                👨‍🏫 Enrolled Teachers ({enrolledTeachers.length})
-              </h3>
+              <h3 className={styles.cardTitle}>👨‍🏫 Enrolled Teachers ({enrolledTeachers.length})</h3>
               {enrolledTeachers.length === 0 ? (
                 <p className={styles.emptyText}>No teachers assigned yet.</p>
               ) : (
@@ -204,10 +156,7 @@ const AdminClassDetail = () => {
                         <p className={styles.userName}>{teacher.name}</p>
                         <p className={styles.userEmail}>{teacher.email}</p>
                       </div>
-                      <button
-                        className={styles.removeBtn}
-                        onClick={() => handleRemove(teacher.id)}
-                      >
+                      <button className={styles.removeBtn} onClick={() => promptRemove(teacher.id, teacher.name)}>
                         Remove
                       </button>
                     </div>
@@ -215,8 +164,6 @@ const AdminClassDetail = () => {
                 </div>
               )}
             </div>
-
-            {/* Available Teachers */}
             {availableTeachers.length > 0 && (
               <div className={styles.userSection}>
                 <h3 className={styles.cardTitle}>➕ Add Teacher</h3>
@@ -230,10 +177,7 @@ const AdminClassDetail = () => {
                         <p className={styles.userName}>{teacher.name}</p>
                         <p className={styles.userEmail}>{teacher.email}</p>
                       </div>
-                      <button
-                        className={styles.addBtn}
-                        onClick={() => handleEnroll(teacher.id)}
-                      >
+                      <button className={styles.addBtn} onClick={() => handleEnroll(teacher.id)}>
                         + Add
                       </button>
                     </div>
@@ -246,64 +190,64 @@ const AdminClassDetail = () => {
 
         {activeTab === 'students' && (
           <div className={styles.tabContent}>
-            {/* Enrolled Students */}
-            <div className={styles.userSection}>
-              <h3 className={styles.cardTitle}>
-                🎓 Enrolled Students ({enrolledStudents.length})
-              </h3>
-              {enrolledStudents.length === 0 ? (
-                <p className={styles.emptyText}>No students enrolled yet.</p>
-              ) : (
-                <div className={styles.userList}>
-                  {enrolledStudents.map(student => (
-                    <div key={student.id} className={styles.userCard}>
-                      <div className={`${styles.userAvatar} ${styles.studentAvatar}`}>
-                        {student.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+            <>
+              <div className={styles.userSection}>
+                <h3 className={styles.cardTitle}>🎓 Enrolled Students ({enrolledStudents.length})</h3>
+                {enrolledStudents.length === 0 ? (
+                  <p className={styles.emptyText}>No students enrolled yet.</p>
+                ) : (
+                  <div className={styles.userList}>
+                    {enrolledStudents.map(student => (
+                      <div key={student.id} className={styles.userCard}>
+                        <div className={`${styles.userAvatar} ${styles.studentAvatar}`}>
+                          {student.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                        </div>
+                        <div className={styles.userInfo}>
+                          <p className={styles.userName}>{student.name}</p>
+                          <p className={styles.userEmail}>{student.email}</p>
+                        </div>
+                        <button className={styles.removeBtn} onClick={() => promptRemove(student.id, student.name)}>
+                          Remove
+                        </button>
                       </div>
-                      <div className={styles.userInfo}>
-                        <p className={styles.userName}>{student.name}</p>
-                        <p className={styles.userEmail}>{student.email}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {availableStudents.length > 0 && (
+                <div className={styles.userSection}>
+                  <h3 className={styles.cardTitle}>➕ Add Student</h3>
+                  <div className={styles.userList}>
+                    {availableStudents.map(student => (
+                      <div key={student.id} className={styles.userCard}>
+                        <div className={`${styles.userAvatar} ${styles.studentAvatar}`}>
+                          {student.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                        </div>
+                        <div className={styles.userInfo}>
+                          <p className={styles.userName}>{student.name}</p>
+                          <p className={styles.userEmail}>{student.email}</p>
+                        </div>
+                        <button className={styles.addBtn} onClick={() => handleEnroll(student.id)}>
+                          + Add
+                        </button>
                       </div>
-                      <button
-                        className={styles.removeBtn}
-                        onClick={() => handleRemove(student.id)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
-            </div>
-
-            {/* Available Students */}
-            {availableStudents.length > 0 && (
-              <div className={styles.userSection}>
-                <h3 className={styles.cardTitle}>➕ Add Student</h3>
-                <div className={styles.userList}>
-                  {availableStudents.map(student => (
-                    <div key={student.id} className={styles.userCard}>
-                      <div className={`${styles.userAvatar} ${styles.studentAvatar}`}>
-                        {student.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                      </div>
-                      <div className={styles.userInfo}>
-                        <p className={styles.userName}>{student.name}</p>
-                        <p className={styles.userEmail}>{student.email}</p>
-                      </div>
-                      <button
-                        className={styles.addBtn}
-                        onClick={() => handleEnroll(student.id)}
-                      >
-                        + Add
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            </>
           </div>
         )}
 
+        <ConfirmModal
+          isOpen={confirmModal.open}
+          onClose={() => setConfirmModal({ open: false, userId: null, userName: '' })}
+          onConfirm={handleRemove}
+          title="Remove User from Class"
+          message={`Are you sure you want to remove "${confirmModal.userName}" from this class? They will lose access to all class materials.`}
+          confirmLabel="Remove"
+          confirmVariant="danger"
+        />
       </div>
     </DashboardLayout>
   )

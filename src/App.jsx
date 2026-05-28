@@ -1,6 +1,7 @@
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
+import ScrollToTop from './components/shared/ScrollToTop'
 
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -76,45 +77,48 @@ const SmartDashboard = () => {
 function App() {
   const { isAuthenticated } = useAuth()
   return (
-    <Routes>
-      <Route path="/login" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Login />} />
-      <Route path="/register" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Register />} />
-      <Route path="/dashboard" element={<ProtectedRoute><SmartDashboard /></ProtectedRoute>} />
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/login" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Login />} />
+        <Route path="/register" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Register />} />
+        <Route path="/dashboard" element={<ProtectedRoute><SmartDashboard /></ProtectedRoute>} />
 
-      {/* SETTINGS - available to all authenticated users */}
-      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        {/* SETTINGS - available to all authenticated users */}
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
-      {/* ADMIN */}
-      <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><AdminUsers /></ProtectedRoute>} />
-      <Route path="/admin/classes" element={<ProtectedRoute allowedRoles={['admin']}><AdminClasses /></ProtectedRoute>} />
-      <Route path="/admin/classes/new" element={<ProtectedRoute allowedRoles={['admin']}><NewClass /></ProtectedRoute>} />
-      <Route path="/admin/classes/:classId" element={<ProtectedRoute allowedRoles={['admin']}><AdminClassDetail /></ProtectedRoute>} />
+        {/* ADMIN */}
+        <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><AdminUsers /></ProtectedRoute>} />
+        <Route path="/admin/classes" element={<ProtectedRoute allowedRoles={['admin']}><AdminClasses /></ProtectedRoute>} />
+        <Route path="/admin/classes/new" element={<ProtectedRoute allowedRoles={['admin']}><NewClass /></ProtectedRoute>} />
+        <Route path="/admin/classes/:classId" element={<ProtectedRoute allowedRoles={['admin']}><AdminClassDetail /></ProtectedRoute>} />
 
-      {/* TEACHER */}
-      <Route path="/teacher/dashboard" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherDashboard /></ProtectedRoute>} />
-      <Route path="/teacher/classes" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherClasses /></ProtectedRoute>} />
-      <Route path="/teacher/classes/:classId" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherClassDetail /></ProtectedRoute>} />
-      <Route path="/teacher/classes/:classId/announcements/new" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><NewAnnouncement /></ProtectedRoute>} />
-      <Route path="/teacher/files" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherFiles /></ProtectedRoute>} />
-      <Route path="/teacher/quizzes" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherQuiz /></ProtectedRoute>} />
-      <Route path="/teacher/analytics" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherAnalytics /></ProtectedRoute>} />
+        {/* TEACHER */}
+        <Route path="/teacher/dashboard" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherDashboard /></ProtectedRoute>} />
+        <Route path="/teacher/classes" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherClasses /></ProtectedRoute>} />
+        <Route path="/teacher/classes/:classId" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherClassDetail /></ProtectedRoute>} />
+        <Route path="/teacher/classes/:classId/announcements/new" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><NewAnnouncement /></ProtectedRoute>} />
+        <Route path="/teacher/files" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherFiles /></ProtectedRoute>} />
+        <Route path="/teacher/quizzes" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherQuiz /></ProtectedRoute>} />
+        <Route path="/teacher/analytics" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherAnalytics /></ProtectedRoute>} />
 
-      {/* STUDENT */}
-      <Route path="/student/dashboard" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentDashboard /></ProtectedRoute>} />
-      <Route path="/student/classes" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentClasses /></ProtectedRoute>} />
-      <Route path="/student/announcements" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentAnnouncements /></ProtectedRoute>} />
-      <Route path="/student/announcements/:announcementId" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><AnnouncementDetail /></ProtectedRoute>} />
-      <Route path="/student/files" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentFiles /></ProtectedRoute>} />
-      <Route path="/student/quizzes" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentQuiz /></ProtectedRoute>} />
-      <Route path="/student/quizzes/:quizId/take" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><TakeQuiz /></ProtectedRoute>} />
-      <Route path="/student/results" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentResults /></ProtectedRoute>} />
+        {/* STUDENT */}
+        <Route path="/student/dashboard" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentDashboard /></ProtectedRoute>} />
+        <Route path="/student/classes" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentClasses /></ProtectedRoute>} />
+        <Route path="/student/announcements" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentAnnouncements /></ProtectedRoute>} />
+        <Route path="/student/announcements/:announcementId" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><AnnouncementDetail /></ProtectedRoute>} />
+        <Route path="/student/files" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentFiles /></ProtectedRoute>} />
+        <Route path="/student/quizzes" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentQuiz /></ProtectedRoute>} />
+        <Route path="/student/quizzes/:quizId/take" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><TakeQuiz /></ProtectedRoute>} />
+        <Route path="/student/results" element={<ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}><StudentResults /></ProtectedRoute>} />
 
-      {/* UTILITY */}
-      <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+        {/* UTILITY */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </>
   )
 }
 

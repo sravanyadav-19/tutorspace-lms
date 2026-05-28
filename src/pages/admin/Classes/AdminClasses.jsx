@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import Input from '../../../components/shared/Input'
+import ConfirmModal from '../../../components/shared/ConfirmModal'
 import { classAPI } from '../../../services/api'
 import { SkeletonGrid } from '../../../components/shared/Skeleton/Skeleton'
 import { useToast } from '../../../context/ToastContext'
@@ -16,6 +17,8 @@ const AdminClasses = () => {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [error, setError] = useState('')
+  const [deleting, setDeleting] = useState(null)
+  const [confirmModal, setConfirmModal] = useState({ open: false, classId: null, className: '' })
 
   useEffect(() => { fetchClasses() }, [])
 
@@ -44,19 +47,23 @@ const AdminClasses = () => {
     }
   }
 
-  const handleDelete = async (classId, className) => {
-    if (!window.confirm(
-      `Delete "${className}"? This cannot be undone.`
-    )) return
+  const promptDelete = (classId, className) => {
+    setConfirmModal({ open: true, classId, className })
+  }
 
+  const handleDelete = async () => {
+    const { classId, className } = confirmModal
+    if (!classId) return
+    setDeleting(classId)
     try {
       await classAPI.deleteClass(classId)
-      setClasses(prev => 
-        prev.filter(c => c.id !== classId)
-      )
+      setClasses(prev => prev.filter(c => c.id !== classId))
       toast.success('Class deleted successfully')
     } catch (err) {
       toast.error('Failed to delete class')
+    } finally {
+      setDeleting(null)
+      setConfirmModal({ open: false, classId: null, className: '' })
     }
   }
 
@@ -210,10 +217,10 @@ const AdminClasses = () => {
                       View Details
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="danger"
                       size="sm"
                       onClick={() =>
-                        handleDelete(cls.id, cls.name)
+                        promptDelete(cls.id, cls.name)
                       }
                     >
                       🗑️ Delete
@@ -224,6 +231,18 @@ const AdminClasses = () => {
             </div>
           </>
         )}
+
+        {/* Confirm Delete Modal */}
+        <ConfirmModal
+          isOpen={confirmModal.open}
+          onClose={() => setConfirmModal({ open: false, classId: null, className: '' })}
+          onConfirm={handleDelete}
+          title="Delete Class"
+          message={`Are you sure you want to delete "${confirmModal.className}"? This will also remove all associated announcements, files, quizzes, and enrollments. This action cannot be undone.`}
+          confirmLabel="Delete Class"
+          confirmVariant="danger"
+          loading={deleting === confirmModal.classId}
+        />
       </div>
     </DashboardLayout>
   )
