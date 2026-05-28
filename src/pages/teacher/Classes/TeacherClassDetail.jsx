@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
+import ConfirmModal from '../../../components/shared/ConfirmModal'
 import { classAPI, announcementAPI } from '../../../services/api'
 import styles from './TeacherClassDetail.module.css'
 import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
@@ -15,6 +16,8 @@ const TeacherClassDetail = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('overview')
+  const [confirmModal, setConfirmModal] = useState({ open: false, announcementId: null })
+  const [deleting, setDeleting] = useState(null)
 
   useEffect(() => { fetchData() }, [classId])
 
@@ -34,13 +37,22 @@ const TeacherClassDetail = () => {
     }
   }
 
-  const handleDeleteAnnouncement = async (announcementId) => {
-    if (!window.confirm('Delete this announcement?')) return
+  const promptDeleteAnnouncement = (announcementId) => {
+    setConfirmModal({ open: true, announcementId })
+  }
+
+  const handleDeleteAnnouncement = async () => {
+    const { announcementId } = confirmModal
+    if (!announcementId) return
+    setDeleting(announcementId)
     try {
       await announcementAPI.deleteAnnouncement(announcementId)
       setAnnouncements(prev => prev.filter(a => a.id !== announcementId))
     } catch (err) {
       setError('Failed to delete announcement')
+    } finally {
+      setDeleting(null)
+      setConfirmModal({ open: false, announcementId: null })
     }
   }
 
@@ -209,9 +221,7 @@ const TeacherClassDetail = () => {
                           </span>
                           <button
                             className={styles.deleteAnnouncementBtn}
-                            onClick={() => handleDeleteAnnouncement(
-                              announcement.id
-                            )}
+                            onClick={() => promptDeleteAnnouncement(announcement.id)}
                           >
                             🗑️
                           </button>
@@ -266,6 +276,16 @@ const TeacherClassDetail = () => {
           </div>
         )}
 
+        <ConfirmModal
+          isOpen={confirmModal.open}
+          onClose={() => setConfirmModal({ open: false, announcementId: null })}
+          onConfirm={handleDeleteAnnouncement}
+          title="Delete Announcement"
+          message="Are you sure you want to delete this announcement? All associated comments will also be removed. This cannot be undone."
+          confirmLabel="Delete Announcement"
+          confirmVariant="danger"
+          loading={!!deleting}
+        />
       </div>
     </DashboardLayout>
   )

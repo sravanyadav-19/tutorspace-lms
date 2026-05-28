@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
+import ConfirmModal from '../../../components/shared/ConfirmModal'
 import { classAPI, fileAPI } from '../../../services/api'
 import styles from './TeacherFiles.module.css'
 import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
@@ -21,6 +22,8 @@ const TeacherFiles = () => {
   const [zoomed, setZoomed] = useState(false)
   const fileInputRef = useRef(null)
   const token = localStorage.getItem('tutorspace_token')
+  const [confirmModal, setConfirmModal] = useState({ open: false, fileId: null, fileName: '' })
+  const [deleting, setDeleting] = useState(null)
 
   useEffect(() => { fetchClasses() }, [])
 
@@ -119,8 +122,14 @@ const TeacherFiles = () => {
     }
   }
 
-  const handleDelete = async (fileId, fileName) => {
-    if (!window.confirm(`Delete "${fileName}"? This cannot be undone.`)) return
+  const promptDelete = (fileId, fileName) => {
+    setConfirmModal({ open: true, fileId, fileName })
+  }
+
+  const handleDelete = async () => {
+    const { fileId, fileName } = confirmModal
+    if (!fileId) return
+    setDeleting(fileId)
     try {
       await fileAPI.deleteFile(fileId)
       setFiles(prev => prev.filter(f => f.id !== fileId))
@@ -128,6 +137,9 @@ const TeacherFiles = () => {
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       setError('Failed to delete file')
+    } finally {
+      setDeleting(null)
+      setConfirmModal({ open: false, fileId: null, fileName: '' })
     }
   }
 
@@ -155,278 +167,111 @@ const TeacherFiles = () => {
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+      year: 'numeric', month: 'short', day: 'numeric'
     })
   }
 
-  // ================================
-  // FULL PAGE PREVIEW (TEACHER)
-  // ================================
   if (previewFile) {
     return (
       <div className={styles.fullPageViewer}>
-
-        {/* Header */}
         <div className={styles.viewerHeader}>
-          <button className={styles.backBtn} onClick={handleClosePreview}>
-            ← Back
-          </button>
-          <h1 className={styles.viewerTitle}>
-            {previewFile.description || previewFile.originalName}
-          </h1>
-          <div className={styles.viewerRight}>
-            <span className={styles.teacherBadge}>👨‍🏫 Teacher Preview</span>
-          </div>
+          <button className={styles.backBtn} onClick={handleClosePreview}>← Back</button>
+          <h1 className={styles.viewerTitle}>{previewFile.description || previewFile.originalName}</h1>
+          <div className={styles.viewerRight}><span className={styles.teacherBadge}>👨‍🏫 Teacher Preview</span></div>
         </div>
-
-        {/* Content */}
         <div className={styles.viewerContent}>
-
-          {/* PDF */}
           {previewFile.mimeType === 'application/pdf' && (
-            <iframe
-              src={`${getViewUrl(previewFile.id)}#toolbar=1&navpanes=1&scrollbar=1`}
-              className={styles.pdfFrame}
-              title={previewFile.description || previewFile.originalName}
-            />
+            <iframe src={`${getViewUrl(previewFile.id)}#toolbar=1&navpanes=1&scrollbar=1`} className={styles.pdfFrame} title={previewFile.description || previewFile.originalName} />
           )}
-
-          {/* PNG */}
           {previewFile.mimeType === 'image/png' && (
-            <div
-              className={`
-                ${styles.imageContainer}
-                ${zoomed ? styles.imageContainerZoomed : ''}
-              `}
-              onClick={() => setZoomed(!zoomed)}
-            >
-              <img
-                src={getViewUrl(previewFile.id)}
-                alt={previewFile.description || previewFile.originalName}
-                className={`
-                  ${styles.viewerImage}
-                  ${zoomed ? styles.viewerImageZoomed : ''}
-                `}
-              />
+            <div className={`${styles.imageContainer} ${zoomed ? styles.imageContainerZoomed : ''}`} onClick={() => setZoomed(!zoomed)}>
+              <img src={getViewUrl(previewFile.id)} alt={previewFile.description || previewFile.originalName} className={`${styles.viewerImage} ${zoomed ? styles.viewerImageZoomed : ''}`} />
               {!zoomed && <div className={styles.zoomHint}>🔍 Click to zoom</div>}
               {zoomed && <div className={styles.zoomHint}>🔍 Click to zoom out</div>}
             </div>
           )}
-
         </div>
       </div>
     )
   }
 
-  // ================================
-  // MAIN PAGE
-  // ================================
   return (
     <DashboardLayout userRole="teacher">
       <div className={styles.filesPage}>
-
-        {/* Page Header */}
         <div className={styles.pageHeader}>
           <div>
             <h1 className={styles.pageTitle}>📄 File Sharing</h1>
-            <p className={styles.pageSubtitle}>
-              Upload PDF and PNG files for your classes
-            </p>
+            <p className={styles.pageSubtitle}>Upload PDF and PNG files for your classes</p>
           </div>
-          <Button variant="secondary" onClick={fetchClasses}>
-            🔄 Refresh
-          </Button>
+          <Button variant="secondary" onClick={fetchClasses}>🔄 Refresh</Button>
         </div>
 
         {success && <div className={styles.successBanner}>✅ {success}</div>}
         {error && <div className={styles.errorBanner} role="alert">⚠️ {error}</div>}
 
-        {loading ? (
-          <SkeletonCard />
-        ) : classes.length === 0 ? (
+        {loading ? <SkeletonCard /> : classes.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>📚</div>
             <h3 className={styles.emptyTitle}>No Classes Assigned</h3>
-            <p className={styles.emptyText}>
-              You need to be assigned to a class before uploading files.
-            </p>
+            <p className={styles.emptyText}>You need to be assigned to a class before uploading files.</p>
           </div>
         ) : (
           <div className={styles.contentLayout}>
-
-            {/* Class Sidebar */}
             <div className={styles.classSidebar}>
               <h3 className={styles.sidebarTitle}>Your Classes</h3>
               <div className={styles.classList}>
                 {classes.map(cls => (
-                  <button
-                    key={cls.id}
-                    className={`
-                      ${styles.classItem}
-                      ${selectedClass?.id === cls.id
-                        ? styles.classItemActive : ''}
-                    `}
-                    onClick={() => setSelectedClass(cls)}
-                  >
+                  <button key={cls.id} className={`${styles.classItem} ${selectedClass?.id === cls.id ? styles.classItemActive : ''}`} onClick={() => setSelectedClass(cls)}>
                     <span className={styles.classItemIcon}>📚</span>
-                    <div className={styles.classItemInfo}>
-                      <p className={styles.classItemName}>{cls.name}</p>
-                      <p className={styles.classItemSubject}>{cls.subject}</p>
-                    </div>
+                    <div className={styles.classItemInfo}><p className={styles.classItemName}>{cls.name}</p><p className={styles.classItemSubject}>{cls.subject}</p></div>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Main Content */}
             <div className={styles.mainContent}>
-
-              {/* Upload Section */}
               <div className={styles.uploadSection}>
-                <h2 className={styles.sectionTitle}>
-                  ⬆️ Upload to {selectedClass?.name}
-                </h2>
-
-                <div className={styles.fileTypeNotice}>
-                  <span>📄 PDF</span>
-                  <span>and</span>
-                  <span>🖼️ PNG</span>
-                  <span>files only • Max 10MB</span>
-                </div>
-
-                <div
-                  className={`
-                    ${styles.dropZone}
-                    ${dragOver ? styles.dropZoneActive : ''}
-                    ${selectedFile ? styles.dropZoneHasFile : ''}
-                  `}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    className={styles.fileInput}
-                    onChange={handleFileSelect}
-                    accept=".pdf,.png"
-                  />
-
+                <h2 className={styles.sectionTitle}>⬆️ Upload to {selectedClass?.name}</h2>
+                <div className={styles.fileTypeNotice}><span>📄 PDF</span><span>and</span><span>🖼️ PNG</span><span>files only • Max 10MB</span></div>
+                <div className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ''} ${selectedFile ? styles.dropZoneHasFile : ''}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={() => fileInputRef.current?.click()}>
+                  <input ref={fileInputRef} type="file" className={styles.fileInput} onChange={handleFileSelect} accept=".pdf,.png" />
                   {selectedFile ? (
                     <div className={styles.selectedFile}>
-                      <div className={styles.selectedFileIcon}>
-                        {selectedFile.type === 'application/pdf' ? '📄' : '🖼️'}
-                      </div>
-                      <div className={styles.selectedFileInfo}>
-                        <p className={styles.selectedFileName}>{selectedFile.name}</p>
-                        <p className={styles.selectedFileSize}>
-                          {getFileSize(selectedFile)} •{' '}
-                          {selectedFile.type === 'application/pdf'
-                            ? 'PDF Document' : 'PNG Image'}
-                        </p>
-                      </div>
-                      <button
-                        className={styles.removeFileBtn}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSelectedFile(null)
-                          if (fileInputRef.current) fileInputRef.current.value = ''
-                        }}
-                      >
-                        ✕
-                      </button>
+                      <div className={styles.selectedFileIcon}>{selectedFile.type === 'application/pdf' ? '📄' : '🖼️'}</div>
+                      <div className={styles.selectedFileInfo}><p className={styles.selectedFileName}>{selectedFile.name}</p><p className={styles.selectedFileSize}>{getFileSize(selectedFile)} • {selectedFile.type === 'application/pdf' ? 'PDF Document' : 'PNG Image'}</p></div>
+                      <button className={styles.removeFileBtn} onClick={(e) => { e.stopPropagation(); setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = '' }}>✕</button>
                     </div>
                   ) : (
                     <div className={styles.dropZoneContent}>
-                      <div className={styles.dropZoneIcons}>
-                        <span>📄</span>
-                        <span>🖼️</span>
-                      </div>
-                      <p className={styles.dropZoneText}>
-                        Drag & drop a PDF or PNG here, or{' '}
-                        <span className={styles.browseLink}>browse</span>
-                      </p>
+                      <div className={styles.dropZoneIcons}><span>📄</span><span>🖼️</span></div>
+                      <p className={styles.dropZoneText}>Drag & drop a PDF or PNG here, or <span className={styles.browseLink}>browse</span></p>
                     </div>
                   )}
                 </div>
-
                 <div className={styles.descriptionField}>
-                  <label className={styles.descriptionLabel}>
-                    File Name / Description
-                  </label>
-                  <input
-                    type="text"
-                    className={styles.descriptionInput}
-                    placeholder="e.g. Chapter 5 Notes, Assignment 2 Guide..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
+                  <label className={styles.descriptionLabel}>File Name / Description</label>
+                  <input type="text" className={styles.descriptionInput} placeholder="e.g. Chapter 5 Notes, Assignment 2 Guide..." value={description} onChange={(e) => setDescription(e.target.value)} />
                 </div>
-
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={handleUpload}
-                  disabled={uploading || !selectedFile}
-                >
-                  {uploading ? '⏳ Uploading...' : '⬆️ Upload File'}
+                <Button variant="primary" size="lg" onClick={handleUpload} loading={uploading} disabled={uploading || !selectedFile}>
+                  {uploading ? 'Uploading...' : '⬆️ Upload File'}
                 </Button>
               </div>
 
-              {/* Files List */}
               <div className={styles.filesSection}>
-                <h2 className={styles.sectionTitle}>
-                  📁 Uploaded Files
-                  <span className={styles.fileCount}>{files.length} files</span>
-                </h2>
-
-                {filesLoading ? (
-                  <SkeletonGrid count={3} type="card" />
-                ) : files.length === 0 ? (
-                  <div className={styles.emptyFiles}>
-                    <div className={styles.emptyIcon}>📭</div>
-                    <p className={styles.emptyText}>No files uploaded yet.</p>
-                  </div>
+                <h2 className={styles.sectionTitle}>📁 Uploaded Files<span className={styles.fileCount}>{files.length} files</span></h2>
+                {filesLoading ? <SkeletonGrid count={3} type="card" /> : files.length === 0 ? (
+                  <div className={styles.emptyFiles}><div className={styles.emptyIcon}>📭</div><p className={styles.emptyText}>No files uploaded yet.</p></div>
                 ) : (
                   <div className={styles.filesList}>
                     {files.map(file => (
                       <div key={file.id} className={styles.fileCard}>
-                        <div className={styles.fileIcon}>
-                          {file.mimeType === 'application/pdf' ? '📄' : '🖼️'}
-                        </div>
-                        <div className={styles.fileInfo}>
-                          <p className={styles.fileName}>
-                            {file.description || file.originalName}
-                          </p>
-                          <div className={styles.fileMeta}>
-                            <span>{file.formattedSize}</span>
-                            <span>•</span>
-                            <span>
-                              {file.mimeType === 'application/pdf' ? 'PDF' : 'PNG'}
-                            </span>
-                            <span>•</span>
-                            <span>{formatDate(file.uploadedAt)}</span>
-                          </div>
+                        <div className={styles.fileIcon}>{file.mimeType === 'application/pdf' ? '📄' : '🖼️'}</div>
+                        <div className={styles.fileInfo}><p className={styles.fileName}>{file.description || file.originalName}</p>
+                          <div className={styles.fileMeta}><span>{file.formattedSize}</span><span>•</span><span>{file.mimeType === 'application/pdf' ? 'PDF' : 'PNG'}</span><span>•</span><span>{formatDate(file.uploadedAt)}</span></div>
                         </div>
                         <div className={styles.fileActions}>
-                          <button
-                            className={styles.previewBtn}
-                            onClick={() => handlePreview(file)}
-                          >
-                            👁️ Preview
-                          </button>
-                          <button
-                            className={styles.deleteBtn}
-                            onClick={() => handleDelete(
-                              file.id,
-                              file.originalName
-                            )}
-                          >
-                            🗑️ Delete
-                          </button>
+                          <button className={styles.previewBtn} onClick={() => handlePreview(file)}>👁️ Preview</button>
+                          <button className={styles.deleteBtn} onClick={() => promptDelete(file.id, file.originalName)}>🗑️ Delete</button>
                         </div>
                       </div>
                     ))}
@@ -436,6 +281,17 @@ const TeacherFiles = () => {
             </div>
           </div>
         )}
+
+        <ConfirmModal
+          isOpen={confirmModal.open}
+          onClose={() => setConfirmModal({ open: false, fileId: null, fileName: '' })}
+          onConfirm={handleDelete}
+          title="Delete File"
+          message={`Are you sure you want to delete "${confirmModal.fileName}"? This file will be permanently removed and students will no longer have access. This cannot be undone.`}
+          confirmLabel="Delete File"
+          confirmVariant="danger"
+          loading={!!deleting}
+        />
       </div>
     </DashboardLayout>
   )

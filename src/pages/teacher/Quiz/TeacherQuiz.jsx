@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
+import ConfirmModal from '../../../components/shared/ConfirmModal'
 import { classAPI, quizAPI } from '../../../services/api'
 import styles from './TeacherQuiz.module.css'
 import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
@@ -32,6 +33,12 @@ const TeacherQuiz = () => {
   const [quizErrors, setQuizErrors] = useState({})
   const [quizTouched, setQuizTouched] = useState({})
   const [quizFormValid, setQuizFormValid] = useState(false)
+
+  // Confirm modals
+  const [deleteModal, setDeleteModal] = useState({ open: false, quizId: null, title: '' })
+  const [releaseModal, setReleaseModal] = useState({ open: false, quizId: null, title: '' })
+  const [deleting, setDeleting] = useState(null)
+  const [releasing, setReleasing] = useState(null)
 
   useEffect(() => { fetchClasses() }, [])
   useEffect(() => { if (selectedClass) fetchQuizzes(selectedClass.id) }, [selectedClass])
@@ -167,24 +174,42 @@ const TeacherQuiz = () => {
     }
   }
 
-  const handleDeleteQuiz = async (quizId, title) => {
-    if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return
+  const promptDelete = (quizId, title) => {
+    setDeleteModal({ open: true, quizId, title })
+  }
+
+  const handleDeleteQuiz = async () => {
+    const { quizId } = deleteModal
+    if (!quizId) return
+    setDeleting(quizId)
     try {
       await quizAPI.deleteQuiz(quizId)
       setQuizzes(prev => prev.filter((q) => q.id !== quizId))
       toast.success('Quiz deleted successfully')
     } catch (err) {
       toast.error('Failed to delete quiz')
+    } finally {
+      setDeleting(null)
+      setDeleteModal({ open: false, quizId: null, title: '' })
     }
   }
 
-  const handleReleaseResults = async (quizId) => {
-    if (!window.confirm('Release results to all students?')) return
+  const promptRelease = (quizId, title) => {
+    setReleaseModal({ open: true, quizId, title })
+  }
+
+  const handleReleaseResults = async () => {
+    const { quizId } = releaseModal
+    if (!quizId) return
+    setReleasing(quizId)
     try {
       await quizAPI.releaseResults(quizId)
       toast.success('Results released to students!')
     } catch (err) {
       toast.error('Failed to release results')
+    } finally {
+      setReleasing(null)
+      setReleaseModal({ open: false, quizId: null, title: '' })
     }
   }
 
@@ -218,10 +243,7 @@ const TeacherQuiz = () => {
                 {classes.map(cls => (
                   <button key={cls.id} className={`${styles.classItem} ${selectedClass?.id === cls.id ? styles.classItemActive : ''}`} onClick={() => { setSelectedClass(cls); setShowCreateForm(false) }}>
                     <span className={styles.classItemIcon}>📚</span>
-                    <div className={styles.classItemInfo}>
-                      <p className={styles.classItemName}>{cls.name}</p>
-                      <p className={styles.classItemSubject}>{cls.subject}</p>
-                    </div>
+                    <div className={styles.classItemInfo}><p className={styles.classItemName}>{cls.name}</p><p className={styles.classItemSubject}>{cls.subject}</p></div>
                   </button>
                 ))}
               </div>
@@ -290,7 +312,7 @@ const TeacherQuiz = () => {
                   </div>
                   <div className={styles.formActions}>
                     <Button variant="secondary" onClick={() => setShowCreateForm(false)}>Cancel</Button>
-                    <Button variant="primary" onClick={handleCreateQuiz} disabled={creating || !quizFormValid}>{creating ? '⏳ Creating...' : '✅ Create Quiz'}</Button>
+                    <Button variant="primary" onClick={handleCreateQuiz} loading={creating} disabled={creating || !quizFormValid}>{creating ? 'Creating...' : '✅ Create Quiz'}</Button>
                   </div>
                 </div>
               )}
@@ -315,18 +337,16 @@ const TeacherQuiz = () => {
                             <span className={`${styles.publishBadge} ${quiz.isPublished ? styles.publishedBadge : styles.draftBadge}`}>{quiz.isPublished ? '🟢 Published' : '⚪ Draft'}</span>
                           </div>
                           <div className={styles.quizMeta}>
-                            <span>❓ {quiz._count?.questions || 0} questions</span>
-                            <span>•</span>
+                            <span>❓ {quiz._count?.questions || 0} questions</span><span>•</span>
                             <span>👥 {quiz._count?.submissions || 0} submissions</span>
                             {quiz.timeLimit && <><span>•</span><span>⏱️ {quiz.timeLimit} min</span></>}
-                            <span>•</span>
-                            <span>{formatDate(quiz.createdAt)}</span>
+                            <span>•</span><span>{formatDate(quiz.createdAt)}</span>
                           </div>
                         </div>
                         <div className={styles.quizActions}>
                           <button className={`${styles.actionBtn} ${quiz.isPublished ? styles.unpublishBtn : styles.publishBtn}`} onClick={() => handleTogglePublish(quiz.id, quiz.isPublished)}>{quiz.isPublished ? '⏸ Unpublish' : '▶ Publish'}</button>
-                          <button className={`${styles.actionBtn} ${styles.resultsBtn}`} onClick={() => handleReleaseResults(quiz.id)}>📊 Release Results</button>
-                          <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => handleDeleteQuiz(quiz.id, quiz.title)}>🗑️ Delete</button>
+                          <button className={`${styles.actionBtn} ${styles.resultsBtn}`} onClick={() => promptRelease(quiz.id, quiz.title)}>📊 Release Results</button>
+                          <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => promptDelete(quiz.id, quiz.title)}>🗑️ Delete</button>
                         </div>
                       </div>
                     ))}
@@ -336,6 +356,27 @@ const TeacherQuiz = () => {
             </div>
           </div>
         )}
+
+        <ConfirmModal
+          isOpen={deleteModal.open}
+          onClose={() => setDeleteModal({ open: false, quizId: null, title: '' })}
+          onConfirm={handleDeleteQuiz}
+          title="Delete Quiz"
+          message={`Are you sure you want to delete "${deleteModal.title}"? All questions, submissions, and results will be permanently removed. This cannot be undone.`}
+          confirmLabel="Delete Quiz"
+          confirmVariant="danger"
+          loading={!!deleting}
+        />
+        <ConfirmModal
+          isOpen={releaseModal.open}
+          onClose={() => setReleaseModal({ open: false, quizId: null, title: '' })}
+          onConfirm={handleReleaseResults}
+          title="Release Quiz Results"
+          message={`Are you sure you want to release results for "${releaseModal.title}"? All students who submitted will be able to see their scores and answer reviews. This cannot be undone.`}
+          confirmLabel="Release Results"
+          confirmVariant="primary"
+          loading={!!releasing}
+        />
       </div>
     </DashboardLayout>
   )
