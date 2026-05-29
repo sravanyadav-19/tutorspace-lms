@@ -234,3 +234,9 @@
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
+/* ======================================
+   KEYBOARD FOCUS STYLES
+   ====================================== */
+.profileBtn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-full); }
+.dropdownItem:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; background: var(--color-canvas); }
+.menuBtn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
