@@ -1,117 +1,98 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ArrowLeft, BookOpen, Target, GraduationCap, CheckCircle, PlusCircle } from 'lucide-react'
 import DashboardLayout from '../../../../components/layout/DashboardLayout'
 import Button from '../../../../components/shared/Button'
 import Input from '../../../../components/shared/Input'
-import ConfirmModal from '../../../../components/shared/ConfirmModal'
-import { classAPI } from '../../../../services/api'
+import { Textarea } from '../../../../components/shared/Input'
+import { classAPI, userAPI } from '../../../../services/api'
 import { useToast } from '../../../../context/ToastContext'
 import { validateField } from '../../../../utils/validation'
 import styles from './NewClass.module.css'
-import { SkeletonCard } from '../../../../components/shared/Skeleton/Skeleton'
 
 const NewClass = () => {
   const navigate = useNavigate()
   const toast = useToast()
   const nameRef = useRef(null)
 
-  const [teachers, setTeachers] = useState([])
-  const [students, setStudents] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [creating, setCreating] = useState(false)
-  const [error, setError] = useState('')
-  const [confirmModal, setConfirmModal] = useState({ open: false, message: '', onConfirm: null })
-
-  const [name, setName] = useState('')
-  const [subject, setSubject] = useState('')
-  const [description, setDescription] = useState('')
-  const [selectedTeachers, setSelectedTeachers] = useState([])
-  const [selectedStudents, setSelectedStudents] = useState([])
-
+  const [formData, setFormData] = useState({ name: '', subject: '', description: '' })
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
   const [isValid, setIsValid] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [teachers, setTeachers] = useState([])
+  const [selectedTeachers, setSelectedTeachers] = useState([])
+  const [selectedStudents, setSelectedStudents] = useState([])
+  const [students, setStudents] = useState([])
 
   useEffect(() => { fetchUsers() }, [])
-
-  // Auto-focus first input on mount
-  useEffect(() => {
-    setTimeout(() => nameRef.current?.focus(), 100)
-  }, [])
+  useEffect(() => setTimeout(() => nameRef.current?.focus(), 100), [])
 
   useEffect(() => {
     const newErrors = {}
     let valid = true
-    const nameErr = validateField('name', name)
-    const subjectErr = validateField('subject', subject)
+    const nameErr = validateField('className', formData.name)
+    const subjErr = validateField('subject', formData.subject)
     if (nameErr) { newErrors.name = nameErr; valid = false }
-    if (subjectErr) { newErrors.subject = subjectErr; valid = false }
+    if (subjErr) { newErrors.subject = subjErr; valid = false }
     setErrors(newErrors)
     setIsValid(valid)
-  }, [name, subject])
+  }, [formData])
 
   const fetchUsers = async () => {
     try {
-      setLoading(true)
-      const res = await import('../../../../services/api')
-      const { userAPI } = res
-      const usersRes = await userAPI.getAllUsers()
-      const allUsers = usersRes.data.data.users
-      setTeachers(allUsers.filter(u => u.role?.name === 'teacher' && u.status === 'active'))
-      setStudents(allUsers.filter(u => u.role?.name === 'student' && u.status === 'active'))
-    } catch (err) {
-      setError('Failed to load users')
-    } finally {
-      setLoading(false)
-    }
+      const res = await userAPI.getAllUsers()
+      const allUsers = res.data.data.users
+      setTeachers(allUsers.filter((u) => u.role.name === 'teacher'))
+      setStudents(allUsers.filter((u) => u.role.name === 'student'))
+    } catch (err) { console.error('Failed to fetch users') }
   }
 
   const handleChange = (e) => {
-    const { name: fieldName, value } = e.target
-    switch (fieldName) {
-      case 'name': setName(value); break
-      case 'subject': setSubject(value); break
-      case 'description': setDescription(value); break
-      default: break
-    }
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
   }
 
-  const handleBlur = (e) => {
-    const { name: fieldName } = e.target
-    setTouched(prev => ({ ...prev, [fieldName]: true }))
-  }
+  const handleBlur = (e) => { const { name } = e.target; setTouched(prev => ({ ...prev, [name]: true })) }
 
-  const toggleUser = (userId, listType) => {
-    if (listType === 'teacher') {
-      setSelectedTeachers(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId])
-    } else {
-      setSelectedStudents(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId])
-    }
-  }
+  const toggleTeacher = (teacherId) => setSelectedTeachers(prev => prev.includes(teacherId) ? prev.filter(id => id !== teacherId) : [...prev, teacherId])
+  const toggleStudent = (studentId) => setSelectedStudents(prev => prev.includes(studentId) ? prev.filter(id => id !== studentId) : [...prev, studentId])
 
-  const handleCreate = async (e) => {
-    if (e) e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     setTouched({ name: true, subject: true })
     if (!isValid) return
-
-    setCreating(true)
-    setError('')
+    setLoading(true)
     try {
-      await classAPI.createClass({
-        name,
-        subject,
-        description: description || undefined,
-        teacherIds: selectedTeachers,
-        studentIds: selectedStudents
-      })
-      toast.success(`Class "${name}" created successfully!`)
-      navigate('/admin/classes')
+      const classRes = await classAPI.createClass(formData)
+      const newClass = classRes.data.data.class
+      for (const teacherId of selectedTeachers) { await classAPI.enrollStudent(newClass.id, teacherId) }
+      for (const studentId of selectedStudents) { await classAPI.enrollStudent(newClass.id, studentId) }
+      setSuccess(true)
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.errors?.[0]?.message || 'Failed to create class'
       toast.error(msg)
-    } finally {
-      setCreating(false)
-    }
+    } finally { setLoading(false) }
+  }
+
+  if (success) {
+    return (
+      <DashboardLayout userRole="admin">
+        <div className={styles.successPage}>
+          <div className={styles.successCard}>
+            <CheckCircle size={48} color="var(--color-success)" style={{ marginBottom: '16px' }} />
+            <h2 className={styles.successTitle}>Class Created Successfully!</h2>
+            <p className={styles.successText}>Your new class is ready with {selectedTeachers.length} teacher(s) and {selectedStudents.length} student(s) enrolled.</p>
+            <div className={styles.successActions}>
+              <Button variant="primary" onClick={() => navigate('/admin/classes')}>View All Classes</Button>
+              <Button variant="secondary" onClick={() => { setSuccess(false); setFormData({ name: '', subject: '', description: '' }); setSelectedTeachers([]); setSelectedStudents([]); setTouched({}) }}>Create Another</Button>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    )
   }
 
   return (
@@ -119,84 +100,55 @@ const NewClass = () => {
       <div className={styles.newClassPage}>
         <div className={styles.pageHeader}>
           <div>
-            <h1 className={styles.pageTitle}>📚 Create New Class</h1>
+            <button className={styles.backBtn} onClick={() => navigate('/admin/classes')}><ArrowLeft size={16} style={{ marginRight: '6px' }} /> Back to Classes</button>
+            <h1 className={styles.pageTitle}>Create New Class</h1>
             <p className={styles.pageSubtitle}>Set up a new class and assign teachers and students</p>
           </div>
-          <Button variant="secondary" onClick={() => navigate('/admin/classes')}>← Back to Classes</Button>
         </div>
-
-        {error && <div className={styles.errorBanner} role="alert">⚠️ {error}</div>}
-
-        {loading ? <SkeletonCard /> : (
-          <form onSubmit={handleCreate} className={styles.form} noValidate>
-            <div className={styles.formSection}>
-              <h2 className={styles.sectionTitle}>📋 Class Details</h2>
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <Input label="Class Name" name="name" placeholder="e.g. Mathematics 101" value={name} onChange={handleChange} onBlur={handleBlur} error={touched.name ? errors.name : ''} required ref={nameRef} />
-                </div>
-                <div className={styles.formGroup}>
-                  <Input label="Subject" name="subject" placeholder="e.g. Calculus" value={subject} onChange={handleChange} onBlur={handleBlur} error={touched.subject ? errors.subject : ''} required />
-                </div>
+        <form onSubmit={handleSubmit} className={styles.createForm}>
+          <div className={styles.formSection}>
+            <h2 className={styles.sectionTitle}><BookOpen size={18} style={{ marginRight: '6px' }} /> Class Details</h2>
+            <div className={styles.formFields}>
+              <Input label="Class Name" name="name" placeholder="e.g. Introduction to Python" value={formData.name} onChange={handleChange} onBlur={handleBlur} error={touched.name ? errors.name : ''} required disabled={loading} />
+              <Input label="Subject" name="subject" placeholder="e.g. Computer Science" value={formData.subject} onChange={handleChange} onBlur={handleBlur} error={touched.subject ? errors.subject : ''} required disabled={loading} />
+              <Textarea label="Description (Optional)" name="description" placeholder="Describe what students will learn..." value={formData.description} onChange={handleChange} rows={4} disabled={loading} />
+            </div>
+          </div>
+          <div className={styles.formSection}>
+            <h2 className={styles.sectionTitle}><Target size={18} style={{ marginRight: '6px' }} /> Assign Teachers <span className={styles.sectionCount}>{selectedTeachers.length} selected</span></h2>
+            {teachers.length === 0 ? <p className={styles.noUsers}>No teachers registered yet</p> : (
+              <div className={styles.userGrid}>
+                {teachers.map(teacher => (
+                  <button key={teacher.id} type="button" className={`${styles.userCard} ${selectedTeachers.includes(teacher.id) ? styles.userCardSelected : ''}`} onClick={() => toggleTeacher(teacher.id)}>
+                    <div className={styles.userAvatar}>{teacher.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}</div>
+                    <div className={styles.userInfo}><p className={styles.userName}>{teacher.name}</p><p className={styles.userEmail}>{teacher.email}</p></div>
+                    {selectedTeachers.includes(teacher.id) && <CheckCircle size={18} color="var(--color-success)" />}
+                  </button>
+                ))}
               </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Description (optional)</label>
-                <textarea className={styles.textarea} placeholder="Brief description of the class..." value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
+            )}
+          </div>
+          <div className={styles.formSection}>
+            <h2 className={styles.sectionTitle}><GraduationCap size={18} style={{ marginRight: '6px' }} /> Assign Students <span className={styles.sectionCount}>{selectedStudents.length} selected</span></h2>
+            {students.length === 0 ? <p className={styles.noUsers}>No students registered yet</p> : (
+              <div className={styles.userGrid}>
+                {students.map(student => (
+                  <button key={student.id} type="button" className={`${styles.userCard} ${selectedStudents.includes(student.id) ? styles.userCardSelected : ''}`} onClick={() => toggleStudent(student.id)}>
+                    <div className={`${styles.userAvatar} ${styles.studentAvatar}`}>{student.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}</div>
+                    <div className={styles.userInfo}><p className={styles.userName}>{student.name}</p><p className={styles.userEmail}>{student.email}</p></div>
+                    {selectedStudents.includes(student.id) && <CheckCircle size={18} color="var(--color-success)" />}
+                  </button>
+                ))}
               </div>
-            </div>
-
-            <div className={styles.formSection}>
-              <h2 className={styles.sectionTitle}>👨‍🏫 Assign Teachers</h2>
-              {teachers.length === 0 ? (
-                <p className={styles.emptyText}>No active teachers available. Create teacher accounts first.</p>
-              ) : (
-                <div className={styles.userGrid}>
-                  {teachers.map(teacher => (
-                    <div key={teacher.id} className={`${styles.userCard} ${selectedTeachers.includes(teacher.id) ? styles.userCardSelected : ''}`} onClick={() => toggleUser(teacher.id, 'teacher')}>
-                      <div className={styles.userAvatar}>{teacher.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}</div>
-                      <div className={styles.userInfo}><p className={styles.userName}>{teacher.name}</p><p className={styles.userEmail}>{teacher.email}</p></div>
-                      <span className={selectedTeachers.includes(teacher.id) ? styles.checkMark : styles.addMark}>{selectedTeachers.includes(teacher.id) ? '✓' : '+'}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className={styles.formSection}>
-              <h2 className={styles.sectionTitle}>🎓 Enroll Students</h2>
-              {students.length === 0 ? (
-                <p className={styles.emptyText}>No active students available. Students must register first.</p>
-              ) : (
-                <div className={styles.userGrid}>
-                  {students.map(student => (
-                    <div key={student.id} className={`${styles.userCard} ${selectedStudents.includes(student.id) ? styles.userCardSelected : ''}`} onClick={() => toggleUser(student.id, 'student')}>
-                      <div className={styles.userAvatar}>{student.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}</div>
-                      <div className={styles.userInfo}><p className={styles.userName}>{student.name}</p><p className={styles.userEmail}>{student.email}</p></div>
-                      <span className={selectedStudents.includes(student.id) ? styles.checkMark : styles.addMark}>{selectedStudents.includes(student.id) ? '✓' : '+'}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className={styles.formActions}>
-              <Button variant="secondary" onClick={() => navigate('/admin/classes')}>Cancel</Button>
-              <Button variant="primary" type="submit" loading={creating} disabled={creating || !isValid}>
-                {creating ? 'Creating...' : '✅ Create Class'}
-              </Button>
-            </div>
-          </form>
-        )}
-
-        <ConfirmModal
-          isOpen={confirmModal.open}
-          onClose={() => setConfirmModal({ open: false, message: '', onConfirm: null })}
-          onConfirm={() => { confirmModal.onConfirm?.(); setConfirmModal({ open: false, message: '', onConfirm: null }) }}
-          title="Confirm"
-          message={confirmModal.message}
-          confirmLabel="Continue"
-          confirmVariant="primary"
-        />
+            )}
+          </div>
+          <div className={styles.formActions}>
+            <Button type="button" variant="secondary" onClick={() => navigate('/admin/classes')} disabled={loading}>Cancel</Button>
+            <Button type="submit" variant="primary" size="lg" loading={loading} disabled={loading || !isValid}>
+              {loading ? 'Creating...' : <><PlusCircle size={16} style={{ marginRight: '6px' }} /> Create Class</>}
+            </Button>
+          </div>
+        </form>
       </div>
     </DashboardLayout>
   )

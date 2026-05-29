@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { BookOpen, Users, Megaphone, ClipboardList, RefreshCw } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import StatCard from '../../../components/dashboard/StatCard'
-import ActivityFeed from '../../../components/dashboard/ActivityFeed'
 import Button from '../../../components/shared/Button'
 import { useAuth } from '../../../context/AuthContext'
 import { classAPI } from '../../../services/api'
@@ -14,20 +13,12 @@ const TeacherDashboard = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  const [stats, setStats] = useState({
-    totalClasses: 0,
-    totalStudents: 0,
-    totalAnnouncements: 0,
-    totalQuizzes: 0
-  })
+  const [stats, setStats] = useState({ totalClasses: 0, totalStudents: 0, totalAnnouncements: 0, totalQuizzes: 0 })
   const [classes, setClasses] = useState([])
-  const [recentAnnouncements, setRecentAnnouncements] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    fetchTeacherData()
-  }, [])
+  useEffect(() => { fetchTeacherData() }, [])
 
   const fetchTeacherData = async () => {
     try {
@@ -35,43 +26,18 @@ const TeacherDashboard = () => {
       const res = await classAPI.getTeacherClasses()
       const teacherClasses = res.data.data.classes
       setClasses(teacherClasses)
-
       const totalStudents = teacherClasses.reduce((sum, cls) => sum + (cls._count?.enrollments || 0), 0)
       const totalAnnouncements = teacherClasses.reduce((sum, cls) => sum + (cls._count?.announcements || 0), 0)
       const totalQuizzes = teacherClasses.reduce((sum, cls) => sum + (cls._count?.quizzes || 0), 0)
-
-      setStats({
-        totalClasses: teacherClasses.length,
-        totalStudents,
-        totalAnnouncements,
-        totalQuizzes
-      })
-
-      const classItems = teacherClasses.slice(0, 5).map(cls => ({
-        icon: '📚',
-        name: cls.name,
-        meta: `${cls.subject} • ${cls._count?.enrollments || 0} students`,
-        badge: cls.status,
-        badgeColor: cls.status === 'active' ? 'success' : 'warning',
-        time: new Date(cls.createdAt).toLocaleDateString()
-      }))
-
-      setRecentAnnouncements(classItems)
-    } catch (err) {
-      setError('Failed to load teacher data')
-      console.error('Teacher dashboard error:', err)
-    } finally {
-      setLoading(false)
-    }
+      setStats({ totalClasses: teacherClasses.length, totalStudents, totalAnnouncements, totalQuizzes })
+    } catch (err) { setError('Failed to load teacher data') }
+    finally { setLoading(false) }
   }
 
   if (loading) {
     return (
       <DashboardLayout userRole="teacher">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <SkeletonGrid count={4} type="stat" />
-          <SkeletonGrid count={2} type="card" />
-        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}><SkeletonGrid count={4} type="stat" /><SkeletonGrid count={2} type="card" /></div>
       </DashboardLayout>
     )
   }
@@ -81,22 +47,12 @@ const TeacherDashboard = () => {
       <div className={styles.teacherDashboard}>
         <div className={styles.pageHeader}>
           <div className={styles.headerLeft}>
-            <h1 className={styles.pageTitle}>
-              Welcome back, {user?.name}!
-            </h1>
-            <p className={styles.pageSubtitle}>
-              Here's your teaching overview for today.
-            </p>
+            <h1 className={styles.pageTitle}>Welcome back, {user?.name}!</h1>
+            <p className={styles.pageSubtitle}>Here's your teaching overview for today.</p>
           </div>
           <div className={styles.headerRight}>
-            <Button variant="secondary" onClick={fetchTeacherData}>
-              <RefreshCw size={16} style={{ marginRight: '6px' }} />
-              Refresh
-            </Button>
-            <Button variant="primary" onClick={() => navigate('/teacher/announcements/new')}>
-              <Megaphone size={16} style={{ marginRight: '6px' }} />
-              New Announcement
-            </Button>
+            <Button variant="secondary" onClick={fetchTeacherData}><RefreshCw size={16} style={{ marginRight: '6px' }} /> Refresh</Button>
+            <Button variant="primary" onClick={() => navigate('/teacher/announcements/new')}><Megaphone size={16} style={{ marginRight: '6px' }} /> New Announcement</Button>
           </div>
         </div>
 
@@ -112,58 +68,36 @@ const TeacherDashboard = () => {
         <div className={styles.quickActions}>
           <h2 className={styles.sectionTitle}>Quick Actions</h2>
           <div className={styles.actionButtons}>
-            <button className={styles.actionBtn} onClick={() => navigate('/teacher/classes')}>
-              <BookOpen size={18} />
-              <span className={styles.actionLabel}>My Classes</span>
-            </button>
-            <button className={styles.actionBtn} onClick={() => navigate('/teacher/announcements')}>
-              <Megaphone size={18} />
-              <span className={styles.actionLabel}>Post Announcement</span>
-            </button>
-            <button className={styles.actionBtn} onClick={() => navigate('/teacher/files')}>
-              <ClipboardList size={18} />
-              <span className={styles.actionLabel}>Upload Files</span>
-            </button>
-            <button className={styles.actionBtn} onClick={() => navigate('/teacher/quizzes')}>
-              <ClipboardList size={18} />
-              <span className={styles.actionLabel}>Create Quiz</span>
-            </button>
+            <button className={styles.actionBtn} onClick={() => navigate('/teacher/classes')}><BookOpen size={18} /><span className={styles.actionLabel}>My Classes</span></button>
+            <button className={styles.actionBtn} onClick={() => navigate('/teacher/announcements')}><Megaphone size={18} /><span className={styles.actionLabel}>Post Announcement</span></button>
+            <button className={styles.actionBtn} onClick={() => navigate('/teacher/files')}><ClipboardList size={18} /><span className={styles.actionLabel}>Upload Files</span></button>
+            <button className={styles.actionBtn} onClick={() => navigate('/teacher/quizzes')}><ClipboardList size={18} /><span className={styles.actionLabel}>Create Quiz</span></button>
           </div>
         </div>
 
         {classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📚</div>
+            <BookOpen size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h3 className={styles.emptyTitle}>No Classes Assigned</h3>
-            <p className={styles.emptyText}>
-              You haven't been assigned to any classes yet.
-              Contact your administrator for class assignments.
-            </p>
-            <Button variant="secondary" onClick={() => navigate('/teacher/profile')}>
-              Update Profile
-            </Button>
+            <p className={styles.emptyText}>You haven't been assigned to any classes yet. Contact your administrator for class assignments.</p>
+            <Button variant="secondary" onClick={() => navigate('/teacher/profile')}>Update Profile</Button>
           </div>
         ) : (
           <div className={styles.classesSection}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Your Classes</h2>
-              <Button variant="ghost" onClick={() => navigate('/teacher/classes')}>View All &rarr;</Button>
-            </div>
+            <div className={styles.sectionHeader}><h2 className={styles.sectionTitle}>Your Classes</h2><Button variant="ghost" onClick={() => navigate('/teacher/classes')}>View All &rarr;</Button></div>
             <div className={styles.classesGrid}>
               {classes.slice(0, 3).map(cls => (
                 <div key={cls.id} className={styles.classCard} onClick={() => navigate(`/teacher/classes/${cls.id}`)}>
-                  <div className={styles.classIcon}>📚</div>
+                  <BookOpen size={24} color="var(--color-primary)" />
                   <div className={styles.classInfo}>
                     <h3 className={styles.className}>{cls.name}</h3>
                     <p className={styles.classSubject}>{cls.subject}</p>
                     <div className={styles.classStats}>
-                      <span className={styles.statItem}>👥 {cls._count?.enrollments || 0} students</span>
-                      <span className={styles.statItem}>📢 {cls._count?.announcements || 0} announcements</span>
+                      <span><Users size={12} /> {cls._count?.enrollments || 0} students</span>
+                      <span><Megaphone size={12} /> {cls._count?.announcements || 0} announcements</span>
                     </div>
                   </div>
-                  <div className={styles.classActions}>
-                    <span className={`${styles.statusBadge} ${styles[`status-${cls.status}`]}`}>{cls.status}</span>
-                  </div>
+                  <div className={styles.classActions}><span className={`${styles.statusBadge} ${styles[`status-${cls.status}`]}`}>{cls.status}</span></div>
                 </div>
               ))}
             </div>
