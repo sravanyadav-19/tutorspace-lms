@@ -72,10 +72,10 @@ const TeacherClassDetail = () => {
         {error && <div className={styles.errorBanner} role="alert"><AlertCircle size={16} style={{ marginRight: '6px' }} /> {error}</div>}
 
         <div className={styles.statsRow}>
-          <div className={styles.statCard}><GraduationCap size={22} color="var(--color-primary)" /><div><p className={styles.statValue}>{enrolledStudents.length}</p><p className={styles.statLabel}>Students</p></div></div>
-          <div className={styles.statCard}><Megaphone size={22} color="var(--color-primary)" /><div><p className={styles.statValue}>{announcements.length}</p><p className={styles.statLabel}>Announcements</p></div></div>
-          <div className={styles.statCard}><ClipboardList size={22} color="var(--color-primary)" /><div><p className={styles.statValue}>{cls?._count?.quizzes || 0}</p><p className={styles.statLabel}>Quizzes</p></div></div>
-          <div className={styles.statCard}><FileText size={22} color="var(--color-primary)" /><div><p className={styles.statValue}>{cls?._count?.files || 0}</p><p className={styles.statLabel}>Files</p></div></div>
+          <div className={styles.statCard}><GraduationCap size={22} color="#cc785c" /><div><p className={styles.statValue}>{enrolledStudents.length}</p><p className={styles.statLabel}>Students</p></div></div>
+          <div className={styles.statCard}><Megaphone size={22} color="#cc785c" /><div><p className={styles.statValue}>{announcements.length}</p><p className={styles.statLabel}>Announcements</p></div></div>
+          <div className={styles.statCard}><ClipboardList size={22} color="#cc785c" /><div><p className={styles.statValue}>{cls?._count?.quizzes || 0}</p><p className={styles.statLabel}>Quizzes</p></div></div>
+          <div className={styles.statCard}><FileText size={22} color="#cc785c" /><div><p className={styles.statValue}>{cls?._count?.files || 0}</p><p className={styles.statLabel}>Files</p></div></div>
         </div>
 
         <div className={styles.tabs}>
@@ -108,7 +108,7 @@ const TeacherClassDetail = () => {
             <div className={styles.announcementsSection}>
               {announcements.length === 0 ? (
                 <div className={styles.emptyState}>
-                  <Megaphone size={32} color="var(--color-muted)" style={{ marginBottom: '12px', opacity: 0.5 }} />
+                  <Megaphone size={32} color="#6c6a64" style={{ marginBottom: '12px', opacity: 0.5 }} />
                   <p className={styles.emptyText}>No announcements yet. Create your first one!</p>
                   <Button variant="primary" onClick={() => navigate(`/teacher/classes/${classId}/announcements/new`)}><Plus size={16} style={{ marginRight: '6px' }} /> New Announcement</Button>
                 </div>
@@ -137,7 +137,7 @@ const TeacherClassDetail = () => {
           <div className={styles.tabContent}>
             <div className={styles.studentsSection}>
               {enrolledStudents.length === 0 ? (
-                <div className={styles.emptyState}><GraduationCap size={32} color="var(--color-muted)" style={{ marginBottom: '12px', opacity: 0.5 }} /><p className={styles.emptyText}>No students enrolled yet.</p></div>
+                <div className={styles.emptyState}><GraduationCap size={32} color="#6c6a64" style={{ marginBottom: '12px', opacity: 0.5 }} /><p className={styles.emptyText}>No students enrolled yet.</p></div>
               ) : (
                 <div className={styles.studentsList}>
                   {enrolledStudents.map(enrollment => (

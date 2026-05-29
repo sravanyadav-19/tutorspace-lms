@@ -51,7 +51,7 @@ const StudentResults = () => {
 
         {loading ? <SkeletonGrid count={3} type="card" /> : submissions.length === 0 ? (
           <div className={styles.emptyState}>
-            <BarChart3 size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+            <BarChart3 size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h3 className={styles.emptyTitle}>No Results Yet</h3><p className={styles.emptyText}>Your teacher hasn't released any quiz results yet.</p>
           </div>
         ) : (

@@ -74,7 +74,7 @@ const AnnouncementDetail = () => {
         <div className={styles.announcementCard}>
           <div className={styles.announcementHeader}>
             <div className={styles.authorInfo}>
-              <div className={styles.authorAvatar}><Target size={20} color="var(--color-primary)" /></div>
+              <div className={styles.authorAvatar}><Target size={20} color="#cc785c" /></div>
               <div className={styles.authorDetails}><p className={styles.authorName}>Teacher</p><p className={styles.postTime}>Announcement #{announcementId}</p></div>
             </div>
           </div>
@@ -98,7 +98,7 @@ const AnnouncementDetail = () => {
                 <div key={comment.id} className={styles.commentCard}>
                   <div className={styles.commentHeader}>
                     <div className={styles.commentAuthor}>
-                      <div className={styles.commentAvatar}>{comment.author?.role?.name === 'teacher' ? <Target size={16} color="var(--color-primary)" /> : <GraduationCap size={16} color="var(--color-info)" />}</div>
+                      <div className={styles.commentAvatar}>{comment.author?.role?.name === 'teacher' ? <Target size={16} color="#cc785c" /> : <GraduationCap size={16} color="#5db8a6" />}</div>
                       <div className={styles.commentAuthorInfo}>
                         <p className={styles.commentAuthorName}>{comment.author?.name}{comment.author?.role?.name === 'teacher' && <span className={styles.teacherBadge}>Teacher</span>}</p>
                         <p className={styles.commentTime}>{formatDate(comment.createdAt)}</p>

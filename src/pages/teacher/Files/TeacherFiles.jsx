@@ -140,7 +140,7 @@ const TeacherFiles = () => {
 
         {loading ? <SkeletonCard /> : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <BookOpen size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h3 className={styles.emptyTitle}>No Classes Assigned</h3>
             <p className={styles.emptyText}>You need to be assigned to a class before uploading files.</p>
           </div>
@@ -160,12 +160,12 @@ const TeacherFiles = () => {
             <div className={styles.mainContent}>
               <div className={styles.uploadSection}>
                 <h2 className={styles.sectionTitle}><Upload size={18} style={{ marginRight: '6px' }} /> Upload to {selectedClass?.name}</h2>
-                <div className={styles.fileTypeNotice}><FileText size={14} color="var(--color-error)" /> PDF <span>and</span> <Image size={14} color="var(--color-info)" /> PNG <span>files only • Max 10MB</span></div>
+                <div className={styles.fileTypeNotice}><FileText size={14} color="#c64545" /> PDF <span>and</span> <Image size={14} color="#5db8a6" /> PNG <span>files only • Max 10MB</span></div>
                 <div className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ''} ${selectedFile ? styles.dropZoneHasFile : ''}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={() => fileInputRef.current?.click()}>
                   <input ref={fileInputRef} type="file" className={styles.fileInput} onChange={handleFileSelect} accept=".pdf,.png" />
                   {selectedFile ? (
                     <div className={styles.selectedFile}>
-                      <div className={styles.selectedFileIcon}>{selectedFile.type === 'application/pdf' ? <FileText size={24} color="var(--color-error)" /> : <Image size={24} color="var(--color-info)" />}</div>
+                      <div className={styles.selectedFileIcon}>{selectedFile.type === 'application/pdf' ? <FileText size={24} color="#c64545" /> : <Image size={24} color="#5db8a6" />}</div>
                       <div className={styles.selectedFileInfo}><p className={styles.selectedFileName}>{selectedFile.name}</p><p className={styles.selectedFileSize}>{getFileSize(selectedFile)} • {selectedFile.type === 'application/pdf' ? 'PDF Document' : 'PNG Image'}</p></div>
                       <button className={styles.removeFileBtn} onClick={(e) => { e.stopPropagation(); setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = '' }}><X size={16} /></button>
                     </div>
@@ -188,12 +188,12 @@ const TeacherFiles = () => {
               <div className={styles.filesSection}>
                 <h2 className={styles.sectionTitle}>Uploaded Files <span className={styles.fileCount}>{files.length} files</span></h2>
                 {filesLoading ? <SkeletonGrid count={3} type="card" /> : files.length === 0 ? (
-                  <div className={styles.emptyFiles}><FileText size={32} color="var(--color-muted)" style={{ marginBottom: '12px', opacity: 0.5 }} /><p className={styles.emptyText}>No files uploaded yet.</p></div>
+                  <div className={styles.emptyFiles}><FileText size={32} color="#6c6a64" style={{ marginBottom: '12px', opacity: 0.5 }} /><p className={styles.emptyText}>No files uploaded yet.</p></div>
                 ) : (
                   <div className={styles.filesList}>
                     {files.map(file => (
                       <div key={file.id} className={styles.fileCard}>
-                        <div className={styles.fileIcon}>{file.mimeType === 'application/pdf' ? <FileText size={48} color="var(--color-error)" /> : <Image size={48} color="var(--color-info)" />}</div>
+                        <div className={styles.fileIcon}>{file.mimeType === 'application/pdf' ? <FileText size={48} color="#c64545" /> : <Image size={48} color="#5db8a6" />}</div>
                         <div className={styles.fileInfo}><p className={styles.fileName}>{file.description || file.originalName}</p>
                           <div className={styles.fileMeta}><span>{file.formattedSize}</span><span>•</span><span>{file.mimeType === 'application/pdf' ? 'PDF' : 'PNG'}</span><span>•</span><span>{formatDate(file.uploadedAt)}</span></div>
                         </div>

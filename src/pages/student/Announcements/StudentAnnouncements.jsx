@@ -60,7 +60,7 @@ const StudentAnnouncements = () => {
 
         {loading ? <SkeletonCard /> : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <BookOpen size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h3 className={styles.emptyTitle}>No Classes Found</h3>
             <p className={styles.emptyText}>You are not enrolled in any classes yet.</p>
           </div>
@@ -89,7 +89,7 @@ const StudentAnnouncements = () => {
 
               {announcementsLoading ? <SkeletonGrid count={3} type="card" /> : announcements.length === 0 ? (
                 <div className={styles.emptyAnnouncements}>
-                  <Megaphone size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+                  <Megaphone size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
                   <h3 className={styles.emptyTitle}>No Announcements Yet</h3>
                   <p className={styles.emptyText}>Your teacher hasn't posted any announcements yet. Check back soon!</p>
                 </div>
@@ -99,7 +99,7 @@ const StudentAnnouncements = () => {
                     <div key={announcement.id} className={styles.announcementCard} onClick={() => navigate(`/student/announcements/${announcement.id}`)}>
                       <div className={styles.announcementHeader}>
                         <div className={styles.authorInfo}>
-                          <div className={styles.authorAvatar}><Target size={20} color="var(--color-primary)" /></div>
+                          <div className={styles.authorAvatar}><Target size={20} color="#cc785c" /></div>
                           <div className={styles.authorDetails}>
                             <p className={styles.authorName}>{announcement.author?.name || 'Teacher'}</p>
                             <p className={styles.postTime}>{formatDate(announcement.createdAt)}</p>

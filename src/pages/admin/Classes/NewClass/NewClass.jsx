@@ -82,7 +82,7 @@ const NewClass = () => {
       <DashboardLayout userRole="admin">
         <div className={styles.successPage}>
           <div className={styles.successCard}>
-            <CheckCircle size={48} color="var(--color-success)" style={{ marginBottom: '16px' }} />
+            <CheckCircle size={48} color="#5db872" style={{ marginBottom: '16px' }} />
             <h2 className={styles.successTitle}>Class Created Successfully!</h2>
             <p className={styles.successText}>Your new class is ready with {selectedTeachers.length} teacher(s) and {selectedStudents.length} student(s) enrolled.</p>
             <div className={styles.successActions}>
@@ -122,7 +122,7 @@ const NewClass = () => {
                   <button key={teacher.id} type="button" className={`${styles.userCard} ${selectedTeachers.includes(teacher.id) ? styles.userCardSelected : ''}`} onClick={() => toggleTeacher(teacher.id)}>
                     <div className={styles.userAvatar}>{teacher.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}</div>
                     <div className={styles.userInfo}><p className={styles.userName}>{teacher.name}</p><p className={styles.userEmail}>{teacher.email}</p></div>
-                    {selectedTeachers.includes(teacher.id) && <CheckCircle size={18} color="var(--color-success)" />}
+                    {selectedTeachers.includes(teacher.id) && <CheckCircle size={18} color="#5db872" />}
                   </button>
                 ))}
               </div>
@@ -136,7 +136,7 @@ const NewClass = () => {
                   <button key={student.id} type="button" className={`${styles.userCard} ${selectedStudents.includes(student.id) ? styles.userCardSelected : ''}`} onClick={() => toggleStudent(student.id)}>
                     <div className={`${styles.userAvatar} ${styles.studentAvatar}`}>{student.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}</div>
                     <div className={styles.userInfo}><p className={styles.userName}>{student.name}</p><p className={styles.userEmail}>{student.email}</p></div>
-                    {selectedStudents.includes(student.id) && <CheckCircle size={18} color="var(--color-success)" />}
+                    {selectedStudents.includes(student.id) && <CheckCircle size={18} color="#5db872" />}
                   </button>
                 ))}
               </div>

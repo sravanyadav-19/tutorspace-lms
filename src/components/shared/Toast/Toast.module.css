@@ -81,3 +81,9 @@
     opacity: 1;
   }
 }
+@media (max-width: 360px) {
+  .toast {
+    min-width: unset;
+    max-width: 100%;
+  }
+}

@@ -77,7 +77,7 @@ const TeacherDashboard = () => {
 
         {classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <BookOpen size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h3 className={styles.emptyTitle}>No Classes Assigned</h3>
             <p className={styles.emptyText}>You haven't been assigned to any classes yet. Contact your administrator for class assignments.</p>
             <Button variant="secondary" onClick={() => navigate('/teacher/profile')}>Update Profile</Button>
@@ -88,13 +88,13 @@ const TeacherDashboard = () => {
             <div className={styles.classesGrid}>
               {classes.slice(0, 3).map(cls => (
                 <div key={cls.id} className={styles.classCard} onClick={() => navigate(`/teacher/classes/${cls.id}`)}>
-                  <BookOpen size={24} color="var(--color-primary)" />
+                  <div className={styles.classIcon}><BookOpen size={24} /></div>
                   <div className={styles.classInfo}>
                     <h3 className={styles.className}>{cls.name}</h3>
                     <p className={styles.classSubject}>{cls.subject}</p>
                     <div className={styles.classStats}>
-                      <span><Users size={12} /> {cls._count?.enrollments || 0} students</span>
-                      <span><Megaphone size={12} /> {cls._count?.announcements || 0} announcements</span>
+                      <span><Users size={12} style={{ marginRight: '4px' }} />{cls._count?.enrollments || 0} students</span>
+                      <span><Megaphone size={12} style={{ marginRight: '4px' }} /> {cls._count?.announcements || 0} announcements</span>
                     </div>
                   </div>
                   <div className={styles.classActions}><span className={`${styles.statusBadge} ${styles[`status-${cls.status}`]}`}>{cls.status}</span></div>

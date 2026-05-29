@@ -70,10 +70,10 @@ const AdminClassDetail = () => {
         {error && <div className={styles.errorBanner} role="alert"><AlertCircle size={16} style={{ marginRight: '6px' }} /> {error}</div>}
 
         <div className={styles.statsRow}>
-          <div className={styles.statCard}><Target size={22} color="var(--color-primary)" /><div><p className={styles.statValue}>{enrolledTeachers.length}</p><p className={styles.statLabel}>Teachers</p></div></div>
-          <div className={styles.statCard}><GraduationCap size={22} color="var(--color-primary)" /><div><p className={styles.statValue}>{enrolledStudents.length}</p><p className={styles.statLabel}>Students</p></div></div>
-          <div className={styles.statCard}><Megaphone size={22} color="var(--color-primary)" /><div><p className={styles.statValue}>{cls?._count?.announcements || 0}</p><p className={styles.statLabel}>Announcements</p></div></div>
-          <div className={styles.statCard}><ClipboardList size={22} color="var(--color-primary)" /><div><p className={styles.statValue}>{cls?._count?.quizzes || 0}</p><p className={styles.statLabel}>Quizzes</p></div></div>
+          <div className={styles.statCard}><Target size={22} color="#cc785c" /><div><p className={styles.statValue}>{enrolledTeachers.length}</p><p className={styles.statLabel}>Teachers</p></div></div>
+          <div className={styles.statCard}><GraduationCap size={22} color="#cc785c" /><div><p className={styles.statValue}>{enrolledStudents.length}</p><p className={styles.statLabel}>Students</p></div></div>
+          <div className={styles.statCard}><Megaphone size={22} color="#cc785c" /><div><p className={styles.statValue}>{cls?._count?.announcements || 0}</p><p className={styles.statLabel}>Announcements</p></div></div>
+          <div className={styles.statCard}><ClipboardList size={22} color="#cc785c" /><div><p className={styles.statValue}>{cls?._count?.quizzes || 0}</p><p className={styles.statLabel}>Quizzes</p></div></div>
         </div>
 
         <div className={styles.tabs}>

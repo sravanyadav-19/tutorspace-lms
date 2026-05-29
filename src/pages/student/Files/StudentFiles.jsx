@@ -103,7 +103,7 @@ const StudentFiles = () => {
 
         {loading ? <SkeletonCard /> : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <BookOpen size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h3 className={styles.emptyTitle}>No Classes Found</h3><p className={styles.emptyText}>You are not enrolled in any classes yet.</p>
           </div>
         ) : (
@@ -124,14 +124,14 @@ const StudentFiles = () => {
                 <div className={styles.filesSectionHeader}><h2 className={styles.sectionTitle}><FileText size={18} style={{ marginRight: '6px' }} /> {selectedClass?.name}</h2><span className={styles.fileCount}>{files.length} files</span></div>
                 {filesLoading ? <SkeletonGrid count={3} type="card" /> : files.length === 0 ? (
                   <div className={styles.emptyFiles}>
-                    <FileText size={32} color="var(--color-muted)" style={{ marginBottom: '12px', opacity: 0.5 }} />
+                    <FileText size={32} color="#6c6a64" style={{ marginBottom: '12px', opacity: 0.5 }} />
                     <h3 className={styles.emptyTitle}>No Files Yet</h3><p className={styles.emptyText}>Your teacher hasn't uploaded any files yet.</p>
                   </div>
                 ) : (
                   <div className={styles.filesGrid}>
                     {files.map(file => (
                       <button key={file.id} className={styles.fileCard} onClick={() => handleViewFile(file)}>
-                        <div className={styles.fileCardIcon}>{file.mimeType === 'application/pdf' ? <FileText size={48} color="var(--color-error)" /> : <Image size={48} color="var(--color-info)" />}</div>
+                        <div className={styles.fileCardIcon}>{file.mimeType === 'application/pdf' ? <FileText size={48} color="#c64545" /> : <Image size={48} color="#5db8a6" />}</div>
                         <div className={styles.fileCardInfo}><p className={styles.fileCardName}>{file.description || file.originalName}</p><p className={styles.fileCardMeta}>{file.mimeType === 'application/pdf' ? 'PDF' : 'PNG'} • {file.formattedSize}</p><p className={styles.fileCardDate}>{formatDate(file.uploadedAt)}</p></div>
                         <div className={styles.viewBtn}><Eye size={14} style={{ marginRight: '4px' }} /> View</div>
                       </button>

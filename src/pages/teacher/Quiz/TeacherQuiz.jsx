@@ -135,7 +135,7 @@ const TeacherQuiz = () => {
 
         {loading ? <SkeletonCard /> : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <BookOpen size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h3 className={styles.emptyTitle}>No Classes Assigned</h3><p className={styles.emptyText}>You need to be assigned to a class first.</p>
           </div>
         ) : (
@@ -184,7 +184,7 @@ const TeacherQuiz = () => {
                 <div className={styles.quizzesHeader}><h2 className={styles.sectionTitle}><ClipboardList size={18} style={{ marginRight: '6px' }} /> {selectedClass?.name} Quizzes</h2><span className={styles.quizCount}>{quizzes.length} quizzes</span></div>
                 {quizzesLoading ? <SkeletonGrid count={3} type="card" /> : quizzes.length === 0 ? (
                   <div className={styles.emptyQuizzes}>
-                    <ClipboardList size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+                    <ClipboardList size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
                     <h3 className={styles.emptyTitle}>No Quizzes Yet</h3><p className={styles.emptyText}>Click "Create Quiz" to add your first quiz.</p>
                   </div>
                 ) : (

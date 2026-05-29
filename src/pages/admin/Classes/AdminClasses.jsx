@@ -72,7 +72,7 @@ const AdminClasses = () => {
 
         {loading ? <SkeletonGrid count={4} type="card" /> : filteredClasses.length === 0 ? (
           <div className={styles.emptyState}>
-            <BookOpen size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h3 className={styles.emptyTitle}>No classes found</h3>
             <p className={styles.emptyText}>{searchTerm ? 'Try a different search term' : 'Create your first class to get started'}</p>
             {!searchTerm && <Button variant="primary" onClick={() => navigate('/admin/classes/new')}><PlusCircle size={16} style={{ marginRight: '6px' }} /> Create First Class</Button>}
@@ -85,7 +85,7 @@ const AdminClasses = () => {
               {filteredClasses.map(cls => (
                 <div key={cls.id} className={styles.classCard}>
                   <div className={styles.cardHeader}>
-                    <BookOpen size={28} color="var(--color-primary)" />
+                    <div className={styles.classIcon}><BookOpen size={28} /></div>
                     <span className={`${styles.statusBadge} ${styles[`status-${cls.status}`]}`}>{cls.status}</span>
                   </div>
                   <div className={styles.classInfo}>

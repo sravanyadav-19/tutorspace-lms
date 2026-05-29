@@ -34,7 +34,7 @@ const StudentClasses = () => {
 
         {loading ? <SkeletonGrid count={4} type="card" /> : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <BookOpen size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h3 className={styles.emptyTitle}>No Classes Found</h3>
             <p className={styles.emptyText}>You are not enrolled in any classes yet.</p>
           </div>
@@ -42,14 +42,14 @@ const StudentClasses = () => {
           <div className={styles.classesGrid}>
             {classes.map(cls => (
               <div key={cls.id} className={styles.classCard}>
-                <BookOpen size={24} color="var(--color-primary)" />
+                <div className={styles.classIcon}><BookOpen size={24} /></div>
                 <div className={styles.classInfo}>
                   <h3 className={styles.className}>{cls.name}</h3>
                   <p className={styles.classSubject}>{cls.subject}</p>
                   {cls.description && <p className={styles.classDescription}>{cls.description}</p>}
                   <div className={styles.classStats}>
-                    <span><Megaphone size={12} /> {cls._count?.announcements || 0} announcements</span>
-                    <span><ClipboardList size={12} /> {cls._count?.quizzes || 0} quizzes</span>
+                    <span><Megaphone size={12} style={{ marginRight: '4px' }} /> {cls._count?.announcements || 0} announcements</span>
+                    <span><ClipboardList size={12} style={{ marginRight: '4px' }} /> {cls._count?.quizzes || 0} quizzes</span>
                     <span><Users size={12} /> {cls._count?.enrollments || 0} enrolled</span>
                   </div>
                 </div>

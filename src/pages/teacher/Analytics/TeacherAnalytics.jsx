@@ -81,7 +81,7 @@ const TeacherAnalytics = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}><SkeletonGrid count={2} type="card" /><SkeletonGrid count={4} type="stat" /></div>
         ) : classes.length === 0 ? (
           <div className={styles.emptyState}>
-            <BookOpen size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h3 className={styles.emptyTitle}>No Classes Assigned</h3><p className={styles.emptyText}>You need to be assigned to a class first.</p>
           </div>
         ) : (
@@ -117,7 +117,7 @@ const TeacherAnalytics = () => {
             <div className={styles.mainContent}>
               {!selectedQuiz ? (
                 <div className={styles.selectQuizPrompt}>
-                  <ClipboardList size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+                  <ClipboardList size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
                   <h3 className={styles.emptyTitle}>Select a Quiz</h3><p className={styles.emptyText}>Choose a quiz from the left to view analytics</p>
                 </div>
               ) : (

@@ -67,3 +67,8 @@
   gap: var(--space-md);
   justify-content: center;
 }
+@media (max-width: 480px) {
+  .actions {
+    flex-direction: column;
+  }
+}

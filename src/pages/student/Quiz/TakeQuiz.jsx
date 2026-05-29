@@ -79,7 +79,7 @@ const TakeQuiz = () => {
     return (
       <DashboardLayout userRole="student">
         <div className={styles.successState}>
-          <CheckCircle size={48} color="var(--color-success)" style={{ marginBottom: '16px' }} />
+          <CheckCircle size={48} color="#5db872" style={{ marginBottom: '16px' }} />
           <h1 className={styles.successTitle}>Quiz Submitted!</h1>
           <p className={styles.successText}>Results will be available when your teacher releases them.</p>
           <Button variant="primary" onClick={() => navigate('/student/quizzes')}><ArrowLeft size={16} style={{ marginRight: '6px' }} /> Back to Quizzes</Button>

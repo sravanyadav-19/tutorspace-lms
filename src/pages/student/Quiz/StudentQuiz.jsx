@@ -39,7 +39,7 @@ const StudentQuiz = () => {
 
         {loading ? <SkeletonGrid count={3} type="card" /> : quizzes.length === 0 ? (
           <div className={styles.emptyState}>
-            <ClipboardList size={48} color="var(--color-muted)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+            <ClipboardList size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
             <h3 className={styles.emptyTitle}>No Quizzes Available</h3>
             <p className={styles.emptyText}>Your teachers haven't published any quizzes yet.</p>
           </div>

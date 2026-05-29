@@ -71,7 +71,7 @@ const Register = () => {
     return (
       <AuthLayout>
         <div className={styles.successContainer}>
-          <div className={styles.successIcon}><CheckCircle size={48} color="var(--color-success)" /></div>
+          <div className={styles.successIcon}><CheckCircle size={48} color="#5db872" /></div>
           <h2 className={styles.successTitle}>Registration Successful!</h2>
           <p className={styles.successText}>
             Your student account has been created. Once approved by admin, you can login and start learning!
