@@ -1,7 +1,7 @@
 import React, { useRef, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
-  LayoutDashboard, Users, BookOpen, PlusCircle,
+  LayoutDashboard, Users, BookOpen, PlusCircle, GraduationCap,
   Megaphone, FileText, ClipboardList, BarChart3,
   Trophy, X
 } from 'lucide-react'
@@ -120,7 +120,6 @@ const Sidebar = ({ isOpen, onClose, isMobile, isCollapsed }) => {
         aria-label="Main navigation"
         role="complementary"
       >
-        {/* Header */}
         <div className={styles.sidebarHeader}>
           <div
             className={styles.logo}
@@ -130,7 +129,9 @@ const Sidebar = ({ isOpen, onClose, isMobile, isCollapsed }) => {
             aria-label="TutorSpace home"
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/dashboard') } }}
           >
-            <span className={styles.logoIcon} aria-hidden="true">🎓</span>
+            <span className={styles.logoIcon}>
+              <GraduationCap size={28} />
+            </span>
             {!isCollapsed && (
               <span className={styles.logoText}>TutorSpace</span>
             )}
@@ -146,7 +147,6 @@ const Sidebar = ({ isOpen, onClose, isMobile, isCollapsed }) => {
           )}
         </div>
 
-        {/* Navigation */}
         <nav
           className={styles.nav}
           aria-label={`${user?.role || 'User'} navigation`}

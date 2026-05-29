@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ChevronDown } from 'lucide-react'
+import { AlertCircle, ChevronDown } from 'lucide-react'
 import AuthLayout from '../../components/layout/AuthLayout'
 import Input from '../../components/shared/Input'
 import Button from '../../components/shared/Button'
@@ -85,7 +85,7 @@ const Login = () => {
 
         {apiError && (
           <div className={styles.errorAlert} role="alert">
-            <span className={styles.errorIcon}>⚠️</span>
+            <AlertCircle size={18} className={styles.errorIcon} />
             <span>{apiError}</span>
           </div>
         )}
@@ -118,7 +118,7 @@ const Login = () => {
           <div className={styles.forgotPassword}>
             <Link to="/forgot-password" className={styles.forgotLink}>Forgot password?</Link>
           </div>
-          <Button type="submit" variant="primary" size="lg" disabled={loading || !isValid} className={styles.submitButton}>
+          <Button type="submit" variant="primary" size="lg" loading={loading} disabled={loading || !isValid} className={styles.submitButton}>
             {loading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
@@ -129,7 +129,6 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Collapsible Demo Accounts — hidden by default for clean portfolio look */}
         <div className={styles.demoSection}>
           <button
             type="button"

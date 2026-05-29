@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Menu, Settings, LogOut, ChevronDown } from 'lucide-react'
+import { Menu, Settings, LogOut, ChevronDown, Crown, Target, GraduationCap } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
 import styles from './TopBar.module.css'
 
@@ -33,25 +33,16 @@ const TopBar = ({ onMenuClick }) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
   }
 
-  const getRoleBadge = (role) => {
+  const getRoleConfig = (role) => {
     switch (role) {
-      case 'admin': return { icon: '👑', label: 'Admin' }
-      case 'teacher': return { icon: '🎯', label: 'Teacher' }
-      case 'student': return { icon: '🎓', label: 'Student' }
-      default: return { icon: '👤', label: 'User' }
+      case 'admin': return { Icon: Crown, label: 'Admin', avatarClass: styles.adminAvatar }
+      case 'teacher': return { Icon: Target, label: 'Teacher', avatarClass: styles.teacherAvatar }
+      case 'student': return { Icon: GraduationCap, label: 'Student', avatarClass: styles.studentAvatar }
+      default: return { Icon: null, label: 'User', avatarClass: '' }
     }
   }
 
-  const getAvatarClass = (role) => {
-    switch (role) {
-      case 'admin': return styles.adminAvatar
-      case 'teacher': return styles.teacherAvatar
-      case 'student': return styles.studentAvatar
-      default: return ''
-    }
-  }
-
-  const roleBadge = getRoleBadge(user?.role)
+  const roleConfig = getRoleConfig(user?.role)
 
   const handleSettings = () => {
     setDropdownOpen(false)
@@ -69,7 +60,6 @@ const TopBar = ({ onMenuClick }) => {
       role="banner"
       aria-label="Top navigation bar"
     >
-      {/* Left: Menu Toggle Button */}
       <div className={styles.left}>
         <button
           className={styles.menuBtn}
@@ -80,7 +70,6 @@ const TopBar = ({ onMenuClick }) => {
         </button>
       </div>
 
-      {/* Right: User Profile */}
       <div className={styles.right}>
         <div className={styles.profileWrapper} ref={dropdownRef} onKeyDown={handleKeyDown}>
           <button
@@ -91,15 +80,17 @@ const TopBar = ({ onMenuClick }) => {
             aria-haspopup="menu"
             aria-label={`User menu for ${user?.name || 'User'}`}
           >
-            <div className={`${styles.avatar} ${getAvatarClass(user?.role)}`} aria-hidden="true">
+            <div className={`${styles.avatar} ${roleConfig.avatarClass}`} aria-hidden="true">
               <span className={styles.avatarInitials}>
                 {getInitials(user?.name)}
               </span>
-              <span className={styles.roleBadge}>{roleBadge.icon}</span>
+              <span className={styles.roleBadge}>
+                {roleConfig.Icon && <roleConfig.Icon size={10} />}
+              </span>
             </div>
             <div className={styles.userInfo}>
               <span className={styles.userName}>{user?.name || 'User'}</span>
-              <span className={styles.userRole}>{roleBadge.label}</span>
+              <span className={styles.userRole}>{roleConfig.label}</span>
             </div>
             <ChevronDown
               size={16}
