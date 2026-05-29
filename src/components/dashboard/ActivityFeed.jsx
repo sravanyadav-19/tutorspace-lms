@@ -1,6 +1,17 @@
 import React from 'react'
-import { User } from 'lucide-react'
+import { User, Target, GraduationCap, BookOpen } from 'lucide-react'
 import styles from './ActivityFeed.module.css'
+
+const iconRender = (icon) => {
+  switch (icon) {
+    case 'teacher': return <Target size={18} strokeWidth={2} />
+    case 'student': return <GraduationCap size={18} strokeWidth={2} />
+    case 'class': return <BookOpen size={18} strokeWidth={2} />
+    default:
+      if (typeof icon === 'string') return <span>{icon}</span>
+      return <User size={18} strokeWidth={2} />
+  }
+}
 
 const ActivityFeed = ({ 
   title, 
@@ -24,11 +35,7 @@ const ActivityFeed = ({
           {items.map((item, index) => (
             <li key={index} className={styles.feedItem}>
               <div className={styles.feedIcon} aria-hidden="true">
-                {typeof item.icon === 'string' ? (
-                  <span>{item.icon}</span>
-                ) : (
-                  <User size={18} strokeWidth={2} />
-                )}
+                {iconRender(item.icon)}
               </div>
               <div className={styles.feedContent}>
                 <p className={styles.feedName}>{item.name}</p>

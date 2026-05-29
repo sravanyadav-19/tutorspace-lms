@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { AlertCircle, CheckCircle, GraduationCap } from 'lucide-react'
 import AuthLayout from '../../components/layout/AuthLayout'
 import Input from '../../components/shared/Input'
 import Button from '../../components/shared/Button'
@@ -70,7 +71,7 @@ const Register = () => {
     return (
       <AuthLayout>
         <div className={styles.successContainer}>
-          <div className={styles.successIcon}>🎉</div>
+          <div className={styles.successIcon}><CheckCircle size={48} color="var(--color-success)" /></div>
           <h2 className={styles.successTitle}>Registration Successful!</h2>
           <p className={styles.successText}>
             Your student account has been created. Once approved by admin, you can login and start learning!
@@ -93,9 +94,9 @@ const Register = () => {
           <h2 className={styles.registerTitle}>Create Student Account</h2>
           <p className={styles.registerSubtitle}>Register as a student to start your learning journey</p>
         </div>
-        {apiError && <div className={styles.errorAlert} role="alert"><span>⚠️</span><span>{apiError}</span></div>}
+        {apiError && <div className={styles.errorAlert} role="alert"><AlertCircle size={18} /><span>{apiError}</span></div>}
         <div style={{ background: 'rgba(21, 101, 192, 0.06)', border: '1px solid rgba(21, 101, 192, 0.15)', borderRadius: '8px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '20px' }}>🎓</span>
+          <GraduationCap size={20} color="#1565c0" style={{ flexShrink: 0 }} />
           <span style={{ fontFamily: 'var(--font-body)', fontSize: '14px', color: '#1565c0', fontWeight: 600 }}>Registering as a Student — Teachers are added by Admin</span>
         </div>
         <form className={styles.registerForm} onSubmit={handleSubmit} noValidate>
@@ -104,7 +105,7 @@ const Register = () => {
           <Input label="Password" type="password" name="password" placeholder="Create a password (min 6 chars)" value={formData.password} onChange={handleChange} onBlur={handleBlur} error={touched.password ? errors.password : ''} required disabled={loading} />
           <PasswordStrength password={formData.password} />
           <Input label="Confirm Password" type="password" name="confirmPassword" placeholder="Confirm your password" value={formData.confirmPassword} onChange={handleChange} onBlur={handleBlur} error={touched.confirmPassword ? errors.confirmPassword : ''} required disabled={loading} />
-          <Button type="submit" variant="primary" size="lg" disabled={loading || !isValid} className={styles.submitButton}>
+          <Button type="submit" variant="primary" size="lg" loading={loading} disabled={loading || !isValid} className={styles.submitButton}>
             {loading ? 'Creating Account...' : 'Create Student Account'}
           </Button>
         </form>
