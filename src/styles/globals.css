@@ -282,3 +282,23 @@ input, textarea {
     font-size: 16px !important;
   }
 }
+/* ======================================
+   CARD HOVER — Global lift effect
+   ====================================== */
+.card-hover {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-hover:active {
+  transform: translateY(-1px);
+}
+
+/* Button spinner alignment */
+.button-loading {
+  cursor: wait;
+}
