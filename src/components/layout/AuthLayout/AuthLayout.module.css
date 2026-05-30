@@ -1,4 +1,7 @@
-/* Auth Layout - Two Column */
+/* ======================================
+   AUTH LAYOUT — Premium Branding Side
+   ====================================== */
+
 .authLayout {
   min-height: 100vh;
   display: grid;
@@ -6,115 +9,301 @@
   background: var(--color-canvas);
 }
 
-/* Left Brand Side */
+/* ======================================
+   LEFT BRAND SIDE
+   ====================================== */
 .brandSide {
-  background: var(--color-surface-dark);
+  background: #181715;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-page);
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
-.brandSide::before {
-  content: '';
+/* === ANIMATED BACKGROUND === */
+.brandBg {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(
-    circle at center,
-    rgba(204, 120, 92, 0.08) 0%,
-    transparent 60%
-  );
+  inset: 0;
   pointer-events: none;
+  z-index: 0;
 }
 
+/* Floating gradient orbs */
+.gradientOrb1 {
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(204, 120, 92, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: orbFloat1 12s ease-in-out infinite;
+}
+
+.gradientOrb2 {
+  position: absolute;
+  bottom: -15%;
+  left: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: orbFloat2 15s ease-in-out infinite;
+}
+
+.gradientOrb3 {
+  position: absolute;
+  top: 40%;
+  left: 30%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(21, 101, 192, 0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: orbFloat3 18s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, -40px) scale(1.15); }
+}
+
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(50px, 20px) scale(1.08); }
+  75% { transform: translate(-30px, -10px) scale(0.92); }
+}
+
+/* Dot grid pattern */
+.dotGrid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.06;
+  background-image: radial-gradient(circle, #faf9f5 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Decorative ring */
+.shapeRing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 50%;
+  animation: ringPulse 8s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.5; }
+}
+
+/* ======================================
+   BRAND CONTENT
+   ====================================== */
 .brandContent {
-  max-width: 400px;
+  max-width: 440px;
   position: relative;
   z-index: 1;
+  width: 100%;
+}
+
+/* === LOGO MARK === */
+.brandHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-section);
+}
+
+.logoMark {
+  width: 48px;
+  height: 48px;
+  background: rgba(204, 120, 92, 0.15);
+  border: 1px solid rgba(204, 120, 92, 0.25);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.versionBadge {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: var(--font-bold);
+  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* === HERO TEXT === */
+.brandHero {
+  margin-bottom: var(--space-section);
 }
 
 .brandName {
   font-family: var(--font-display);
-  font-size: 48px;
+  font-size: 52px;
   font-weight: var(--font-bold);
-  color: var(--color-on-dark);
+  color: #faf9f5;
   margin: 0 0 var(--space-lg) 0;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-shadow: 0 0 80px rgba(204, 120, 92, 0.15);
+}
+
+.brandTaglineWrapper {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.taglineAccent {
+  width: 3px;
+  min-height: 100%;
+  background: var(--color-primary);
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .brandTagline {
   font-family: var(--font-body);
   font-size: var(--text-body-lg);
-  color: var(--color-on-dark-muted, #a09d96);
-  margin: 0 0 var(--space-xxl) 0;
-  line-height: 1.6;
+  color: rgba(250, 249, 245, 0.60);
+  margin: 0;
+  line-height: 1.7;
+  max-width: 360px;
 }
 
+/* === FEATURES === */
 .brandFeatures {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-page);
+  gap: var(--space-md);
+  margin-bottom: var(--space-section);
 }
 
 .feature {
   display: flex;
   align-items: center;
   gap: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: all 0.4s ease;
+}
+
+.featureVisible {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .featureIcon {
-  font-size: 24px;
-  width: 44px;
-  height: 44px;
-  background: rgba(204, 120, 92, 0.15);
+  width: 40px;
+  height: 40px;
+  background: rgba(204, 120, 92, 0.12);
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 
 .featureText {
   font-family: var(--font-body);
-  font-size: var(--text-body);
-  color: var(--color-on-dark);
+  font-size: var(--text-body-sm);
+  color: rgba(250, 249, 245, 0.75);
   line-height: 1.4;
+  font-weight: 500;
 }
 
+/* === FOOTER === */
 .brandFooter {
   padding-top: var(--space-xl);
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.brandDay {
+.footerStats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.footerStat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statValue {
   font-family: var(--font-display);
-  font-size: var(--text-body-sm);
-  color: var(--color-primary);
-  margin: 0;
+  font-size: var(--text-body-lg);
+  font-weight: var(--font-bold);
+  color: #faf9f5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-/* Right Form Side */
+.statLabel {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: rgba(250, 249, 245, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.footerDivider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ======================================
+   RIGHT FORM SIDE
+   ====================================== */
 .formSide {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-page);
   overflow-y: auto;
+  background: var(--color-canvas);
 }
 
 .formContainer {
   width: 100%;
-  max-width: 420px;
+  max-width: 460px;
 }
 
-/* Mobile Responsive */
+/* ======================================
+   RESPONSIVE
+   ====================================== */
+@media (max-width: 1024px) {
+  .brandName {
+    font-size: 42px;
+  }
+}
+
 @media (max-width: 768px) {
   .authLayout {
     grid-template-columns: 1fr;
@@ -123,26 +312,64 @@
 
   .brandSide {
     padding: var(--space-xxl) var(--space-xl);
-    min-height: 200px;
+    min-height: 280px;
+  }
+
+  .brandContent {
+    max-width: 100%;
+  }
+
+  .brandHeader {
+    margin-bottom: var(--space-xl);
+  }
+
+  .logoMark {
+    width: 40px;
+    height: 40px;
   }
 
   .brandName {
-    font-size: 32px;
+    font-size: 34px;
+    margin-bottom: var(--space-md);
   }
 
   .brandFeatures {
     display: none;
   }
 
+  .brandFooter {
+    display: none;
+  }
+
+  .brandHero {
+    margin-bottom: 0;
+  }
+
+  .taglineAccent {
+    display: none;
+  }
+
+  .brandTagline {
+    font-size: var(--text-body-sm);
+  }
+
   .formSide {
     padding: var(--space-xl) var(--space-lg);
     align-items: flex-start;
   }
+
+  .gradientOrb1,
+  .gradientOrb2,
+  .gradientOrb3,
+  .shapeRing {
+    opacity: 0.5;
+  }
 }
+
 @media (max-width: 480px) {
   .brandSide {
     padding: var(--space-xl) var(--space-lg);
-    min-height: 140px;
+    min-height: 180px;
   }
 
   .brandName {
@@ -150,7 +377,7 @@
   }
 
   .brandTagline {
-    font-size: var(--text-body-sm);
+    font-size: 13px;
   }
 
   .formSide {
