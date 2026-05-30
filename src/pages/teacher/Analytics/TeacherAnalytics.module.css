@@ -433,6 +433,12 @@
   color: var(--color-muted);
 }
 
+.xxxxCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
 @media (max-width: 1024px) {
   .statsGrid { grid-template-columns: repeat(2, 1fr); }
   .tableHeader,

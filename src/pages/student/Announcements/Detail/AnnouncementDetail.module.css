@@ -230,6 +230,12 @@
   line-height: 1.5;
 }
 
+.xxxxCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
 /* ======== RESPONSIVE ======== */
 
 @media (max-width: 768px) {

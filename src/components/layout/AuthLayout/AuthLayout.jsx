@@ -41,7 +41,7 @@ const AuthLayout = ({ children }) => {
 
       {/* Right Side — Form */}
       <main
-        className={styles.formSide}
+        className={`${styles.formSide} page-fade-in`}
         id="main-content"
         role="main"
         aria-label="Authentication form"

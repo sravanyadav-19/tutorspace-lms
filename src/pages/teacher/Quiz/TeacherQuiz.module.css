@@ -563,6 +563,12 @@
   color: var(--color-muted);
 }
 
+.xxxxCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
 @media (max-width: 1024px) {
   .contentLayout { grid-template-columns: 220px 1fr; }
   .quizCard { flex-direction: column; align-items: flex-start; }

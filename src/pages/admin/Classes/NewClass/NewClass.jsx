@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, BookOpen, Target, GraduationCap, CheckCircle, PlusCircle } from 'lucide-react'
 import DashboardLayout from '../../../../components/layout/DashboardLayout'
@@ -13,7 +13,6 @@ import styles from './NewClass.module.css'
 const NewClass = () => {
   const navigate = useNavigate()
   const toast = useToast()
-  const nameRef = useRef(null)
 
   const [formData, setFormData] = useState({ name: '', subject: '', description: '' })
   const [errors, setErrors] = useState({})
@@ -27,7 +26,6 @@ const NewClass = () => {
   const [students, setStudents] = useState([])
 
   useEffect(() => { fetchUsers() }, [])
-  useEffect(() => setTimeout(() => nameRef.current?.focus(), 100), [])
 
   useEffect(() => {
     const newErrors = {}

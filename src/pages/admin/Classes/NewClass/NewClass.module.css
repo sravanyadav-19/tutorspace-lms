@@ -243,6 +243,12 @@
   flex-wrap: wrap;
 }
 
+.xxxxCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .userGrid {

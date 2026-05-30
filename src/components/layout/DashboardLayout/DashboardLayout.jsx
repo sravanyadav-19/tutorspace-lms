@@ -42,7 +42,7 @@ const DashboardLayout = ({ children, userRole = 'student' }) => {
       />
       <TopBar onMenuClick={handleMenuClick} />
       <main
-        className={styles.dashboardMain}
+        className={`${styles.dashboardMain} page-fade-in`}
         id="main-content"
         role="main"
         aria-label="Main content"

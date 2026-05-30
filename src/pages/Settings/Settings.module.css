@@ -292,6 +292,12 @@
   border-top: 1px solid var(--color-border-soft);
 }
 
+.xxxxCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
 @media (max-width: 1024px) {
   .contentLayout { grid-template-columns: 280px 1fr; }
 }
