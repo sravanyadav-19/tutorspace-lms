@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ClipboardList, RefreshCw, Clock, Play, CheckCircle, BarChart3, AlertCircle } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
+import EmptyState from '../../../components/shared/EmptyState'
 import Button from '../../../components/shared/Button'
 import { quizAPI } from '../../../services/api'
 import styles from './StudentQuiz.module.css'
@@ -38,11 +39,11 @@ const StudentQuiz = () => {
         {error && <div className={styles.errorBanner} role="alert"><AlertCircle size={16} style={{ marginRight: '6px' }} /> {error}</div>}
 
         {loading ? <SkeletonGrid count={3} type="card" /> : quizzes.length === 0 ? (
-          <div className={styles.emptyState}>
-            <ClipboardList size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <h3 className={styles.emptyTitle}>No Quizzes Available</h3>
-            <p className={styles.emptyText}>Your teachers haven't published any quizzes yet.</p>
-          </div>
+          <EmptyState
+            icon="quizzes"
+            title="No Quizzes Available"
+            message="Your teachers haven't published any quizzes yet."
+          />
         ) : (
           <div className={styles.quizGrid}>
             {quizzes.map(quiz => {

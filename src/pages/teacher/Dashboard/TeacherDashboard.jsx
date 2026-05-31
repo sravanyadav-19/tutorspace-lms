@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BookOpen, Users, Megaphone, ClipboardList, RefreshCw } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
+import EmptyState from '../../../components/shared/EmptyState'
 import StatCard from '../../../components/dashboard/StatCard'
 import Button from '../../../components/shared/Button'
 import { useAuth } from '../../../context/AuthContext'
@@ -76,12 +77,13 @@ const TeacherDashboard = () => {
         </div>
 
         {classes.length === 0 ? (
-          <div className={styles.emptyState}>
-            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <h3 className={styles.emptyTitle}>No Classes Assigned</h3>
-            <p className={styles.emptyText}>You haven't been assigned to any classes yet. Contact your administrator for class assignments.</p>
-            <Button variant="secondary" onClick={() => navigate('/teacher/profile')}>Update Profile</Button>
-          </div>
+          <EmptyState
+            icon="classes"
+            title="No Classes Assigned"
+            message="You haven't been assigned to any classes yet. Contact your administrator."
+            actionLabel="Update Profile"
+            onAction={() => navigate('/teacher/profile')}
+          />
         ) : (
           <div className={styles.classesSection}>
             <div className={styles.sectionHeader}><h2 className={styles.sectionTitle}>Your Classes</h2><Button variant="ghost" onClick={() => navigate('/teacher/classes')}>View All &rarr;</Button></div>

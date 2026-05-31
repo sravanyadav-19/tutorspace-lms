@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Trophy, RefreshCw, CheckCircle, XCircle, ChevronDown, ChevronUp, AlertCircle, BarChart3 } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
+import EmptyState from '../../../components/shared/EmptyState'
 import Button from '../../../components/shared/Button'
 import { quizAPI } from '../../../services/api'
 import styles from './StudentResults.module.css'
@@ -50,10 +51,11 @@ const StudentResults = () => {
         {error && <div className={styles.errorBanner} role="alert"><AlertCircle size={16} style={{ marginRight: '6px' }} /> {error}</div>}
 
         {loading ? <SkeletonGrid count={3} type="card" /> : submissions.length === 0 ? (
-          <div className={styles.emptyState}>
-            <BarChart3 size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <h3 className={styles.emptyTitle}>No Results Yet</h3><p className={styles.emptyText}>Your teacher hasn't released any quiz results yet.</p>
-          </div>
+          <EmptyState
+            icon="results"
+            title="No Results Yet"
+            message="Your teacher hasn't released any quiz results yet. Check back soon!"
+          />
         ) : (
           <div className={styles.resultsList}>
             {submissions.map(submission => {

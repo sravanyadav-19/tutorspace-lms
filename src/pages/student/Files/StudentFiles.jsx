@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FileText, BookOpen, RefreshCw, Eye, Image, Lock, ZoomIn, ArrowLeft, AlertCircle } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
+import EmptyState from '../../../components/shared/EmptyState'
 import Button from '../../../components/shared/Button'
 import { classAPI, fileAPI } from '../../../services/api'
 import { useAuth } from '../../../context/AuthContext'
@@ -123,10 +124,7 @@ const StudentFiles = () => {
               <div className={styles.filesSection}>
                 <div className={styles.filesSectionHeader}><h2 className={styles.sectionTitle}><FileText size={18} style={{ marginRight: '6px' }} /> {selectedClass?.name}</h2><span className={styles.fileCount}>{files.length} files</span></div>
                 {filesLoading ? <SkeletonGrid count={3} type="card" /> : files.length === 0 ? (
-                  <div className={styles.emptyFiles}>
-                    <FileText size={32} color="#6c6a64" style={{ marginBottom: '12px', opacity: 0.5 }} />
-                    <h3 className={styles.emptyTitle}>No Files Yet</h3><p className={styles.emptyText}>Your teacher hasn't uploaded any files yet.</p>
-                  </div>
+                  <EmptyState icon="files" title="No Files Yet" message="Your teacher hasn't uploaded any files yet." size="sm" />
                 ) : (
                   <div className={styles.filesGrid}>
                     {files.map(file => (

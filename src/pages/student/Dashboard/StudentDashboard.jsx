@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BookOpen, Megaphone, ClipboardList, Trophy, RefreshCw, AlertCircle } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
+import EmptyState from '../../../components/shared/EmptyState'
 import StatCard from '../../../components/dashboard/StatCard'
 import Button from '../../../components/shared/Button'
 import { useAuth } from '../../../context/AuthContext'
@@ -73,11 +74,11 @@ const StudentDashboard = () => {
         </div>
 
         {classes.length === 0 ? (
-          <div className={styles.emptyState}>
-            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <h3 className={styles.emptyTitle}>No Classes Yet</h3>
-            <p className={styles.emptyText}>You haven't been enrolled in any classes yet. Contact your administrator.</p>
-          </div>
+          <EmptyState
+            icon="classes"
+            title="No Classes Yet"
+            message="You haven't been enrolled in any classes yet. Contact your administrator."
+          />
         ) : (
           <div className={styles.classesSection}>
             <div className={styles.sectionHeader}><h2 className={styles.sectionTitle}>My Classes</h2><Button variant="ghost" onClick={() => navigate('/student/classes')}>View All &rarr;</Button></div>

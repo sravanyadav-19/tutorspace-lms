@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { BookOpen, BarChart3, ClipboardList, RefreshCw, Users, CheckCircle, Clock, AlertCircle, Play, Pause } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
+import EmptyState from '../../../components/shared/EmptyState'
 import ConfirmModal from '../../../components/shared/ConfirmModal'
 import { classAPI, quizAPI } from '../../../services/api'
 import styles from './TeacherAnalytics.module.css'
@@ -116,10 +117,7 @@ const TeacherAnalytics = () => {
             </div>
             <div className={styles.mainContent}>
               {!selectedQuiz ? (
-                <div className={styles.selectQuizPrompt}>
-                  <ClipboardList size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-                  <h3 className={styles.emptyTitle}>Select a Quiz</h3><p className={styles.emptyText}>Choose a quiz from the left to view analytics</p>
-                </div>
+                <EmptyState icon="analytics" title="Select a Quiz" message="Choose a quiz from the left sidebar to view analytics" size="sm" />
               ) : (
                 <>
                   <div className={styles.quizAnalyticsHeader}><div><h2 className={styles.quizAnalyticsTitle}>{selectedQuiz.title}</h2><p className={styles.quizAnalyticsMeta}>{selectedClass?.name} • {selectedQuiz._count?.questions || 0} questions • {submissions.length} submissions</p></div><button className={styles.releaseBtn} onClick={() => promptRelease(selectedQuiz.id)}><BarChart3 size={16} style={{ marginRight: '6px' }} /> Release Results</button></div>
