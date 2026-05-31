@@ -1,0 +1,67 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-page) var(--space-xl);
+  gap: var(--space-lg);
+  text-align: center;
+}
+
+.iconWrapper {
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconWrapperLg {
+  width: 96px;
+  height: 96px;
+  background: rgba(204, 120, 92, 0.06);
+  border: 1px solid rgba(204, 120, 92, 0.1);
+}
+
+.iconWrapperSm {
+  width: 64px;
+  height: 64px;
+  background: rgba(204, 120, 92, 0.05);
+  border: 1px solid rgba(204, 120, 92, 0.08);
+}
+
+.icon {
+  color: var(--color-primary);
+  opacity: 0.5;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.message {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--color-muted);
+  margin: 0;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: var(--space-section) var(--space-lg);
+  }
+
+  .iconWrapperLg {
+    width: 72px;
+    height: 72px;
+  }
+
+  .title {
+    font-size: var(--text-display-sm);
+  }
+}

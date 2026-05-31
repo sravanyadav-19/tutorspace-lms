@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { AlertCircle, CheckCircle, GraduationCap } from 'lucide-react'
+import { AlertCircle, CheckCircle, GraduationCap, Eye, EyeOff, UserPlus, ArrowRight, Lock, Mail, User } from 'lucide-react'
 import AuthLayout from '../../components/layout/AuthLayout'
-import Input from '../../components/shared/Input'
 import Button from '../../components/shared/Button'
 import PasswordStrength from '../../components/shared/PasswordStrength/PasswordStrength'
 import { authAPI } from '../../services/api'
@@ -20,11 +19,13 @@ const Register = () => {
   const [apiError, setApiError] = useState('')
   const [success, setSuccess] = useState(false)
   const [isValid, setIsValid] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   useEffect(() => {
     const newErrors = {}
     let valid = true
-    ;['name','email','password','confirmPassword'].forEach((field) => {
+    ;['name', 'email', 'password', 'confirmPassword'].forEach((field) => {
       const error = validateField(field, formData[field], formData)
       if (error) { newErrors[field] = error; valid = false }
     })
@@ -70,18 +71,43 @@ const Register = () => {
   if (success) {
     return (
       <AuthLayout>
-        <div className={styles.successContainer}>
-          <div className={styles.successIcon}><CheckCircle size={48} color="#5db872" /></div>
-          <h2 className={styles.successTitle}>Registration Successful!</h2>
-          <p className={styles.successText}>
-            Your student account has been created. Once approved by admin, you can login and start learning!
-          </p>
-          <div className={styles.successSteps}>
-            <div className={styles.step}><span className={styles.stepNum}>1</span><span className={styles.stepText}>Wait for admin to approve your account</span></div>
-            <div className={styles.step}><span className={styles.stepNum}>2</span><span className={styles.stepText}>Login with your email and password</span></div>
-            <div className={styles.step}><span className={styles.stepNum}>3</span><span className={styles.stepText}>Start your learning journey!</span></div>
+        <div className={styles.registerWrapper}>
+          <div className={styles.successCard}>
+            <div className={styles.successGlow} />
+            <div className={styles.successIconWrapper}>
+              <CheckCircle size={48} className={styles.successIcon} />
+            </div>
+            <h2 className={styles.successTitle}>Registration Successful!</h2>
+            <p className={styles.successText}>
+              Your student account has been created and is awaiting admin approval.
+            </p>
+            <div className={styles.successSteps}>
+              <div className={styles.step}>
+                <span className={styles.stepNum}>1</span>
+                <span className={styles.stepContent}>
+                  <span className={styles.stepLabel}>Pending Approval</span>
+                  <span className={styles.stepHint}>An admin will review and activate your account</span>
+                </span>
+              </div>
+              <div className={styles.step}>
+                <span className={styles.stepNum}>2</span>
+                <span className={styles.stepContent}>
+                  <span className={styles.stepLabel}>Sign In</span>
+                  <span className={styles.stepHint}>Use your email and password to log in</span>
+                </span>
+              </div>
+              <div className={styles.step}>
+                <span className={styles.stepNum}>3</span>
+                <span className={styles.stepContent}>
+                  <span className={styles.stepLabel}>Start Learning</span>
+                  <span className={styles.stepHint}>Access classes, quizzes, files, and more</span>
+                </span>
+              </div>
+            </div>
+            <Button variant="primary" size="lg" onClick={() => navigate('/login')} className={styles.successBtn}>
+              Go to Login <ArrowRight size={16} />
+            </Button>
           </div>
-          <Button variant="primary" size="lg" onClick={() => navigate('/login')} className={styles.loginBtn}>Go to Login</Button>
         </div>
       </AuthLayout>
     )
@@ -89,29 +115,103 @@ const Register = () => {
 
   return (
     <AuthLayout>
-      <div className={styles.registerContainer}>
-        <div className={styles.registerHeader}>
-          <h2 className={styles.registerTitle}>Create Student Account</h2>
-          <p className={styles.registerSubtitle}>Register as a student to start your learning journey</p>
+      <div className={styles.registerWrapper}>
+
+        {/* Welcome Section */}
+        <div className={styles.welcomeSection}>
+          <div className={styles.welcomeBadge}>
+            <GraduationCap size={14} />
+            <span>Student Registration</span>
+          </div>
+          <h1 className={styles.welcomeTitle}>Create your account</h1>
+          <p className={styles.welcomeText}>
+            Join TutorSpace as a student. Teachers are added by administrators — so you're in the right place.
+          </p>
         </div>
-        {apiError && <div className={styles.errorAlert} role="alert"><AlertCircle size={18} /><span>{apiError}</span></div>}
-        <div style={{ background: 'rgba(21, 101, 192, 0.06)', border: '1px solid rgba(21, 101, 192, 0.15)', borderRadius: '8px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <GraduationCap size={20} color="#1565c0" style={{ flexShrink: 0 }} />
-          <span style={{ fontFamily: 'var(--font-body)', fontSize: '14px', color: '#1565c0', fontWeight: 600 }}>Registering as a Student — Teachers are added by Admin</span>
+
+        {/* Register Card */}
+        <div className={styles.registerCard}>
+          <div className={styles.cardGlow} />
+
+          {/* Role Notice */}
+          <div className={styles.roleNotice}>
+            <GraduationCap size={18} />
+            <span>You're registering as a Student</span>
+          </div>
+
+          {apiError && (
+            <div className={styles.errorAlert} role="alert">
+              <AlertCircle size={18} />
+              <span>{apiError}</span>
+            </div>
+          )}
+
+          <form className={styles.registerForm} onSubmit={handleSubmit} noValidate>
+
+            {/* Full Name */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel} htmlFor="reg-name">Full Name</label>
+              <div className={`${styles.fieldWrapper} ${touched.name && errors.name ? styles.fieldError : ''} ${touched.name && !errors.name && formData.name ? styles.fieldSuccess : ''}`}>
+                <User size={16} className={styles.fieldIcon} />
+                <input id="reg-name" type="text" name="name" className={styles.fieldInput} placeholder="John Doe" value={formData.name} onChange={handleChange} onBlur={handleBlur} disabled={loading} autoComplete="name" />
+              </div>
+              {touched.name && errors.name && <span className={styles.fieldHint} role="alert">{errors.name}</span>}
+            </div>
+
+            {/* Email */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel} htmlFor="reg-email">Email Address</label>
+              <div className={`${styles.fieldWrapper} ${touched.email && errors.email ? styles.fieldError : ''} ${touched.email && !errors.email && formData.email ? styles.fieldSuccess : ''}`}>
+                <Mail size={16} className={styles.fieldIcon} />
+                <input id="reg-email" type="email" name="email" className={styles.fieldInput} placeholder="you@example.com" value={formData.email} onChange={handleChange} onBlur={handleBlur} disabled={loading} autoComplete="email" />
+              </div>
+              {touched.email && errors.email && <span className={styles.fieldHint} role="alert">{errors.email}</span>}
+            </div>
+
+            {/* Password */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel} htmlFor="reg-password">Password</label>
+              <div className={`${styles.fieldWrapper} ${touched.password && errors.password ? styles.fieldError : ''} ${touched.password && !errors.password && formData.password ? styles.fieldSuccess : ''}`}>
+                <Lock size={16} className={styles.fieldIcon} />
+                <input id="reg-password" type={showPassword ? 'text' : 'password'} name="password" className={styles.fieldInput} placeholder="Min. 6 characters" value={formData.password} onChange={handleChange} onBlur={handleBlur} disabled={loading} autoComplete="new-password" />
+                <button type="button" className={styles.passwordToggle} onClick={() => setShowPassword(!showPassword)} tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {touched.password && errors.password && <span className={styles.fieldHint} role="alert">{errors.password}</span>}
+            </div>
+
+            {/* Password Strength */}
+            <PasswordStrength password={formData.password} />
+
+            {/* Confirm Password */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel} htmlFor="reg-confirm">Confirm Password</label>
+              <div className={`${styles.fieldWrapper} ${touched.confirmPassword && errors.confirmPassword ? styles.fieldError : ''} ${touched.confirmPassword && !errors.confirmPassword && formData.confirmPassword ? styles.fieldSuccess : ''}`}>
+                <Lock size={16} className={styles.fieldIcon} />
+                <input id="reg-confirm" type={showConfirm ? 'text' : 'password'} name="confirmPassword" className={styles.fieldInput} placeholder="Re-enter your password" value={formData.confirmPassword} onChange={handleChange} onBlur={handleBlur} disabled={loading} autoComplete="new-password" />
+                <button type="button" className={styles.passwordToggle} onClick={() => setShowConfirm(!showConfirm)} tabIndex={-1} aria-label={showConfirm ? 'Hide password' : 'Show password'}>
+                  {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {touched.confirmPassword && errors.confirmPassword && <span className={styles.fieldHint} role="alert">{errors.confirmPassword}</span>}
+            </div>
+
+            {/* Submit */}
+            <Button type="submit" variant="primary" size="lg" loading={loading} disabled={loading || !isValid} className={styles.submitButton}>
+              {loading ? 'Creating Account...' : <><UserPlus size={18} style={{ marginRight: '8px' }} /> Create Student Account</>}
+            </Button>
+          </form>
         </div>
-        <form className={styles.registerForm} onSubmit={handleSubmit} noValidate>
-          <Input label="Full Name" type="text" name="name" placeholder="Enter your full name" value={formData.name} onChange={handleChange} onBlur={handleBlur} error={touched.name ? errors.name : ''} required disabled={loading} />
-          <Input label="Email Address" type="email" name="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} onBlur={handleBlur} error={touched.email ? errors.email : ''} required disabled={loading} />
-          <Input label="Password" type="password" name="password" placeholder="Create a password (min 6 chars)" value={formData.password} onChange={handleChange} onBlur={handleBlur} error={touched.password ? errors.password : ''} required disabled={loading} />
-          <PasswordStrength password={formData.password} />
-          <Input label="Confirm Password" type="password" name="confirmPassword" placeholder="Confirm your password" value={formData.confirmPassword} onChange={handleChange} onBlur={handleBlur} error={touched.confirmPassword ? errors.confirmPassword : ''} required disabled={loading} />
-          <Button type="submit" variant="primary" size="lg" loading={loading} disabled={loading || !isValid} className={styles.submitButton}>
-            {loading ? 'Creating Account...' : 'Create Student Account'}
-          </Button>
-        </form>
-        <div className={styles.loginPrompt}>
-          <p className={styles.loginText}>Already have an account? <Link to="/login" className={styles.loginLink}>Sign in here</Link></p>
-        </div>
+
+        {/* Login Prompt */}
+        <p className={styles.loginPrompt}>
+          Already have an account?{' '}
+          <Link to="/login" className={styles.loginLink}>
+            Sign in instead <ArrowRight size={14} style={{ verticalAlign: 'middle' }} />
+          </Link>
+        </p>
+
       </div>
     </AuthLayout>
   )
