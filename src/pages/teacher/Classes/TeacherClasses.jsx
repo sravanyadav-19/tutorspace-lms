@@ -7,6 +7,7 @@ import Input from '../../../components/shared/Input'
 import { classAPI } from '../../../services/api'
 import styles from './TeacherClasses.module.css'
 import { SkeletonGrid } from '../../../components/shared/Skeleton/Skeleton'
+import EmptyState from '../../../components/shared/EmptyState'
 
 const TeacherClasses = () => {
   const navigate = useNavigate()
@@ -47,11 +48,11 @@ const TeacherClasses = () => {
         {error && <div className={styles.errorState} role="alert"><AlertCircle size={16} style={{ marginRight: '6px' }} /> {error}</div>}
 
         {loading ? <SkeletonGrid count={4} type="card" /> : filteredClasses.length === 0 ? (
-          <div className={styles.emptyState}>
-            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <h3 className={styles.emptyTitle}>{searchTerm ? 'No classes found' : 'No classes assigned'}</h3>
-            <p className={styles.emptyText}>{searchTerm ? 'Try a different search term' : 'Contact your administrator to get assigned to classes'}</p>
-          </div>
+          <EmptyState
+            icon="classes"
+            title={searchTerm ? 'No classes found' : 'No classes assigned'}
+            message={searchTerm ? 'Try a different search term' : 'Contact your administrator to get assigned to classes'}
+          />
         ) : (
           <>
             <p className={styles.resultsCount}>Showing {filteredClasses.length} of {classes.length} classes</p>

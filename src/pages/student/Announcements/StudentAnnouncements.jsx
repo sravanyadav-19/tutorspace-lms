@@ -6,6 +6,7 @@ import Button from '../../../components/shared/Button'
 import { classAPI, announcementAPI } from '../../../services/api'
 import styles from './StudentAnnouncements.module.css'
 import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
+import EmptyState from '../../../components/shared/EmptyState'
 
 const StudentAnnouncements = () => {
   const navigate = useNavigate()
@@ -59,11 +60,11 @@ const StudentAnnouncements = () => {
         {error && <div className={styles.errorState} role="alert"><AlertCircle size={16} style={{ marginRight: '6px' }} /> {error}</div>}
 
         {loading ? <SkeletonCard /> : classes.length === 0 ? (
-          <div className={styles.emptyState}>
-            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <h3 className={styles.emptyTitle}>No Classes Found</h3>
-            <p className={styles.emptyText}>You are not enrolled in any classes yet.</p>
-          </div>
+          <EmptyState
+            icon="classes"
+            title="No Classes Found"
+            message="You are not enrolled in any classes yet."
+          />
         ) : (
           <div className={styles.contentLayout}>
             <div className={styles.classSidebar}>
@@ -88,11 +89,12 @@ const StudentAnnouncements = () => {
               )}
 
               {announcementsLoading ? <SkeletonGrid count={3} type="card" /> : announcements.length === 0 ? (
-                <div className={styles.emptyAnnouncements}>
-                  <Megaphone size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-                  <h3 className={styles.emptyTitle}>No Announcements Yet</h3>
-                  <p className={styles.emptyText}>Your teacher hasn't posted any announcements yet. Check back soon!</p>
-                </div>
+                <EmptyState
+                  icon="announcements"
+                  title="No Announcements Yet"
+                  message="Your teacher hasn't posted any announcements yet. Check back soon!"
+                  size="sm"
+                />
               ) : (
                 <div className={styles.announcementsList}>
                   {announcements.map(announcement => (

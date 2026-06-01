@@ -6,6 +6,7 @@ import ConfirmModal from '../../../components/shared/ConfirmModal'
 import { classAPI, fileAPI } from '../../../services/api'
 import styles from './TeacherFiles.module.css'
 import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
+import EmptyState from '../../../components/shared/EmptyState'
 
 const TeacherFiles = () => {
   const [classes, setClasses] = useState([])
@@ -139,11 +140,11 @@ const TeacherFiles = () => {
         {error && <div className={styles.errorBanner} role="alert"><AlertCircle size={16} style={{ marginRight: '6px' }} /> {error}</div>}
 
         {loading ? <SkeletonCard /> : classes.length === 0 ? (
-          <div className={styles.emptyState}>
-            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <h3 className={styles.emptyTitle}>No Classes Assigned</h3>
-            <p className={styles.emptyText}>You need to be assigned to a class before uploading files.</p>
-          </div>
+          <EmptyState
+            icon="classes"
+            title="No Classes Assigned"
+            message="You need to be assigned to a class before uploading files."
+          />
         ) : (
           <div className={styles.contentLayout}>
             <div className={styles.classSidebar}>
@@ -188,8 +189,8 @@ const TeacherFiles = () => {
               <div className={styles.filesSection}>
                 <h2 className={styles.sectionTitle}>Uploaded Files <span className={styles.fileCount}>{files.length} files</span></h2>
                 {filesLoading ? <SkeletonGrid count={3} type="card" /> : files.length === 0 ? (
-                  <div className={styles.emptyFiles}><FileText size={32} color="#6c6a64" style={{ marginBottom: '12px', opacity: 0.5 }} /><p className={styles.emptyText}>No files uploaded yet.</p></div>
-                ) : (
+                  <EmptyState icon="files" title="No Files Yet" message="No files uploaded yet." size="sm" />
+                  ) : (
                   <div className={styles.filesList}>
                     {files.map(file => (
                       <div key={file.id} className={styles.fileCard}>

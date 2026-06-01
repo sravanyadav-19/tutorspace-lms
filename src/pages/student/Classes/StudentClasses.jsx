@@ -5,6 +5,7 @@ import Button from '../../../components/shared/Button'
 import { classAPI } from '../../../services/api'
 import styles from './StudentClasses.module.css'
 import { SkeletonGrid } from '../../../components/shared/Skeleton/Skeleton'
+import EmptyState from '../../../components/shared/EmptyState'
 
 const StudentClasses = () => {
   const [classes, setClasses] = useState([])
@@ -33,11 +34,11 @@ const StudentClasses = () => {
         {error && <div className={styles.errorBanner} role="alert"><AlertCircle size={16} style={{ marginRight: '6px' }} /> {error}</div>}
 
         {loading ? <SkeletonGrid count={4} type="card" /> : classes.length === 0 ? (
-          <div className={styles.emptyState}>
-            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <h3 className={styles.emptyTitle}>No Classes Found</h3>
-            <p className={styles.emptyText}>You are not enrolled in any classes yet.</p>
-          </div>
+          <EmptyState
+            icon="classes"
+            title="No Classes Found"
+            message="You are not enrolled in any classes yet."
+          />
         ) : (
           <div className={styles.classesGrid}>
             {classes.map(cls => (

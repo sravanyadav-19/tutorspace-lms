@@ -9,6 +9,7 @@ import styles from './TeacherQuiz.module.css'
 import { SkeletonGrid, SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 import { useToast } from '../../../context/ToastContext'
 import { validateField } from '../../../utils/validation'
+import EmptyState from '../../../components/shared/EmptyState'
 
 const TeacherQuiz = () => {
   const navigate = useNavigate()
@@ -134,10 +135,11 @@ const TeacherQuiz = () => {
         {error && <div className={styles.errorBanner} role="alert"><AlertCircle size={16} style={{ marginRight: '6px' }} /> {error}</div>}
 
         {loading ? <SkeletonCard /> : classes.length === 0 ? (
-          <div className={styles.emptyState}>
-            <BookOpen size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <h3 className={styles.emptyTitle}>No Classes Assigned</h3><p className={styles.emptyText}>You need to be assigned to a class first.</p>
-          </div>
+          <EmptyState
+            icon="classes"
+            title="No Classes Assigned"
+            message="You need to be assigned to a class first."
+          />
         ) : (
           <div className={styles.contentLayout}>
             <div className={styles.classSidebar}>
@@ -183,10 +185,12 @@ const TeacherQuiz = () => {
               <div className={styles.quizzesList}>
                 <div className={styles.quizzesHeader}><h2 className={styles.sectionTitle}><ClipboardList size={18} style={{ marginRight: '6px' }} /> {selectedClass?.name} Quizzes</h2><span className={styles.quizCount}>{quizzes.length} quizzes</span></div>
                 {quizzesLoading ? <SkeletonGrid count={3} type="card" /> : quizzes.length === 0 ? (
-                  <div className={styles.emptyQuizzes}>
-                    <ClipboardList size={48} color="#6c6a64" style={{ marginBottom: '16px', opacity: 0.5 }} />
-                    <h3 className={styles.emptyTitle}>No Quizzes Yet</h3><p className={styles.emptyText}>Click "Create Quiz" to add your first quiz.</p>
-                  </div>
+                  <EmptyState
+                    icon="quizzes"
+                    title="No Quizzes Yet"
+                    message='Click "Create Quiz" to add your first quiz.'
+                    size="sm"
+                  />
                 ) : (
                   <div className={styles.quizCards}>
                     {quizzes.map(quiz => (
