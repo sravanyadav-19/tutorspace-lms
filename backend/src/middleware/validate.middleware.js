@@ -23,9 +23,11 @@ export const validate = (schema) => (req, res, next) => {
         errors: formatted
       })
     }
+    // Handle non-Zod errors (e.g., schema parse receiving malformed data)
+    console.error('Validation middleware error:', error)
     return res.status(500).json({
       success: false,
-      message: 'Internal validation error'
+      message: 'Validation error'
     })
   }
 }

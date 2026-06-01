@@ -224,7 +224,8 @@ export const createClass = async (req, res) => {
         name: name.trim(),
         subject: subject.trim(),
         description: description?.trim() || null,
-        status: 'active'
+        status: 'active',
+        createdById: req.user.id
       },
       include: {
         _count: {
