@@ -2,6 +2,8 @@ import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import ScrollToTop from './components/shared/ScrollToTop'
+import ErrorBoundary from './components/shared/ErrorBoundary'
+
 
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -79,7 +81,8 @@ function App() {
   return (
     <>
       <ScrollToTop />
-      <Routes>
+      <ErrorBoundary>
+        <Routes>
         <Route path="/login" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Login />} />
         <Route path="/register" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Register />} />
         <Route path="/dashboard" element={<ProtectedRoute><SmartDashboard /></ProtectedRoute>} />
@@ -117,7 +120,8 @@ function App() {
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
+        </Routes>
+      </ErrorBoundary>
     </>
   )
 }
