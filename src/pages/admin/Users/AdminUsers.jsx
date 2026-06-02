@@ -8,6 +8,7 @@ import { userAPI } from '../../../services/api'
 import { SkeletonCard } from '../../../components/shared/Skeleton/Skeleton'
 import { useToast } from '../../../context/ToastContext'
 import styles from './AdminUsers.module.css'
+import tm from './TeacherModal.module.css'
 
 const AdminUsers = () => {
   const toast = useToast()
@@ -190,19 +191,25 @@ const AdminUsers = () => {
         )}
 
         {showTeacherModal && (
-          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "16px" }} onClick={() => setShowTeacherModal(false)} onKeyDown={(e) => { if (e.key === "Escape") setShowTeacherModal(false) }} role="dialog" aria-modal="true" aria-label="Create new teacher">
-            <div style={{ background: "var(--color-surface-card)", borderRadius: "12px", padding: "32px", maxWidth: "480px", width: "100%", boxShadow: "var(--shadow-lg)" }} onClick={(e) => e.stopPropagation()}>
-              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "24px", fontWeight: "bold", margin: "0 0 8px 0", color: 	"#141413", display: "flex", alignItems: "center" }}>
-                <Target size={20} style={{ marginRight: '8px' }} /> Create New Teacher
-              </h2>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#6c6a64", margin: "0 0 24px 0" }}>Set up a teacher account. They will use these credentials to login.</p>
-              <form onSubmit={handleCreateTeacher} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                <div><label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "6px", color: 	"#141413" }}>Full Name</label><input type="text" value={teacherForm.name} aria-label="Teacher full name" onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })} placeholder="Jane Doe" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} /></div>
-                <div><label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "6px", color: 	"#141413" }}>Email</label><input type="email" value={teacherForm.email} aria-label="Teacher email address" onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })} placeholder="jane@school.com" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} /></div>
-                <div><label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "6px", color: 	"#141413" }}>Password (min 6 chars)</label><input type="password" value={teacherForm.password} aria-label="Teacher password" onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })} placeholder="Type a secure password" style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--color-border)", borderRadius: "8px", fontFamily: "var(--font-body)", fontSize: "14px", background: "var(--color-canvas)", boxSizing: "border-box" }} />
-                  <p style={{ fontSize: "12px", color: "#6c6a64", margin: "6px 0 0 0", display: "flex", alignItems: "center", gap: "4px" }}><Info size={12} /> Share this password with the teacher securely</p>
+          <div className={tm.overlay} onClick={() => setShowTeacherModal(false)} onKeyDown={(e) => { if (e.key === 'Escape') setShowTeacherModal(false) }} role="dialog" aria-modal="true" aria-label="Create new teacher">
+            <div className={tm.modal} onClick={(e) => e.stopPropagation()}>
+              <h2 className={tm.title}><Target size={20} style={{ marginRight: '8px' }} /> Create New Teacher</h2>
+              <p className={tm.subtitle}>Set up a teacher account. They will use these credentials to login.</p>
+              <form onSubmit={handleCreateTeacher} className={tm.form}>
+                <div className={tm.fieldGroup}>
+                  <label className={tm.fieldLabel}>Full Name</label>
+                  <input type="text" className={tm.fieldInput} value={teacherForm.name} aria-label="Teacher full name" onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })} placeholder="Jane Doe" />
                 </div>
-                <div style={{ display: "flex", gap: "12px", marginTop: "16px", justifyContent: "flex-end" }}>
+                <div className={tm.fieldGroup}>
+                  <label className={tm.fieldLabel}>Email</label>
+                  <input type="email" className={tm.fieldInput} value={teacherForm.email} aria-label="Teacher email address" onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })} placeholder="jane@school.com" />
+                </div>
+                <div className={tm.fieldGroup}>
+                  <label className={tm.fieldLabel}>Password (min 6 chars)</label>
+                  <input type="password" className={tm.fieldInput} value={teacherForm.password} aria-label="Teacher password" onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })} placeholder="Type a secure password" />
+                  <p className={tm.fieldHint}><Info size={12} /> Share this password with the teacher securely</p>
+                </div>
+                <div className={tm.actions}>
                   <Button type="button" variant="secondary" onClick={() => setShowTeacherModal(false)}>Cancel</Button>
                   <Button type="submit" variant="primary" loading={teacherLoading} disabled={teacherLoading}>
                     {teacherLoading ? 'Creating...' : <><CheckCircle size={14} style={{ marginRight: '4px' }} /> Create Teacher</>}
