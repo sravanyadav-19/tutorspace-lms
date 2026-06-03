@@ -147,3 +147,4 @@ backend/downloaded_test.txt
 
 #bash commands
 *.sh
+.vercel

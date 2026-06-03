@@ -91,7 +91,7 @@ const TeacherFiles = () => {
   const handlePreview = (file) => { setPreviewFile(file); setZoomed(false) }
   const handleClosePreview = () => { setPreviewFile(null); setZoomed(false) }
 
-  const getViewUrl = (fileId) => `http://localhost:5000/api/files/view/${fileId}?token=${token}`
+  const getViewUrl = (fileId) => `https://tutorspace-lms.onrender.com/api/files/view/${fileId}?token=${token}`
 
   const getFileSize = (file) => {
     if (!file) return ''

@@ -49,7 +49,7 @@ const StudentFiles = () => {
 
   const handleViewFile = (file) => { setSelectedFile(file); setZoomed(false) }
   const handleCloseViewer = () => { setSelectedFile(null); setZoomed(false); navigate('/student/files') }
-  const getViewUrl = (fileId) => `http://localhost:5000/api/files/view/${fileId}?token=${token}`
+  const getViewUrl = (fileId) => `https://tutorspace-lms.onrender.com/api/files/view/${fileId}?token=${token}`
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
 
   const getWatermarkText = () => {
