@@ -16,13 +16,6 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', {
-      url: error.config?.url,
-      method: error.config?.method,
-      status: error.response?.status,
-      message: error.response?.data?.message,
-      token: localStorage.getItem('tutorspace_token') ? 'Present' : 'Missing'
-    })
     const isUserUpdate = error.config?.url?.includes("/users/") && error.config?.method === "put"
     if (error.response?.status === 401 && !isUserUpdate) {
       localStorage.removeItem('tutorspace_token')
@@ -55,47 +48,30 @@ export const classAPI = {
   createClass: (data) => api.post('/classes', data),
   updateClass: (id, data) => api.put(`/classes/${id}`, data),
   deleteClass: (id) => api.delete(`/classes/${id}`),
-  enrollStudent: (classId, userId) =>
-    api.post(`/classes/${classId}/enroll/${userId}`),
-  removeStudent: (classId, userId) =>
-    api.delete(`/classes/${classId}/enroll/${userId}`)
+  enrollStudent: (classId, userId) => api.post(`/classes/${classId}/enroll/${userId}`),
+  removeStudent: (classId, userId) => api.delete(`/classes/${classId}/enroll/${userId}`)
 }
 
 export const announcementAPI = {
-  getClassAnnouncements: (classId) =>
-    api.get(`/announcements/class/${classId}`),
-  createAnnouncement: (classId, data) =>
-    api.post(`/announcements/class/${classId}`, data),
-  updateAnnouncement: (id, data) =>
-    api.put(`/announcements/${id}`, data),
-  deleteAnnouncement: (id) =>
-    api.delete(`/announcements/${id}`),
-  getAnnouncementComments: (announcementId) =>
-    api.get(`/announcements/${announcementId}/comments`),
-  addComment: (announcementId, data) =>
-    api.post(`/announcements/${announcementId}/comments`, data),
-  deleteComment: (commentId) =>
-    api.delete(`/announcements/comments/${commentId}`)
+  getClassAnnouncements: (classId) => api.get(`/announcements/class/${classId}`),
+  createAnnouncement: (classId, data) => api.post(`/announcements/class/${classId}`, data),
+  updateAnnouncement: (id, data) => api.put(`/announcements/${id}`, data),
+  deleteAnnouncement: (id) => api.delete(`/announcements/${id}`),
+  getAnnouncementComments: (announcementId) => api.get(`/announcements/${announcementId}/comments`),
+  addComment: (announcementId, data) => api.post(`/announcements/${announcementId}/comments`, data),
+  deleteComment: (commentId) => api.delete(`/announcements/comments/${commentId}`)
 }
 
 export const fileAPI = {
-  uploadFile: (classId, formData) =>
-    api.post(`/files/class/${classId}/upload`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    }),
-  getClassFiles: (classId) =>
-    api.get(`/files/class/${classId}`),
-  getTeacherFiles: () =>
-    api.get('/files/teacher'),
-  getStudentFiles: () =>
-    api.get('/files/student'),
-  downloadFile: (fileId) =>
-    api.get(`/files/download/${fileId}`, { responseType: 'blob' }),
-  deleteFile: (fileId) =>
-    api.delete(`/files/${fileId}`)
+  uploadFile: (classId, formData) => api.post(`/files/class/${classId}/upload`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  getClassFiles: (classId) => api.get(`/files/class/${classId}`),
+  getTeacherFiles: () => api.get('/files/teacher'),
+  getStudentFiles: () => api.get('/files/student'),
+  downloadFile: (fileId) => api.get(`/files/download/${fileId}`, { responseType: 'blob' }),
+  deleteFile: (fileId) => api.delete(`/files/${fileId}`)
 }
-
-export default api
 
 export const quizAPI = {
   createQuiz: (data) => api.post('/quizzes', data),
@@ -110,3 +86,5 @@ export const quizAPI = {
   getQuizForStudent: (quizId) => api.get(`/quizzes/student/${quizId}/take`),
   submitQuiz: (quizId, data) => api.post(`/quizzes/student/${quizId}/submit`, data)
 }
+
+export default api
