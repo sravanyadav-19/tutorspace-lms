@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'https://tutorspace-lms.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://tutorspace-lms.onrender.com/api',
   headers: { 'Content-Type': 'application/json' }
 })
 

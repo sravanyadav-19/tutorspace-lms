@@ -49,7 +49,8 @@ const StudentFiles = () => {
 
   const handleViewFile = (file) => { setSelectedFile(file); setZoomed(false) }
   const handleCloseViewer = () => { setSelectedFile(null); setZoomed(false); navigate('/student/files') }
-  const getViewUrl = (fileId) => `https://tutorspace-lms.onrender.com/api/files/view/${fileId}?token=${token}`
+  const API_URL = import.meta.env.VITE_API_URL || 'https://tutorspace-lms.onrender.com/api'
+  const getViewUrl = (fileId) => `${API_URL}/files/view/${fileId}?token=${token}`
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
 
   const getWatermarkText = () => {
