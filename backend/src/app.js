@@ -30,7 +30,18 @@ app.use(helmet({
   frameguard: false,
   crossOriginResourcePolicy: { policy: 'cross-origin' },
   crossOriginEmbedderPolicy: false,
-  contentSecurityPolicy: false
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      frameSrc: ["'self'", "https://tutorspace-lms.vercel.app", "http://localhost:3000"],
+      connectSrc: ["'self'", "https://tutorspace-lms.vercel.app", "http://localhost:3000"],
+      mediaSrc: ["'self'"]
+    }
+  }
 }))
 
 const limiter = rateLimit({
