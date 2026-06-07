@@ -202,4 +202,4 @@ const SettingsPage = () => {
   )
 }
 
-export default SettingsPage
+export default Settings
