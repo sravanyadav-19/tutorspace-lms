@@ -3,7 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import ScrollToTop from './components/shared/ScrollToTop'
 import ErrorBoundary from './components/shared/ErrorBoundary'
-
+import ForgotPassword from './pages/auth/ForgotPassword/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword/ResetPassword'
 
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -85,6 +86,8 @@ function App() {
         <Routes>
         <Route path="/login" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Login />} />
         <Route path="/register" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/dashboard" element={<ProtectedRoute><SmartDashboard /></ProtectedRoute>} />
 
         {/* SETTINGS - available to all authenticated users */}
