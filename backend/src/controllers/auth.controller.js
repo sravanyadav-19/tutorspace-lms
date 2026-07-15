@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../lib/prisma.js'
 import {
   generateAccessToken,
   generateRandomToken
@@ -8,8 +8,6 @@ import {
   sendVerificationEmail,
   sendPasswordResetEmail
 } from '../utils/email.utils.js'
-
-const prisma = new PrismaClient()
 
 // ================================
 // REGISTER

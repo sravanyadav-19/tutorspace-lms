@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '../lib/prisma.js'
 
 // Get announcements for a class
 export const getClassAnnouncements = async (req, res) => {
