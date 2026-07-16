@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import { prisma } from '../lib/prisma.js'
+import { prisma, withRetry } from '../lib/prisma.js'
 import {
   generateAccessToken,
   generateRandomToken
@@ -136,11 +136,15 @@ export const login = async (req, res) => {
       })
     }
 
-    // Find user with role
-    const user = await prisma.user.findUnique({
-      where: { email },
-      include: { role: true }
-    })
+    // Find user with role (wrapped in withRetry so an idle dropped
+    // connection transparently reconnects instead of 500-ing the user)
+    const user = await withRetry(
+      () => prisma.user.findUnique({
+        where: { email },
+        include: { role: true }
+      }),
+      { label: 'auth.login' }
+    )
 
     // Check if user exists
     if (!user) {
