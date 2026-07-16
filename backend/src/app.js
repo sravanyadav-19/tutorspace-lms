@@ -21,7 +21,12 @@ const app = express()
 // TRUST PROXY (Render uses a reverse proxy)
 // Must be set BEFORE any middleware that reads IPs or origins
 // ================================
-app.set('trust proxy', true)
+// Trust exactly one hop — Render sits a single reverse proxy
+// in front of the app. Using a literal number (1) satisfies
+// express-rate-limit v8's strict trust-proxy validation,
+// which rejects `true` (a boolean) as too permissive and
+// throws ERR_ERL_PERMISSIVE_TRUST_PROXY on first request.
+app.set('trust proxy', 1)
 
 // ================================
 // CORS — MUST be the very first middleware
@@ -65,7 +70,7 @@ app.use(cors(corsOptions))
 // ================================
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 1000,
+  max: 5000,
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.method === 'OPTIONS',
