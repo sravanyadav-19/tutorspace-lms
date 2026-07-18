@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { FileText, Image, BookOpen, RefreshCw, Upload, Eye, Trash2, X, ZoomIn, Target, AlertCircle } from 'lucide-react'
+import { ArrowLeft, FileText, Image, BookOpen, RefreshCw, Upload, Eye, Trash2, X, ZoomIn, Target, AlertCircle } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import ConfirmModal from '../../../components/shared/ConfirmModal'
