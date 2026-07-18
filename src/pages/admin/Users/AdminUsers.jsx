@@ -28,7 +28,7 @@ const AdminUsers = () => {
   useEffect(() => { fetchUsers() }, [])
 
   useEffect(() => {
-    let result = [...users]
+    let result = [...(users || [])]
     if (searchTerm) result = result.filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase()))
     if (filterRole !== 'all') result = result.filter(u => u.role.name === filterRole)
     if (filterStatus !== 'all') result = result.filter(u => u.status === filterStatus)
@@ -37,7 +37,7 @@ const AdminUsers = () => {
   }, [users, searchTerm, filterRole, filterStatus])
 
   const fetchUsers = async () => {
-    try { setLoading(true); const res = await userAPI.getAllUsers(); setUsers(res.data.data.users) }
+    try { setLoading(true); const res = await userAPI.getAllUsers(); setUsers(res.data.data.users || []) }
     catch (err) { setError('Failed to load users') }
     finally { setLoading(false) }
   }
@@ -46,7 +46,7 @@ const AdminUsers = () => {
     try {
       setActionLoading(userId)
       await userAPI.updateUser(userId, { status: 'active' })
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'active' } : u))
+      setUsers(prev => (prev || []).map(u => u.id === userId ? { ...u, status: 'active' } : u))
       toast.success('User approved successfully')
     } catch (err) { toast.error(err.response?.data?.message || 'Failed to approve user') }
     finally { setActionLoading(null) }
@@ -62,11 +62,11 @@ const AdminUsers = () => {
     try {
       if (type === 'deactivate') {
         await userAPI.updateUser(userId, { status: 'inactive' })
-        setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'inactive' } : u))
+        setUsers(prev => (prev || []).map(u => u.id === userId ? { ...u, status: 'inactive' } : u))
         toast.success('User deactivated')
       } else {
         await userAPI.deleteUser(userId)
-        setUsers(prev => prev.filter(u => u.id !== userId))
+        setUsers(prev => (prev || []).filter(u => u.id !== userId))
         toast.success('User deleted successfully')
       }
     } catch (err) { toast.error(err.response?.data?.message || 'Failed') }

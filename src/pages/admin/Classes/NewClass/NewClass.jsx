@@ -41,7 +41,7 @@ const NewClass = () => {
   const fetchUsers = async () => {
     try {
       const res = await userAPI.getAllUsers()
-      const allUsers = res.data.data.users
+      const allUsers = res.data.data.users || []
       setTeachers(allUsers.filter((u) => u.role.name === 'teacher'))
       setStudents(allUsers.filter((u) => u.role.name === 'student'))
     } catch (err) { console.error('Failed to fetch users') }

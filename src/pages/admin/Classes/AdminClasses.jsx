@@ -26,15 +26,15 @@ const AdminClasses = () => {
 
   useEffect(() => {
     if (searchTerm) {
-      setFilteredClasses(classes.filter(c =>
+      setFilteredClasses((classes || []).filter(c =>
         c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.subject.toLowerCase().includes(searchTerm.toLowerCase())
       ))
-    } else { setFilteredClasses(classes) }
+    } else { setFilteredClasses(classes || []) }
   }, [classes, searchTerm])
 
   const fetchClasses = async () => {
-    try { setLoading(true); const res = await classAPI.getAllClasses(); setClasses(res.data.data.classes) }
+    try { setLoading(true); const res = await classAPI.getAllClasses(); setClasses(res.data.data.classes || []) }
     catch (err) { setError('Failed to load classes') }
     finally { setLoading(false) }
   }
@@ -45,7 +45,7 @@ const AdminClasses = () => {
     const { classId, className } = confirmModal
     if (!classId) return
     setDeleting(classId)
-    try { await classAPI.deleteClass(classId); setClasses(prev => prev.filter(c => c.id !== classId)); toast.success('Class deleted successfully') }
+    try { await classAPI.deleteClass(classId); setClasses(prev => (prev || []).filter(c => c.id !== classId)); toast.success('Class deleted successfully') }
     catch (err) { toast.error('Failed to delete class') }
     finally { setDeleting(null); setConfirmModal({ open: false, classId: null, className: '' }) }
   }

@@ -26,7 +26,7 @@ const AdminClassDetail = () => {
       setLoading(true)
       const [classRes, usersRes] = await Promise.all([classAPI.getClassById(classId), userAPI.getAllUsers()])
       setCls(classRes.data.data.class)
-      setAllUsers(usersRes.data.data.users)
+      setAllUsers(usersRes.data.data.users || [])
     } catch (err) { setError('Failed to load class details') }
     finally { setLoading(false) }
   }

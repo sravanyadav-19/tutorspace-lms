@@ -82,7 +82,7 @@ const Login = () => {
         <div className={styles.welcomeSection}>
           <div className={styles.welcomeBadge}>
             <span className={styles.badgeDot} />
-            TutorSpace LMS
+            TutorSpace
           </div>
           <h1 className={styles.welcomeTitle}>Welcome back</h1>
           <p className={styles.welcomeText}>

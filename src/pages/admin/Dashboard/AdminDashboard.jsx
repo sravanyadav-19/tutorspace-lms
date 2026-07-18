@@ -28,8 +28,8 @@ const AdminDashboard = () => {
     try {
       setLoading(true)
       const [usersRes, classesRes] = await Promise.all([userAPI.getAllUsers(), classAPI.getAllClasses()])
-      const users = usersRes.data.data.users
-      const classes = classesRes.data.data.classes
+      const users = usersRes.data.data.users || []
+      const classes = classesRes.data.data.classes || []
       setStats({
         totalUsers: users.length, totalClasses: classes.length,
         pendingUsers: users.filter(u => u.status === 'pending').length,

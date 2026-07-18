@@ -36,12 +36,12 @@ const AuthLayout = ({ children }) => {
 
         <div className={styles.brandContent}>
           {/* Logo + Badge */}
-          <div className={styles.brandHeader}>
+          {/* <div className={styles.brandHeader}>
             <div className={styles.logoMark}>
               <BookOpen size={28} />
             </div>
             <span className={styles.versionBadge}>v1.0</span>
-          </div>
+          </div> */}
 
           {/* Hero Text */}
           <div className={styles.brandHero}>
@@ -68,28 +68,6 @@ const AuthLayout = ({ children }) => {
                 <span className={styles.featureText}>{text}</span>
               </div>
             ))}
-          </div>
-
-          {/* Footer */}
-          <div className={styles.brandFooter}>
-            <div className={styles.footerStats}>
-              <div className={styles.footerStat}>
-                <span className={styles.statValue}>3</span>
-                <span className={styles.statLabel}>User Roles</span>
-              </div>
-              <div className={styles.footerDivider} />
-              <div className={styles.footerStat}>
-                <span className={styles.statValue}>50</span>
-                <span className={styles.statLabel}>Day Build</span>
-              </div>
-              <div className={styles.footerDivider} />
-              <div className={styles.footerStat}>
-                <span className={styles.statValue}>
-                  <CheckCircle size={14} />
-                </span>
-                <span className={styles.statLabel}>Open Source</span>
-              </div>
-            </div>
           </div>
         </div>
       </aside>
