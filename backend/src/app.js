@@ -21,12 +21,7 @@ const app = express()
 // TRUST PROXY (Render uses a reverse proxy)
 // Must be set BEFORE any middleware that reads IPs or origins
 // ================================
-// Trust exactly one hop — Render sits a single reverse proxy
-// in front of the app. Using a literal number (1) satisfies
-// express-rate-limit v8's strict trust-proxy validation,
-// which rejects `true` (a boolean) as too permissive and
-// throws ERR_ERL_PERMISSIVE_TRUST_PROXY on first request.
-app.set('trust proxy', 1)
+app.set('trust proxy', true)
 
 // ================================
 // CORS — MUST be the very first middleware
@@ -37,25 +32,6 @@ const allowedOrigins = [
   'http://localhost:5173',   // Vite default
 ]
 
-/**
- * Write a CORS-compliant Access-Control-Allow-Origin header on `res`
- * ONLY if the request's `Origin` header matches an allowed origin.
- *
- * Per the CORS spec, `Access-Control-Allow-Origin: *` cannot be
- * combined with `Access-Control-Allow-Credentials: true` — the
- * browser will reject the response. So we never fall back to `*`;
- * we either echo back a real, allow-listed origin, or we write
- * nothing at all (and the browser blocks the response client-side,
- * which is the correct behavior for an unknown origin).
- */
-function setCorsHeader(req, res) {
-  const origin = req.headers.origin
-  if (origin && allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin)
-    res.header('Access-Control-Allow-Credentials', 'true')
-  }
-}
-
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (server-to-server, curl, mobile apps)
@@ -65,15 +41,8 @@ const corsOptions = {
       return callback(null, true)
     }
 
-    // Reject gracefully instead of throwing — throwing routes
-    // through Express's default error handler and returns a bare
-    // 500 with no CORS headers, which the browser reports as
-    // "No 'Access-Control-Allow-Origin' header is present".
-    // `callback(null, false)` tells the cors middleware to refuse
-    // the request with no CORS headers — the browser then blocks
-    // the response client-side, which is the correct outcome.
     console.warn(`🚫 CORS blocked origin: ${origin}`)
-    return callback(null, false)
+    return callback(new Error(`Not allowed by CORS: ${origin}`))
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -96,7 +65,7 @@ app.use(cors(corsOptions))
 // ================================
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5000,
+  max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.method === 'OPTIONS',
@@ -114,6 +83,11 @@ app.use(
   helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
     crossOriginEmbedderPolicy: false,
+    // Disable legacy X-Frame-Options — it only supports a single
+    // 'sameorigin' / 'deny' value and cannot express an allowlist of
+    // specific origins. We replace it below with the modern equivalent
+    // via CSP frame-ancestors.
+    frameguard: false,
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
@@ -125,6 +99,16 @@ app.use(
           "'self'",
           'https://tutorspace-lms.vercel.app',
           'http://localhost:3000',
+        ],
+        // frame-ancestors replaces X-Frame-Options. Restricted to our
+        // known frontend origins so file previews load in an <iframe>
+        // from the Vercel frontend, while arbitrary third-party sites
+        // are still blocked from framing the backend.
+        frameAncestors: [
+          "'self'",
+          'https://tutorspace-lms.vercel.app',
+          'http://localhost:3000',
+          'http://localhost:5173',
         ],
         connectSrc: [
           "'self'",
@@ -178,8 +162,9 @@ app.use('/api/quizzes', quizRoutes)
 // 404 HANDLER — includes CORS headers so preflight never gets a bare 404
 // ================================
 app.use((req, res) => {
-  // Apply CORS only for allow-listed origins (never '*' with credentials)
-  setCorsHeader(req, res)
+  // Re-apply CORS headers in case they were stripped or never set
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*')
+  res.header('Access-Control-Allow-Credentials', 'true')
 
   res.status(404).json({
     success: false,
@@ -193,8 +178,9 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error('Global error:', err)
 
-  // Apply CORS only for allow-listed origins (never '*' with credentials)
-  setCorsHeader(req, res)
+  // Ensure CORS headers on error responses too
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*')
+  res.header('Access-Control-Allow-Credentials', 'true')
 
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({
