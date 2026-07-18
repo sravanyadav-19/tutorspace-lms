@@ -57,6 +57,7 @@ export const updateUserSchema = z.object({
     .object({
       name: nameSchema.optional(),
       email: emailSchema.optional(),
+      status: z.enum(['active', 'inactive', 'pending']).optional(),
       currentPassword: z.string().optional(),
       newPassword: passwordSchema.optional()
     })
