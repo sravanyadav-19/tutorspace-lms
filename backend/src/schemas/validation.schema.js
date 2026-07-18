@@ -12,7 +12,11 @@ const nameSchema = z
   .max(100, 'Name must not exceed 100 characters')
   .trim()
 
-const uuidSchema = z.string().uuid('Invalid ID format')
+// ID validator for path/body parameters that arrive as URL-encoded
+// integer strings (e.g. "4"). Matches one or more digits only.
+// Was previously z.string().uuid() which rejected every valid integer
+// ID from the Prisma autoincrement Int primary keys.
+const uuidSchema = z.string().regex(/^\d+$/, 'Invalid ID format')
 
 export const registerSchema = z.object({
   body: z.object({
