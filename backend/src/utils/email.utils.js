@@ -3,6 +3,16 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+// Parse FRONTEND_URL — accept comma-separated list, use only the first URL.
+// This allows Render's environment variables to hold fallback domains
+// without breaking email links.
+const getFrontendUrl = () => {
+  const raw = process.env.FRONTEND_URL || 'http://localhost:3000'
+  return raw.split(',')[0].trim()
+}
+
+const FRONTEND_URL = getFrontendUrl()
+
 // Create transporter
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -16,7 +26,7 @@ const transporter = nodemailer.createTransport({
 
 // Send verification email
 export const sendVerificationEmail = async (email, name, token) => {
-  const verifyUrl = `${process.env.FRONTEND_URL}/verify-email/${token}`
+  const verifyUrl = `${FRONTEND_URL}/verify-email/${token}`
 
   const mailOptions = {
     from: `"TutorSpace" <${process.env.EMAIL_USER}>`,
@@ -56,7 +66,7 @@ export const sendVerificationEmail = async (email, name, token) => {
 
 // Send password reset email
 export const sendPasswordResetEmail = async (email, name, token) => {
-  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`
+  const resetUrl = `${FRONTEND_URL}/reset-password/${token}`
 
   const mailOptions = {
     from: `"TutorSpace" <${process.env.EMAIL_USER}>`,
