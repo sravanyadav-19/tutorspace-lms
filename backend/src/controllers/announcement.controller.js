@@ -1,9 +1,43 @@
 import { prisma } from '../lib/prisma.js'
 
+/**
+ * Check that the requesting user has access to a class.
+ * Allowed if:
+ *   - user is admin, OR
+ *   - user is enrolled in the class (teacher or student)
+ */
+async function checkClassAccess(userId, userRole, classId) {
+  if (userRole === 'admin') {
+    return true
+  }
+
+  const enrollment = await prisma.classEnrollment.findUnique({
+    where: {
+      userId_classId: {
+        userId,
+        classId: parseInt(classId)
+      }
+    }
+  })
+
+  return !!enrollment
+}
+
 // Get announcements for a class
 export const getClassAnnouncements = async (req, res) => {
   try {
     const { classId } = req.params
+    const userId = req.user.id
+    const userRole = req.user.role
+
+    // Check enrollment
+    const hasAccess = await checkClassAccess(userId, userRole, classId)
+    if (!hasAccess) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have access to this class'
+      })
+    }
 
     const announcements = await prisma.announcement.findMany({
       where: {
@@ -246,11 +280,34 @@ export const addComment = async (req, res) => {
     const { announcementId } = req.params
     const { content } = req.body
     const userId = req.user.id
+    const userRole = req.user.role
 
     if (!content?.trim()) {
       return res.status(400).json({
         success: false,
         message: 'Comment content is required'
+      })
+    }
+
+    // Find the announcement to get its classId for enrollment check
+    const announcement = await prisma.announcement.findUnique({
+      where: { id: parseInt(announcementId) },
+      select: { classId: true }
+    })
+
+    if (!announcement) {
+      return res.status(404).json({
+        success: false,
+        message: 'Announcement not found'
+      })
+    }
+
+    // Check enrollment in the announcement's class
+    const hasAccess = await checkClassAccess(userId, userRole, announcement.classId)
+    if (!hasAccess) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have access to this class'
       })
     }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, GraduationCap, Megaphone, ClipboardList, FileText, BookOpen, Plus, Trash2, MessageCircle, AlertCircle } from 'lucide-react'
+import { ArrowLeft, GraduationCap, Megaphone, ClipboardList, FileText, BookOpen, Plus, Trash2, MessageCircle, AlertCircle, ChevronDown, ChevronUp, User } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import ConfirmModal from '../../../components/shared/ConfirmModal'
@@ -19,6 +19,8 @@ const TeacherClassDetail = () => {
   const [activeTab, setActiveTab] = useState('overview')
   const [confirmModal, setConfirmModal] = useState({ open: false, announcementId: null })
   const [deleting, setDeleting] = useState(null)
+  const [expandedComments, setExpandedComments] = useState({})
+  const [commentsLoading, setCommentsLoading] = useState({})
 
   useEffect(() => { fetchData() }, [classId])
 
@@ -34,6 +36,25 @@ const TeacherClassDetail = () => {
     finally { setLoading(false) }
   }
 
+  const toggleComments = async (announcementId) => {
+    // If already expanded, collapse
+    if (expandedComments[announcementId]) {
+      setExpandedComments(prev => ({ ...prev, [announcementId]: false }))
+      return
+    }
+
+    // Fetch comments
+    setCommentsLoading(prev => ({ ...prev, [announcementId]: true }))
+    try {
+      const res = await announcementAPI.getAnnouncementComments(announcementId)
+      setExpandedComments(prev => ({ ...prev, [announcementId]: res.data.data.comments || [] }))
+    } catch (err) {
+      setExpandedComments(prev => ({ ...prev, [announcementId]: [] }))
+    } finally {
+      setCommentsLoading(prev => ({ ...prev, [announcementId]: false }))
+    }
+  }
+
   const promptDeleteAnnouncement = (announcementId) => setConfirmModal({ open: true, announcementId })
 
   const handleDeleteAnnouncement = async () => {
@@ -43,11 +64,13 @@ const TeacherClassDetail = () => {
     try {
       await announcementAPI.deleteAnnouncement(announcementId)
       setAnnouncements(prev => prev.filter(a => a.id !== announcementId))
+      setExpandedComments(prev => { const n = { ...prev }; delete n[announcementId]; return n })
     } catch (err) { setError('Failed to delete announcement') }
     finally { setDeleting(null); setConfirmModal({ open: false, announcementId: null }) }
   }
 
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  const formatDateTime = (dateString) => new Date(dateString).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
   const enrolledStudents = cls?.enrollments?.filter(e => e.user?.role?.name === 'student') || []
 
   if (loading) {
@@ -114,19 +137,69 @@ const TeacherClassDetail = () => {
                 </div>
               ) : (
                 <div className={styles.announcementsList}>
-                  {announcements.map(announcement => (
-                    <div key={announcement.id} className={styles.announcementCard}>
-                      <div className={styles.announcementHeader}>
-                        <h3 className={styles.announcementTitle}>{announcement.title}</h3>
-                        <div className={styles.announcementActions}>
-                          <span className={styles.announcementDate}>{formatDate(announcement.createdAt)}</span>
-                          <button className={styles.deleteAnnouncementBtn} onClick={() => promptDeleteAnnouncement(announcement.id)}><Trash2 size={16} /></button>
+                  {announcements.map(announcement => {
+                    const comments = expandedComments[announcement.id]
+                    const isExpanded = Array.isArray(comments)
+                    const isLoading = commentsLoading[announcement.id]
+                    return (
+                      <div key={announcement.id} className={styles.announcementCard}>
+                        <div className={styles.announcementHeader}>
+                          <h3 className={styles.announcementTitle}>{announcement.title}</h3>
+                          <div className={styles.announcementActions}>
+                            <span className={styles.announcementDate}>{formatDate(announcement.createdAt)}</span>
+                            <button className={styles.deleteAnnouncementBtn} onClick={() => promptDeleteAnnouncement(announcement.id)}><Trash2 size={16} /></button>
+                          </div>
                         </div>
+                        <p className={styles.announcementContent}>{announcement.content.length > 500 ? announcement.content.substring(0, 500) + '...' : announcement.content}</p>
+
+                        {/* Comment toggle button */}
+                        <button
+                          className={styles.commentToggle}
+                          onClick={() => toggleComments(announcement.id)}
+                        >
+                          <MessageCircle size={14} style={{ marginRight: '4px' }} />
+                          {announcement._count?.comments || 0} comments
+                          {isExpanded
+                            ? <ChevronUp size={14} style={{ marginLeft: 'auto' }} />
+                            : <ChevronDown size={14} style={{ marginLeft: 'auto' }} />
+                          }
+                        </button>
+
+                        {/* Expanded comments section */}
+                        {isExpanded && (
+                          <div className={styles.commentsSection}>
+                            {comments.length === 0 ? (
+                              <p className={styles.noCommentsText}>No comments yet.</p>
+                            ) : (
+                              comments.map(comment => (
+                                <div key={comment.id} className={styles.commentItem}>
+                                  <div className={styles.commentAvatar}>
+                                    {comment.author?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                                  </div>
+                                  <div className={styles.commentBody}>
+                                    <div className={styles.commentHeader}>
+                                      <span className={styles.commentAuthor}>{comment.author?.name}</span>
+                                      <span className={`${styles.commentRoleBadge} ${styles[`roleBadge-${comment.author?.role?.name}`]}`}>
+                                        {comment.author?.role?.name}
+                                      </span>
+                                      <span className={styles.commentTime}>{formatDateTime(comment.createdAt)}</span>
+                                    </div>
+                                    <p className={styles.commentText}>{comment.commentText}</p>
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        )}
+
+                        {isLoading && (
+                          <div className={styles.commentsLoading}>
+                            <span>Loading comments...</span>
+                          </div>
+                        )}
                       </div>
-                      <p className={styles.announcementContent}>{announcement.content.length > 200 ? announcement.content.substring(0, 200) + '...' : announcement.content}</p>
-                      <p className={styles.announcementMeta}><MessageCircle size={12} style={{ marginRight: '4px' }} /> {announcement._count?.comments || 0} comments</p>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>

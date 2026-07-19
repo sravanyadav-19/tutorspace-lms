@@ -26,6 +26,52 @@ const formatFileSize = (bytes) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
+/**
+ * Check that the requesting user is authorized to access a file.
+ * Allowed if:
+ *   - user is admin, OR
+ *   - user is enrolled in the file's class (teacher or student), OR
+ *   - user is the uploader of the file
+ *
+ * Returns an object with { authorized: boolean, classId: number|null }.
+ */
+async function checkFileAccess(userId, userRole, fileId) {
+  // Admin bypass
+  if (userRole === 'admin') {
+    return { authorized: true, classId: null }
+  }
+
+  const file = await prisma.file.findUnique({
+    where: { id: parseInt(fileId) },
+    select: { classId: true, uploaderId: true }
+  })
+
+  if (!file) {
+    return { authorized: false, classId: null }
+  }
+
+  // Uploader always has access
+  if (file.uploaderId === userId) {
+    return { authorized: true, classId: file.classId }
+  }
+
+  // Check enrollment in the class
+  const enrollment = await prisma.classEnrollment.findUnique({
+    where: {
+      userId_classId: {
+        userId,
+        classId: file.classId
+      }
+    }
+  })
+
+  if (enrollment) {
+    return { authorized: true, classId: file.classId }
+  }
+
+  return { authorized: false, classId: file.classId }
+}
+
 // Upload file (Teacher only)
 export const uploadFile = async (req, res) => {
   try {
@@ -148,8 +194,10 @@ export const getClassFiles = async (req, res) => {
 export const downloadFile = async (req, res) => {
   try {
     const { fileId } = req.params
+    const userId = req.user.id
+    const userRole = req.user.role
 
-    // Get file from database
+    // Get file from database (include classId and uploaderId for access check)
     const file = await prisma.file.findUnique({
       where: { id: parseInt(fileId) }
     })
@@ -160,6 +208,16 @@ export const downloadFile = async (req, res) => {
         message: 'File not found'
       })
     }
+
+    // --- Enrollment/access check ---
+    const access = await checkFileAccess(userId, userRole, fileId)
+    if (!access.authorized) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have access to this file'
+      })
+    }
+    // ------------------------------
 
     // Check if file exists on disk
     if (!fs.existsSync(file.filePath)) {
@@ -345,6 +403,8 @@ export const getStudentFiles = async (req, res) => {
 export const viewFile = async (req, res) => {
   try {
     const { fileId } = req.params
+    const userId = req.user.id
+    const userRole = req.user.role
 
     // Get file from database
     const file = await prisma.file.findUnique({
@@ -357,6 +417,16 @@ export const viewFile = async (req, res) => {
         message: 'File not found'
       })
     }
+
+    // --- Enrollment/access check ---
+    const access = await checkFileAccess(userId, userRole, fileId)
+    if (!access.authorized) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have access to this file'
+      })
+    }
+    // ------------------------------
 
     // Check if file exists on disk
     if (!fs.existsSync(file.filePath)) {
