@@ -102,7 +102,9 @@ export const getTeacherClasses = async (req, res) => {
 export const getClassById = async (req, res) => {
   try {
     const { id } = req.params
-    
+    const userId = req.user.id
+    const userRole = req.user.role
+
     const classData = await prisma.class.findUnique({
       where: { id: parseInt(id) },
       include: {
@@ -163,6 +165,25 @@ export const getClassById = async (req, res) => {
         success: false,
         message: 'Class not found'
       })
+    }
+
+    // Enrollment/access check: admin bypass, otherwise must be enrolled
+    if (userRole !== 'admin') {
+      const enrollment = await prisma.classEnrollment.findUnique({
+        where: {
+          userId_classId: {
+            userId,
+            classId: parseInt(id)
+          }
+        }
+      })
+
+      if (!enrollment) {
+        return res.status(403).json({
+          success: false,
+          message: 'You do not have access to this class'
+        })
+      }
     }
 
     res.status(200).json({
