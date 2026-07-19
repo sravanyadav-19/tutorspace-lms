@@ -47,7 +47,7 @@ const TakeQuiz = () => {
 
   const handleAutoSubmit = async () => {
     clearTimeout(timerRef.current)
-    if (!quiz) return
+    if (!quiz || submitted) return          // ← GUARD: skip if already submitted
     setSubmitting(true)
     try { const payload = { answers: quiz.questions.map(q => ({ questionId: q.id, studentAnswer: answers[q.id] || '' })) }; await quizAPI.submitQuiz(quizId, payload); setSubmitted(true); toast.warning('Time is up! Your quiz has been auto-submitted.') }
     catch (err) { setError('Auto-submission failed.') }

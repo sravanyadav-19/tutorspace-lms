@@ -217,9 +217,12 @@ export const submitQuizSchema = z.object({
     quizId: uuidSchema
   }),
   body: z.object({
-    answers: z.record(z.string().min(1), {
-      invalid_type_error: 'Answers must be a valid object'
-    }),
+    answers: z.array(
+      z.object({
+        questionId: z.number().int().positive('Question ID is required'),
+        studentAnswer: z.string().min(0).default('')
+      }).passthrough()
+    ).min(1, 'At least one answer is required'),
     timeTaken: z.number().int().min(0).optional()
   })
 })
