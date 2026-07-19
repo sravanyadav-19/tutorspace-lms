@@ -78,6 +78,7 @@ export const getClassQuizzes = async (req, res) => {
 export const getQuizById = async (req, res) => {
   try {
     const { quizId } = req.params
+    const userRole = req.user.role
 
     const quiz = await prisma.quiz.findUnique({
       where: { id: parseInt(quizId) },
@@ -92,6 +93,15 @@ export const getQuizById = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Quiz not found'
+      })
+    }
+
+    // Strip correctAnswer from questions for non-teacher/admin users
+    // (defense-in-depth — the route also has authorize('teacher', 'admin'))
+    if (userRole !== 'teacher' && userRole !== 'admin') {
+      quiz.questions = quiz.questions.map(q => {
+        const { correctAnswer, ...rest } = q
+        return rest
       })
     }
 
