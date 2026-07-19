@@ -2,9 +2,14 @@ import multer from 'multer'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import fs from 'fs'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // Create upload directory if it doesn't exist
-const uploadDir = 'uploads/files'
+// Absolute path: <project-root>/backend/uploads/files
+const uploadDir = path.join(__dirname, '..', '..', 'uploads', 'files')
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true })
 }
