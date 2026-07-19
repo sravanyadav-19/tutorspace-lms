@@ -57,6 +57,7 @@ export const classAPI = {
 
 export const announcementAPI = {
   getClassAnnouncements: (classId) => api.get(`/announcements/class/${classId}`),
+  getAnnouncementById: (id) => api.get(`/announcements/${id}`),
   createAnnouncement: (classId, data) => api.post(`/announcements/class/${classId}`, data),
   updateAnnouncement: (id, data) => api.put(`/announcements/${id}`, data),
   deleteAnnouncement: (id) => api.delete(`/announcements/${id}`),

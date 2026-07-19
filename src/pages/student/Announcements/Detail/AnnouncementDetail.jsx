@@ -31,7 +31,11 @@ const AnnouncementDetail = () => {
   const fetchAnnouncementData = async () => {
     try {
       setLoading(true)
-      const commentsRes = await announcementAPI.getAnnouncementComments(announcementId)
+      const [announcementRes, commentsRes] = await Promise.all([
+        announcementAPI.getAnnouncementById(announcementId),
+        announcementAPI.getAnnouncementComments(announcementId)
+      ])
+      setAnnouncement(announcementRes.data.data.announcement)
       setComments(commentsRes.data.data.comments || [])
     } catch (err) {
       setError('Failed to load announcement')
@@ -82,11 +86,11 @@ const AnnouncementDetail = () => {
 
   if (loading) return (<DashboardLayout userRole="student"><SkeletonCard /></DashboardLayout>)
 
-  if (error) {
+  if (error || !announcement) {
     return (
       <DashboardLayout userRole="student">
         <div className={styles.errorState} role="alert">
-          <AlertCircle size={16} style={{ marginRight: '6px' }} /> {error}
+          <AlertCircle size={16} style={{ marginRight: '6px' }} /> {error || 'Announcement not found'}
           <Button variant="secondary" onClick={() => navigate(-1)}><ArrowLeft size={16} style={{ marginRight: '6px' }} /> Go Back</Button>
         </div>
       </DashboardLayout>
@@ -99,6 +103,23 @@ const AnnouncementDetail = () => {
         <button className={styles.backBtn} onClick={() => navigate('/student/announcements')}>
           <ArrowLeft size={16} style={{ marginRight: '6px' }} /> Back to Announcements
         </button>
+
+        {/* Announcement content card */}
+        <div className={styles.announcementCard}>
+          <div className={styles.announcementHeader}>
+            <div className={styles.authorInfo}>
+              <div className={styles.authorAvatar}>
+                <Target size={22} color="white" />
+              </div>
+              <div>
+                <p className={styles.authorName}>{announcement.author?.name || 'Teacher'}</p>
+                <p className={styles.postTime}>{formatDate(announcement.createdAt)}</p>
+              </div>
+            </div>
+          </div>
+          <h1 className={styles.announcementTitle}>{announcement.title}</h1>
+          <p className={styles.announcementText}>{announcement.content}</p>
+        </div>
 
         <div className={styles.commentsSection}>
           <h2 className={styles.commentsTitle}><MessageCircle size={18} style={{ marginRight: '6px' }} /> Comments ({comments.length})</h2>

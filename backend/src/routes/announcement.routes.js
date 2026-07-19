@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   getClassAnnouncements,
+  getAnnouncementById,
   createAnnouncement,
   updateAnnouncement,
   deleteAnnouncement,
@@ -19,6 +20,7 @@ import {
 const router = express.Router()
 
 router.get('/class/:classId', authenticate, getClassAnnouncements)
+router.get('/:announcementId', authenticate, getAnnouncementById)
 router.post('/class/:classId', authenticate, authorize('teacher', 'admin'), validate(createAnnouncementSchema), createAnnouncement)
 router.put('/:id', authenticate, authorize('teacher', 'admin'), validate(updateAnnouncementSchema), updateAnnouncement)
 router.delete('/:id', authenticate, authorize('teacher', 'admin'), deleteAnnouncement)
