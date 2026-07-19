@@ -352,17 +352,12 @@ export const deleteComment = async (req, res) => {
       where: { id: parseInt(commentId) }
     })
 
-    if (!existing) {
+    // Return 404 for BOTH "not found" AND "not owned" so non-owners
+    // cannot distinguish whether a commentId exists or not.
+    if (!existing || existing.authorId !== userId) {
       return res.status(404).json({
         success: false,
         message: 'Comment not found'
-      })
-    }
-
-    if (existing.authorId !== userId) {
-      return res.status(403).json({
-        success: false,
-        message: 'You can only delete your own comments'
       })
     }
 
