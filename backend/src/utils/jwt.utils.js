@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 
 // Generate access token with role
 export const generateAccessToken = (userId, role) => {
@@ -26,8 +27,7 @@ export const verifyToken = (token, secret) => {
   return jwt.verify(token, secret)
 }
 
-// Generate random token for email verification
+// Generate cryptographically secure random token for email verification
 export const generateRandomToken = () => {
-  return Math.random().toString(36).substring(2) +
-         Date.now().toString(36)
+  return crypto.randomBytes(32).toString('hex')
 }
