@@ -219,9 +219,10 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params
+    const userId = parseInt(id)
 
     // Prevent deleting yourself
-    if (parseInt(id) === req.user.id) {
+    if (userId === req.user.id) {
       return res.status(400).json({
         success: false,
         message: 'You cannot delete your own account'
@@ -229,7 +230,7 @@ export const deleteUser = async (req, res) => {
     }
 
     await prisma.user.delete({
-      where: { id: parseInt(id) }
+      where: { id: userId }
     })
 
     res.json({
@@ -238,6 +239,15 @@ export const deleteUser = async (req, res) => {
     })
 
   } catch (error) {
+    // Prisma P2003 = foreign key constraint violation
+    if (error.code === 'P2003') {
+      console.error('Delete user FK error:', error.message)
+      return res.status(409).json({
+        success: false,
+        message: 'Cannot delete this user because they have existing records (enrollments, files, quizzes, etc.). Remove or reassign their related data first.'
+      })
+    }
+
     console.error('Delete user error:', error)
     res.status(500).json({
       success: false,
