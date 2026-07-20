@@ -29,21 +29,10 @@ const formatFileSize = (bytes) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-/**
- * Determine Cloudinary resource_type based on mime type.
- * Images → 'image', everything else (PDF, etc.) → 'raw'
- */
 function getResourceType(mimeType) {
   return mimeType?.startsWith('image/') ? 'image' : 'raw'
 }
 
-/**
- * Check that the requesting user is authorized to access a file.
- * Allowed if:
- *   - user is admin, OR
- *   - user is enrolled in the file's class (teacher or student), OR
- *   - user is the uploader of the file
- */
 async function checkFileAccess(userId, userRole, fileId) {
   if (userRole === 'admin') {
     return { authorized: true, classId: null }
@@ -64,10 +53,7 @@ async function checkFileAccess(userId, userRole, fileId) {
 
   const enrollment = await prisma.classEnrollment.findUnique({
     where: {
-      userId_classId: {
-        userId,
-        classId: file.classId
-      }
+      userId_classId: { userId, classId: file.classId }
     }
   })
 
@@ -79,10 +65,26 @@ async function checkFileAccess(userId, userRole, fileId) {
 }
 
 /**
- * Generate a signed Cloudinary URL for secure file access.
+ * Extract the Cloudinary public_id from a Cloudinary URL.
+ * URL: https://res.cloudinary.com/cloud_name/image/upload/v1234/folder/public_id.ext
+ * Returns: folder/public_id (no extension)
  */
+function extractPublicIdFromUrl(url) {
+  try {
+    const cleanUrl = url.split('?')[0]
+    const parts = cleanUrl.split('/upload/')
+    if (parts.length < 2) return null
+    const afterUpload = parts[1]
+    const afterVersion = afterUpload.replace(/^v\d+\//, '')
+    const withoutExt = afterVersion.replace(/\.[^.]+$/, '')
+    return withoutExt
+  } catch {
+    return null
+  }
+}
+
 function getSignedCloudinaryUrl(fileRecord, options = {}) {
-  const publicId = fileRecord.filename
+  const publicId = extractPublicIdFromUrl(fileRecord.filePath) || fileRecord.filename
   const resourceType = getResourceType(fileRecord.mimeType)
 
   return cloudinary.url(publicId, {
@@ -95,14 +97,12 @@ function getSignedCloudinaryUrl(fileRecord, options = {}) {
   })
 }
 
-/**
- * Delete file from storage (cloudinary or local disk).
- */
 async function deleteFileFromStorage(fileRecord) {
-  if (storageProvider === 'cloudinary' && fileRecord.filename) {
+  if (storageProvider === 'cloudinary' && fileRecord.filePath) {
+    const publicId = extractPublicIdFromUrl(fileRecord.filePath) || fileRecord.filename
     const resourceType = getResourceType(fileRecord.mimeType)
     try {
-      await cloudinary.uploader.destroy(fileRecord.filename, {
+      await cloudinary.uploader.destroy(publicId, {
         resource_type: resourceType,
         invalidate: true
       })
@@ -116,7 +116,6 @@ async function deleteFileFromStorage(fileRecord) {
   }
 }
 
-// Upload file (Teacher only)
 export const uploadFile = async (req, res) => {
   try {
     const { classId } = req.params
@@ -183,15 +182,12 @@ export const uploadFile = async (req, res) => {
   }
 }
 
-// Get files for a class
 export const getClassFiles = async (req, res) => {
   try {
     const { classId } = req.params
 
     const files = await prisma.file.findMany({
-      where: {
-        classId: parseInt(classId)
-      },
+      where: { classId: parseInt(classId) },
       include: {
         uploader: {
           select: {
@@ -224,7 +220,6 @@ export const getClassFiles = async (req, res) => {
   }
 }
 
-// Download file
 export const downloadFile = async (req, res) => {
   try {
     const { fileId } = req.params
@@ -251,9 +246,7 @@ export const downloadFile = async (req, res) => {
     }
 
     if (storageProvider === 'cloudinary') {
-      const signedUrl = getSignedCloudinaryUrl(file, {
-        attachment: file.originalName
-      })
+      const signedUrl = getSignedCloudinaryUrl(file, { attachment: file.originalName })
       return res.redirect(signedUrl)
     }
 
@@ -278,7 +271,6 @@ export const downloadFile = async (req, res) => {
   }
 }
 
-// Delete file (Teacher who uploaded it)
 export const deleteFile = async (req, res) => {
   try {
     const { fileId } = req.params
@@ -318,7 +310,6 @@ export const deleteFile = async (req, res) => {
   }
 }
 
-// Get all files for teacher's classes
 export const getTeacherFiles = async (req, res) => {
   try {
     const teacherId = req.user.id
@@ -352,7 +343,6 @@ export const getTeacherFiles = async (req, res) => {
   }
 }
 
-// Get all files for student's enrolled classes
 export const getStudentFiles = async (req, res) => {
   try {
     const studentId = req.user.id
@@ -393,7 +383,6 @@ export const getStudentFiles = async (req, res) => {
   }
 }
 
-// View file inline (no download) - for students
 export const viewFile = async (req, res) => {
   try {
     const { fileId } = req.params
