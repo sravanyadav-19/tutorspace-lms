@@ -2,9 +2,12 @@ import { prisma } from '../lib/prisma.js'
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
+import cloudinary from '../config/cloudinary.config.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+
+const storageProvider = process.env.STORAGE_PROVIDER || 'local'
 
 // Get file icon based on mime type
 const getFileIcon = (mimeType) => {
@@ -32,11 +35,8 @@ const formatFileSize = (bytes) => {
  *   - user is admin, OR
  *   - user is enrolled in the file's class (teacher or student), OR
  *   - user is the uploader of the file
- *
- * Returns an object with { authorized: boolean, classId: number|null }.
  */
 async function checkFileAccess(userId, userRole, fileId) {
-  // Admin bypass
   if (userRole === 'admin') {
     return { authorized: true, classId: null }
   }
@@ -50,12 +50,10 @@ async function checkFileAccess(userId, userRole, fileId) {
     return { authorized: false, classId: null }
   }
 
-  // Uploader always has access
   if (file.uploaderId === userId) {
     return { authorized: true, classId: file.classId }
   }
 
-  // Check enrollment in the class
   const enrollment = await prisma.classEnrollment.findUnique({
     where: {
       userId_classId: {
@@ -72,6 +70,28 @@ async function checkFileAccess(userId, userRole, fileId) {
   return { authorized: false, classId: file.classId }
 }
 
+/**
+ * Delete file from storage (cloudinary or local disk).
+ */
+async function deleteFileFromStorage(filePath) {
+  if (storageProvider === 'cloudinary') {
+    // Extract public_id from Cloudinary URL
+    // URL format: https://res.cloudinary.com/cloud_name/image/upload/v1234/tutorspace/files/public_id.ext
+    const parts = filePath.split('/')
+    const publicIdWithExt = parts[parts.length - 1]
+    const publicId = `tutorspace/files/${path.parse(publicIdWithExt).name}`
+    try {
+      await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' })
+    } catch (e) {
+      console.warn('Cloudinary delete warning:', e.message)
+    }
+  } else {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath)
+    }
+  }
+}
+
 // Upload file (Teacher only)
 export const uploadFile = async (req, res) => {
   try {
@@ -79,7 +99,6 @@ export const uploadFile = async (req, res) => {
     const { description } = req.body
     const teacherId = req.user.id
 
-    // Check if file was uploaded
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -94,21 +113,35 @@ export const uploadFile = async (req, res) => {
 
     if (!classExists) {
       // Delete uploaded file if class not found
-      fs.unlinkSync(req.file.path)
+      if (req.file.path) {
+        await deleteFileFromStorage(req.file.path)
+      }
       return res.status(404).json({
         success: false,
         message: 'Class not found'
       })
     }
 
+    // Determine the file path/URL to store
+    // Cloudinary provides req.file.path as the secure URL
+    // Local disk provides req.file.path as the local filesystem path
+    let filePath = req.file.path
+    let fileSize = req.file.size
+
+    // For Cloudinary, also store the public_id for later deletion
+    let cloudinaryPublicId = null
+    if (storageProvider === 'cloudinary' && req.file.filename) {
+      cloudinaryPublicId = req.file.filename
+    }
+
     // Save file record to database
     const file = await prisma.file.create({
       data: {
-        filename: req.file.filename,
+        filename: req.file.filename || path.basename(filePath),
         originalName: req.file.originalname,
-        filePath: req.file.path,
+        filePath,
         description: description?.trim() || null,
-        fileSize: req.file.size,
+        fileSize,
         mimeType: req.file.mimetype,
         uploaderId: teacherId,
         classId: parseInt(classId)
@@ -137,8 +170,8 @@ export const uploadFile = async (req, res) => {
     })
   } catch (error) {
     // Delete uploaded file if error occurs
-    if (req.file) {
-      try { fs.unlinkSync(req.file.path) } catch (e) {}
+    if (req.file && req.file.path) {
+      await deleteFileFromStorage(req.file.path)
     }
     console.error('Upload file error:', error)
     res.status(500).json({
@@ -169,7 +202,6 @@ export const getClassFiles = async (req, res) => {
       orderBy: { uploadedAt: 'desc' }
     })
 
-    // Add icon and formatted size to each file
     const filesWithMeta = files.map(file => ({
       ...file,
       icon: getFileIcon(file.mimeType),
@@ -197,7 +229,6 @@ export const downloadFile = async (req, res) => {
     const userId = req.user.id
     const userRole = req.user.role
 
-    // Get file from database (include classId and uploaderId for access check)
     const file = await prisma.file.findUnique({
       where: { id: parseInt(fileId) }
     })
@@ -209,7 +240,6 @@ export const downloadFile = async (req, res) => {
       })
     }
 
-    // --- Enrollment/access check ---
     const access = await checkFileAccess(userId, userRole, fileId)
     if (!access.authorized) {
       return res.status(403).json({
@@ -217,9 +247,16 @@ export const downloadFile = async (req, res) => {
         message: 'You do not have access to this file'
       })
     }
-    // ------------------------------
 
-    // Check if file exists on disk
+    if (storageProvider === 'cloudinary') {
+      // Redirect to Cloudinary URL for download
+      // Add fl_attachment flag to force download
+      const separator = file.filePath.includes('?') ? '&' : '?'
+      const downloadUrl = `${file.filePath}${separator}fl_attachment&filename=${encodeURIComponent(file.originalName)}`
+      return res.redirect(downloadUrl)
+    }
+
+    // Local disk fallback
     if (!fs.existsSync(file.filePath)) {
       return res.status(404).json({
         success: false,
@@ -227,14 +264,12 @@ export const downloadFile = async (req, res) => {
       })
     }
 
-    // Set headers for download
     res.setHeader(
       'Content-Disposition',
       `attachment; filename="${file.originalName}"`
     )
     res.setHeader('Content-Type', file.mimeType)
 
-    // Stream file to response
     const fileStream = fs.createReadStream(file.filePath)
     fileStream.pipe(res)
 
@@ -253,7 +288,6 @@ export const deleteFile = async (req, res) => {
     const { fileId } = req.params
     const userId = req.user.id
 
-    // Get file from database
     const file = await prisma.file.findUnique({
       where: { id: parseInt(fileId) }
     })
@@ -265,7 +299,6 @@ export const deleteFile = async (req, res) => {
       })
     }
 
-    // Check ownership
     if (file.uploaderId !== userId) {
       return res.status(403).json({
         success: false,
@@ -273,10 +306,8 @@ export const deleteFile = async (req, res) => {
       })
     }
 
-    // Delete file from disk
-    if (fs.existsSync(file.filePath)) {
-      fs.unlinkSync(file.filePath)
-    }
+    // Delete from storage (Cloudinary or local disk)
+    await deleteFileFromStorage(file.filePath)
 
     // Delete file record from database
     await prisma.file.delete({
@@ -348,7 +379,6 @@ export const getStudentFiles = async (req, res) => {
   try {
     const studentId = req.user.id
 
-    // Get all classes student is enrolled in
     const enrollments = await prisma.classEnrollment.findMany({
       where: { userId: studentId },
       select: { classId: true }
@@ -356,7 +386,6 @@ export const getStudentFiles = async (req, res) => {
 
     const classIds = enrollments.map(e => e.classId)
 
-    // Get all files from those classes
     const files = await prisma.file.findMany({
       where: {
         classId: { in: classIds }
@@ -406,7 +435,6 @@ export const viewFile = async (req, res) => {
     const userId = req.user.id
     const userRole = req.user.role
 
-    // Get file from database
     const file = await prisma.file.findUnique({
       where: { id: parseInt(fileId) }
     })
@@ -418,7 +446,6 @@ export const viewFile = async (req, res) => {
       })
     }
 
-    // --- Enrollment/access check ---
     const access = await checkFileAccess(userId, userRole, fileId)
     if (!access.authorized) {
       return res.status(403).json({
@@ -426,9 +453,13 @@ export const viewFile = async (req, res) => {
         message: 'You do not have access to this file'
       })
     }
-    // ------------------------------
 
-    // Check if file exists on disk
+    if (storageProvider === 'cloudinary') {
+      // Redirect to Cloudinary URL for inline viewing
+      return res.redirect(file.filePath)
+    }
+
+    // Local disk fallback
     if (!fs.existsSync(file.filePath)) {
       return res.status(404).json({
         success: false,
@@ -436,21 +467,18 @@ export const viewFile = async (req, res) => {
       })
     }
 
-    // Set headers to DISPLAY inline (not download)
     res.setHeader(
       'Content-Disposition',
       `inline; filename="${file.originalName}"`
     )
     res.setHeader('Content-Type', file.mimeType)
-    
-    // Security headers to prevent download
+
     res.setHeader('X-Content-Type-Options', 'nosniff')
     res.setHeader(
       'Content-Security-Policy',
       "default-src 'self'"
     )
 
-    // Stream file to response
     const fileStream = fs.createReadStream(file.filePath)
     fileStream.pipe(res)
 

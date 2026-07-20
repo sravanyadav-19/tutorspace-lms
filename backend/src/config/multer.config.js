@@ -3,29 +3,48 @@ import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
+import { CloudinaryStorage } from 'multer-storage-cloudinary'
+import cloudinary from './cloudinary.config.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Create upload directory if it doesn't exist
-// Absolute path: <project-root>/backend/uploads/files
-const uploadDir = path.join(__dirname, '..', '..', 'uploads', 'files')
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true })
-}
+// Determine storage provider from env (default: 'local')
+const storageProvider = process.env.STORAGE_PROVIDER || 'local'
 
-// Configure storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir)
-  },
-  filename: (req, file, cb) => {
-    const uniqueId = uuidv4()
-    const extension = path.extname(file.originalname)
-    const filename = `${uniqueId}${extension}`
-    cb(null, filename)
+// Build storage engine
+let storage
+
+if (storageProvider === 'cloudinary') {
+  // Cloudinary storage
+  storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: 'tutorspace/files',
+      resource_type: 'auto',
+      public_id: (req, file) => uuidv4(),
+      transformation: [{ quality: 'auto' }]
+    }
+  })
+} else {
+  // Local disk storage (fallback)
+  const uploadDir = path.join(__dirname, '..', '..', 'uploads', 'files')
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true })
   }
-})
+
+  storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadDir)
+    },
+    filename: (req, file, cb) => {
+      const uniqueId = uuidv4()
+      const extension = path.extname(file.originalname)
+      const filename = `${uniqueId}${extension}`
+      cb(null, filename)
+    }
+  })
+}
 
 // File filter - ONLY PDF and PNG
 const fileFilter = (req, file, cb) => {
