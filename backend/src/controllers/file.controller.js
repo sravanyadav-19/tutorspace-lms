@@ -30,6 +30,14 @@ const formatFileSize = (bytes) => {
 }
 
 /**
+ * Determine Cloudinary resource_type based on mime type.
+ * Images → 'image', everything else (PDF, etc.) → 'raw'
+ */
+function getResourceType(mimeType) {
+  return mimeType?.startsWith('image/') ? 'image' : 'raw'
+}
+
+/**
  * Check that the requesting user is authorized to access a file.
  * Allowed if:
  *   - user is admin, OR
@@ -71,23 +79,39 @@ async function checkFileAccess(userId, userRole, fileId) {
 }
 
 /**
+ * Generate a signed Cloudinary URL for secure file access.
+ */
+function getSignedCloudinaryUrl(fileRecord, options = {}) {
+  const publicId = fileRecord.filename
+  const resourceType = getResourceType(fileRecord.mimeType)
+
+  return cloudinary.url(publicId, {
+    secure: true,
+    type: 'upload',
+    resource_type: resourceType,
+    sign_url: true,
+    expires_at: Math.floor(Date.now() / 1000) + 3600,
+    ...options
+  })
+}
+
+/**
  * Delete file from storage (cloudinary or local disk).
  */
-async function deleteFileFromStorage(filePath) {
-  if (storageProvider === 'cloudinary') {
-    // Extract public_id from Cloudinary URL
-    // URL format: https://res.cloudinary.com/cloud_name/image/upload/v1234/tutorspace/files/public_id.ext
-    const parts = filePath.split('/')
-    const publicIdWithExt = parts[parts.length - 1]
-    const publicId = `tutorspace/files/${path.parse(publicIdWithExt).name}`
+async function deleteFileFromStorage(fileRecord) {
+  if (storageProvider === 'cloudinary' && fileRecord.filename) {
+    const resourceType = getResourceType(fileRecord.mimeType)
     try {
-      await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' })
+      await cloudinary.uploader.destroy(fileRecord.filename, {
+        resource_type: resourceType,
+        invalidate: true
+      })
     } catch (e) {
       console.warn('Cloudinary delete warning:', e.message)
     }
   } else {
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath)
+    if (fs.existsSync(fileRecord.filePath)) {
+      fs.unlinkSync(fileRecord.filePath)
     }
   }
 }
@@ -106,42 +130,24 @@ export const uploadFile = async (req, res) => {
       })
     }
 
-    // Check if class exists
     const classExists = await prisma.class.findUnique({
       where: { id: parseInt(classId) }
     })
 
     if (!classExists) {
-      // Delete uploaded file if class not found
-      if (req.file.path) {
-        await deleteFileFromStorage(req.file.path)
-      }
       return res.status(404).json({
         success: false,
         message: 'Class not found'
       })
     }
 
-    // Determine the file path/URL to store
-    // Cloudinary provides req.file.path as the secure URL
-    // Local disk provides req.file.path as the local filesystem path
-    let filePath = req.file.path
-    let fileSize = req.file.size
-
-    // For Cloudinary, also store the public_id for later deletion
-    let cloudinaryPublicId = null
-    if (storageProvider === 'cloudinary' && req.file.filename) {
-      cloudinaryPublicId = req.file.filename
-    }
-
-    // Save file record to database
     const file = await prisma.file.create({
       data: {
-        filename: req.file.filename || path.basename(filePath),
+        filename: req.file.filename || path.basename(req.file.path),
         originalName: req.file.originalname,
-        filePath,
+        filePath: req.file.path,
         description: description?.trim() || null,
-        fileSize,
+        fileSize: req.file.size,
         mimeType: req.file.mimetype,
         uploaderId: teacherId,
         classId: parseInt(classId)
@@ -169,10 +175,6 @@ export const uploadFile = async (req, res) => {
       }
     })
   } catch (error) {
-    // Delete uploaded file if error occurs
-    if (req.file && req.file.path) {
-      await deleteFileFromStorage(req.file.path)
-    }
     console.error('Upload file error:', error)
     res.status(500).json({
       success: false,
@@ -249,14 +251,12 @@ export const downloadFile = async (req, res) => {
     }
 
     if (storageProvider === 'cloudinary') {
-      // Redirect to Cloudinary URL for download
-      // Add fl_attachment flag to force download
-      const separator = file.filePath.includes('?') ? '&' : '?'
-      const downloadUrl = `${file.filePath}${separator}fl_attachment&filename=${encodeURIComponent(file.originalName)}`
-      return res.redirect(downloadUrl)
+      const signedUrl = getSignedCloudinaryUrl(file, {
+        attachment: file.originalName
+      })
+      return res.redirect(signedUrl)
     }
 
-    // Local disk fallback
     if (!fs.existsSync(file.filePath)) {
       return res.status(404).json({
         success: false,
@@ -264,12 +264,8 @@ export const downloadFile = async (req, res) => {
       })
     }
 
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename="${file.originalName}"`
-    )
+    res.setHeader('Content-Disposition', `attachment; filename="${file.originalName}"`)
     res.setHeader('Content-Type', file.mimeType)
-
     const fileStream = fs.createReadStream(file.filePath)
     fileStream.pipe(res)
 
@@ -306,13 +302,8 @@ export const deleteFile = async (req, res) => {
       })
     }
 
-    // Delete from storage (Cloudinary or local disk)
-    await deleteFileFromStorage(file.filePath)
-
-    // Delete file record from database
-    await prisma.file.delete({
-      where: { id: parseInt(fileId) }
-    })
+    await deleteFileFromStorage(file)
+    await prisma.file.delete({ where: { id: parseInt(fileId) } })
 
     res.status(200).json({
       success: true,
@@ -333,23 +324,10 @@ export const getTeacherFiles = async (req, res) => {
     const teacherId = req.user.id
 
     const files = await prisma.file.findMany({
-      where: {
-        uploaderId: teacherId
-      },
+      where: { uploaderId: teacherId },
       include: {
-        class: {
-          select: {
-            id: true,
-            name: true,
-            subject: true
-          }
-        },
-        uploader: {
-          select: {
-            id: true,
-            name: true
-          }
-        }
+        class: { select: { id: true, name: true, subject: true } },
+        uploader: { select: { id: true, name: true } }
       },
       orderBy: { uploadedAt: 'desc' }
     })
@@ -387,23 +365,10 @@ export const getStudentFiles = async (req, res) => {
     const classIds = enrollments.map(e => e.classId)
 
     const files = await prisma.file.findMany({
-      where: {
-        classId: { in: classIds }
-      },
+      where: { classId: { in: classIds } },
       include: {
-        class: {
-          select: {
-            id: true,
-            name: true,
-            subject: true
-          }
-        },
-        uploader: {
-          select: {
-            id: true,
-            name: true
-          }
-        }
+        class: { select: { id: true, name: true, subject: true } },
+        uploader: { select: { id: true, name: true } }
       },
       orderBy: { uploadedAt: 'desc' }
     })
@@ -455,11 +420,10 @@ export const viewFile = async (req, res) => {
     }
 
     if (storageProvider === 'cloudinary') {
-      // Redirect to Cloudinary URL for inline viewing
-      return res.redirect(file.filePath)
+      const signedUrl = getSignedCloudinaryUrl(file)
+      return res.redirect(signedUrl)
     }
 
-    // Local disk fallback
     if (!fs.existsSync(file.filePath)) {
       return res.status(404).json({
         success: false,
@@ -467,17 +431,10 @@ export const viewFile = async (req, res) => {
       })
     }
 
-    res.setHeader(
-      'Content-Disposition',
-      `inline; filename="${file.originalName}"`
-    )
+    res.setHeader('Content-Disposition', `inline; filename="${file.originalName}"`)
     res.setHeader('Content-Type', file.mimeType)
-
     res.setHeader('X-Content-Type-Options', 'nosniff')
-    res.setHeader(
-      'Content-Security-Policy',
-      "default-src 'self'"
-    )
+    res.setHeader('Content-Security-Policy', "default-src 'self'")
 
     const fileStream = fs.createReadStream(file.filePath)
     fileStream.pipe(res)

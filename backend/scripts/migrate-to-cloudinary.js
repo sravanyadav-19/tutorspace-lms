@@ -1,6 +1,6 @@
 /**
  * One-time migration script: upload all locally stored files to Cloudinary
- * and update the database records with new Cloudinary URLs.
+ * and update the database records with new Cloudinary URLs + public_ids.
  *
  * Usage:
  *   node scripts/migrate-to-cloudinary.js
@@ -13,15 +13,11 @@ import { prisma } from '../src/lib/prisma.js'
 import cloudinary from '../src/config/cloudinary.config.js'
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 async function migrate() {
   console.log('🔄 Starting migration to Cloudinary...\n')
 
-  // Get all files with local paths
+  // Get all files with local paths (start with /)
   const files = await prisma.file.findMany({
     where: {
       filePath: {
@@ -51,17 +47,20 @@ async function migrate() {
 
       console.log(`  Uploading: ${file.originalName} (${file.fileSize ? Math.round(file.fileSize / 1024) + 'KB' : 'unknown'})...`)
 
-      // Upload to Cloudinary
+      // Upload to Cloudinary — 'auto' resource_type lets Cloudinary decide
       const result = await cloudinary.uploader.upload(file.filePath, {
         folder: 'tutorspace/files',
         resource_type: 'auto',
         public_id: path.parse(file.filename).name
       })
 
-      // Update database record with Cloudinary URL
+      // Update database record with Cloudinary URL and public_id (filename)
       await prisma.file.update({
         where: { id: file.id },
-        data: { filePath: result.secure_url }
+        data: {
+          filePath: result.secure_url,
+          filename: result.public_id  // Store public_id for deletion
+        }
       })
 
       console.log(`  ✅ Updated file ID ${file.id} → ${result.secure_url}`)
