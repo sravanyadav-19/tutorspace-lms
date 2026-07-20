@@ -66,26 +66,33 @@ async function checkFileAccess(userId, userRole, fileId) {
 
 /**
  * Extract the Cloudinary public_id from a Cloudinary URL.
+ * For 'raw' resources (PDFs), the extension MUST be preserved.
+ * For 'image' resources (PNGs), the extension is stripped (Cloudinary convention).
+ *
  * URL: https://res.cloudinary.com/cloud_name/image/upload/v1234/folder/public_id.ext
- * Returns: folder/public_id (no extension)
+ * Returns: folder/public_id (with or without extension based on resourceType)
  */
-function extractPublicIdFromUrl(url) {
+function extractPublicIdFromUrl(url, resourceType) {
   try {
     const cleanUrl = url.split('?')[0]
     const parts = cleanUrl.split('/upload/')
     if (parts.length < 2) return null
     const afterUpload = parts[1]
     const afterVersion = afterUpload.replace(/^v\d+\//, '')
-    const withoutExt = afterVersion.replace(/\.[^.]+$/, '')
-    return withoutExt
+    // For 'image' resources, strip the extension (Cloudinary manages format separately).
+    // For 'raw' resources (PDFs), keep the extension — Cloudinary requires it.
+    if (resourceType === 'image') {
+      return afterVersion.replace(/\.[^.]+$/, '')
+    }
+    return afterVersion
   } catch {
     return null
   }
 }
 
 function getSignedCloudinaryUrl(fileRecord, options = {}) {
-  const publicId = extractPublicIdFromUrl(fileRecord.filePath) || fileRecord.filename
   const resourceType = getResourceType(fileRecord.mimeType)
+  const publicId = extractPublicIdFromUrl(fileRecord.filePath, resourceType) || fileRecord.filename
 
   return cloudinary.url(publicId, {
     secure: true,
@@ -99,8 +106,8 @@ function getSignedCloudinaryUrl(fileRecord, options = {}) {
 
 async function deleteFileFromStorage(fileRecord) {
   if (storageProvider === 'cloudinary' && fileRecord.filePath) {
-    const publicId = extractPublicIdFromUrl(fileRecord.filePath) || fileRecord.filename
     const resourceType = getResourceType(fileRecord.mimeType)
+    const publicId = extractPublicIdFromUrl(fileRecord.filePath, resourceType) || fileRecord.filename
     try {
       await cloudinary.uploader.destroy(publicId, {
         resource_type: resourceType,
