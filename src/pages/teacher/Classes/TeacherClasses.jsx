@@ -25,7 +25,7 @@ const TeacherClasses = () => {
   }, [classes, searchTerm])
 
   const fetchClasses = async () => {
-    try { setLoading(true); const res = await classAPI.getTeacherClasses(); setClasses(res.data.data.classes) }
+    try { setLoading(true); const res = await classAPI.getTeacherClasses(); setClasses(res.data.data.classes || []) }
     catch (err) { setError('Failed to load your classes') }
     finally { setLoading(false) }
   }

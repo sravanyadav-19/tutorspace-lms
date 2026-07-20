@@ -37,7 +37,7 @@ const TeacherFiles = () => {
   }
 
   const fetchFiles = async (classId) => {
-    try { setFilesLoading(true); const res = await fileAPI.getClassFiles(classId); setFiles(res.data.data.files) }
+    try { setFilesLoading(true); const res = await fileAPI.getClassFiles(classId); setFiles(res.data.data.files || []) }
     catch (err) { setFiles([]) }
     finally { setFilesLoading(false) }
   }

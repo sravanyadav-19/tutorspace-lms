@@ -32,7 +32,7 @@ const StudentAnnouncements = () => {
   }
 
   const fetchAnnouncements = async (classId) => {
-    try { setAnnouncementsLoading(true); const res = await announcementAPI.getClassAnnouncements(classId); setAnnouncements(res.data.data.announcements) }
+    try { setAnnouncementsLoading(true); const res = await announcementAPI.getClassAnnouncements(classId); setAnnouncements(res.data.data.announcements || []) }
     catch (err) { setAnnouncements([]) }
     finally { setAnnouncementsLoading(false) }
   }

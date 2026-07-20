@@ -66,7 +66,7 @@ const TeacherQuiz = () => {
   }
 
   const fetchQuizzes = async (classId) => {
-    try { setQuizzesLoading(true); const res = await quizAPI.getClassQuizzes(classId); setQuizzes(res.data.data.quizzes) }
+    try { setQuizzesLoading(true); const res = await quizAPI.getClassQuizzes(classId); setQuizzes(res.data.data.quizzes || []) }
     catch (err) { setQuizzes([]) }
     finally { setQuizzesLoading(false) }
   }
