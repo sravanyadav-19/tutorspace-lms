@@ -19,12 +19,15 @@ if (storageProvider === 'cloudinary') {
   // Cloudinary storage
   storage = new CloudinaryStorage({
     cloudinary,
-    params: {
+    params: (req, file) => ({
       folder: 'tutorspace/files',
-      resource_type: 'auto',
-      public_id: (req, file) => uuidv4(),
+      // Explicitly set resource_type based on mimetype so it matches
+      // what file.controller.js's getResourceType() later expects.
+      // PDF → 'raw', PNG → 'image'
+      resource_type: file.mimetype === 'application/pdf' ? 'raw' : 'image',
+      public_id: uuidv4(),
       transformation: [{ quality: 'auto' }]
-    }
+    })
   })
 } else {
   // Local disk storage (fallback)
