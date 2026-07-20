@@ -66,33 +66,26 @@ async function checkFileAccess(userId, userRole, fileId) {
 
 /**
  * Extract the Cloudinary public_id from a Cloudinary URL.
- * For 'raw' resources (PDFs), the extension MUST be preserved.
- * For 'image' resources (PNGs), the extension is stripped (Cloudinary convention).
- *
  * URL: https://res.cloudinary.com/cloud_name/image/upload/v1234/folder/public_id.ext
- * Returns: folder/public_id (with or without extension based on resourceType)
+ * Returns: folder/public_id (no extension)
  */
-function extractPublicIdFromUrl(url, resourceType) {
+function extractPublicIdFromUrl(url) {
   try {
     const cleanUrl = url.split('?')[0]
     const parts = cleanUrl.split('/upload/')
     if (parts.length < 2) return null
     const afterUpload = parts[1]
     const afterVersion = afterUpload.replace(/^v\d+\//, '')
-    // For 'image' resources, strip the extension (Cloudinary manages format separately).
-    // For 'raw' resources (PDFs), keep the extension — Cloudinary requires it.
-    if (resourceType === 'image') {
-      return afterVersion.replace(/\.[^.]+$/, '')
-    }
-    return afterVersion
+    const withoutExt = afterVersion.replace(/\.[^.]+$/, '')
+    return withoutExt
   } catch {
     return null
   }
 }
 
 function getSignedCloudinaryUrl(fileRecord, options = {}) {
+  const publicId = extractPublicIdFromUrl(fileRecord.filePath) || fileRecord.filename
   const resourceType = getResourceType(fileRecord.mimeType)
-  const publicId = extractPublicIdFromUrl(fileRecord.filePath, resourceType) || fileRecord.filename
 
   return cloudinary.url(publicId, {
     secure: true,
@@ -106,8 +99,8 @@ function getSignedCloudinaryUrl(fileRecord, options = {}) {
 
 async function deleteFileFromStorage(fileRecord) {
   if (storageProvider === 'cloudinary' && fileRecord.filePath) {
+    const publicId = extractPublicIdFromUrl(fileRecord.filePath) || fileRecord.filename
     const resourceType = getResourceType(fileRecord.mimeType)
-    const publicId = extractPublicIdFromUrl(fileRecord.filePath, resourceType) || fileRecord.filename
     try {
       await cloudinary.uploader.destroy(publicId, {
         resource_type: resourceType,
@@ -416,8 +409,25 @@ export const viewFile = async (req, res) => {
     }
 
     if (storageProvider === 'cloudinary') {
+      // Generate a signed Cloudinary URL, then proxy the file through
+      // our backend so we can control Content-Disposition and Content-Type
+      // headers. Cloudinary serves raw resources (PDFs) with Content-Disposition:
+      // attachment and Content-Type: application/octet-stream by default,
+      // which forces a download instead of inline display in the iframe.
       const signedUrl = getSignedCloudinaryUrl(file)
-      return res.redirect(signedUrl)
+      const cloudinaryRes = await fetch(signedUrl)
+      if (!cloudinaryRes.ok) {
+        return res.status(502).json({
+          success: false,
+          message: 'Failed to fetch file from storage'
+        })
+      }
+      const arrayBuffer = await cloudinaryRes.arrayBuffer()
+      res.setHeader('Content-Disposition', `inline; filename="${file.originalName}"`)
+      res.setHeader('Content-Type', file.mimeType)
+      res.setHeader('X-Content-Type-Options', 'nosniff')
+      res.setHeader('Content-Security-Policy', "default-src 'self'")
+      return res.send(Buffer.from(arrayBuffer))
     }
 
     if (!fs.existsSync(file.filePath)) {
