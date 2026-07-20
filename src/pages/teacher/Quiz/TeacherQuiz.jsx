@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { BookOpen, PlusCircle, Pencil, Trash2, Play, Pause, BarChart3, ClipboardList, Clock, AlertCircle, X, CheckCircle } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
@@ -12,7 +11,6 @@ import { validateField } from '../../../utils/validation'
 import EmptyState from '../../../components/shared/EmptyState'
 
 const TeacherQuiz = () => {
-  const navigate = useNavigate()
   const toast = useToast()
 
   const [classes, setClasses] = useState([])
@@ -38,20 +36,21 @@ const TeacherQuiz = () => {
   const [releasing, setReleasing] = useState(null)
 
   useEffect(() => { fetchClasses() }, [])
-  useEffect(() => { if (selectedClass) fetchQuizzes(selectedClass.id) }, [selectedClass])
+  useEffect(() => { if (selectedClass?.id) fetchQuizzes(selectedClass.id) }, [selectedClass])
 
   useEffect(() => {
     const errors = {}; let valid = true
     const titleErr = validateField('quizTitle', quizTitle)
     if (titleErr) { errors.title = titleErr; valid = false }
     const questionErrors = []
-    questions.forEach((q, i) => {
+    ;(questions || []).forEach((q) => {
       const qErrors = {}
-      const textErr = validateField('questionText', q.questionText)
-      const ansErr = validateField('correctAnswer', q.correctAnswer)
+      const textErr = validateField('questionText', q?.questionText)
+      const ansErr = validateField('correctAnswer', q?.correctAnswer)
       if (textErr) { qErrors.questionText = textErr; valid = false }
       if (ansErr) { qErrors.correctAnswer = ansErr; valid = false }
-      const filledOptions = q.options.filter((o) => o.trim() !== '')
+      const opts = Array.isArray(q?.options) ? q.options : []
+      const filledOptions = opts.filter((o) => typeof o === 'string' && o.trim() !== '')
       if (filledOptions.length < 2) { qErrors.options = 'At least 2 options required'; valid = false }
       questionErrors.push(qErrors)
     })
@@ -60,44 +59,59 @@ const TeacherQuiz = () => {
   }, [quizTitle, questions])
 
   const fetchClasses = async () => {
-    try { setLoading(true); const res = await classAPI.getTeacherClasses(); const tc = res.data.data.classes; setClasses(tc); if (tc.length > 0) setSelectedClass(tc[0]) }
+    try { setLoading(true); const res = await classAPI.getTeacherClasses(); const tc = res?.data?.data?.classes || []; setClasses(tc); if (tc.length > 0) setSelectedClass(tc[0]) }
     catch (err) { setError('Failed to load classes') }
     finally { setLoading(false) }
   }
 
   const fetchQuizzes = async (classId) => {
-    try { setQuizzesLoading(true); const res = await quizAPI.getClassQuizzes(classId); setQuizzes(res.data.data.quizzes || []) }
+    try { setQuizzesLoading(true); const res = await quizAPI.getClassQuizzes(classId); setQuizzes(res?.data?.data?.quizzes || []) }
     catch (err) { setQuizzes([]) }
     finally { setQuizzesLoading(false) }
   }
 
-  const addQuestion = () => setQuestions(prev => [...prev, { questionText: '', questionType: 'multiple_choice', options: ['', '', '', ''], correctAnswer: '', points: 1 }])
-  const removeQuestion = (index) => { if (questions.length === 1) return; setQuestions(prev => prev.filter((_, i) => i !== index)) }
-  const updateQuestion = (index, field, value) => setQuestions(prev => prev.map((q, i) => (i === index ? { ...q, [field]: value } : q)))
-  const updateOption = (qIndex, optIndex, value) => setQuestions(prev => prev.map((q, i) => { if (i !== qIndex) return q; const newOptions = [...q.options]; newOptions[optIndex] = value; return { ...q, options: newOptions } }))
+  const addQuestion = () => setQuestions(prev => [...(prev || []), { questionText: '', questionType: 'multiple_choice', options: ['', '', '', ''], correctAnswer: '', points: 1 }])
+  const removeQuestion = (index) => { if ((questions || []).length <= 1) return; setQuestions(prev => (prev || []).filter((_, i) => i !== index)) }
+  const updateQuestion = (index, field, value) => setQuestions(prev => (prev || []).map((q, i) => (i === index ? { ...q, [field]: value } : q)))
+  const updateOption = (qIndex, optIndex, value) => setQuestions(prev => (prev || []).map((q, i) => { if (i !== qIndex) return q; const newOptions = Array.isArray(q.options) ? [...q.options] : ['', '', '', '']; newOptions[optIndex] = value; return { ...q, options: newOptions } }))
 
   const getQuestionError = (qIndex, field) => { if (!quizTouched.questions?.[qIndex]?.[field]) return ''; return quizErrors.questions?.[qIndex]?.[field] || '' }
   const touchQuestionField = (qIndex, field) => setQuizTouched(prev => { const qs = prev.questions ? [...prev.questions] : []; if (!qs[qIndex]) qs[qIndex] = {}; qs[qIndex] = { ...qs[qIndex], [field]: true }; return { ...prev, questions: qs } })
   const touchQuizField = (field) => setQuizTouched(prev => ({ ...prev, [field]: true }))
 
   const handleCreateQuiz = async () => {
-    const touchedQuestions = questions.map(() => ({ questionText: true, correctAnswer: true, options: true }))
+    const touchedQuestions = (questions || []).map(() => ({ questionText: true, correctAnswer: true, options: true }))
     setQuizTouched({ title: true, questions: touchedQuestions })
-    if (!quizFormValid) return
+    if (!quizFormValid || !selectedClass?.id) return
     setCreating(true); setError('')
     try {
-      const quizData = { title: quizTitle, description: quizDescription, classId: selectedClass.id, timeLimit: timeLimit ? parseInt(timeLimit) : null, questions: questions.map((q) => ({ questionText: q.questionText, questionType: q.questionType, options: q.options.filter((o) => o.trim() !== ''), correctAnswer: q.correctAnswer, points: parseInt(q.points) || 1 })) }
+      const quizData = {
+        title: quizTitle,
+        description: quizDescription,
+        classId: selectedClass.id,
+        timeLimit: timeLimit ? parseInt(timeLimit) : null,
+        questions: (questions || []).map((q) => ({
+          questionText: q?.questionText || '',
+          questionType: q?.questionType || 'multiple_choice',
+          options: (Array.isArray(q?.options) ? q.options : []).filter((o) => typeof o === 'string' && o.trim() !== ''),
+          correctAnswer: q?.correctAnswer || '',
+          points: parseInt(q?.points) || 1
+        }))
+      }
       const res = await quizAPI.createQuiz(quizData)
-      setQuizzes(prev => [res.data.data.quiz, ...prev])
+      const createdQuiz = res?.data?.data?.quiz
+      if (createdQuiz) {
+        setQuizzes(prev => [createdQuiz, ...(prev || [])])
+      }
       toast.success('Quiz created successfully!')
       setShowCreateForm(false); setQuizTitle(''); setQuizDescription(''); setTimeLimit('')
       setQuestions([{ questionText: '', questionType: 'multiple_choice', options: ['', '', '', ''], correctAnswer: '', points: 1 }]); setQuizTouched({})
-    } catch (err) { toast.error(err.response?.data?.message || 'Failed to create quiz') }
+    } catch (err) { toast.error(err?.response?.data?.message || 'Failed to create quiz') }
     finally { setCreating(false) }
   }
 
   const handleTogglePublish = async (quizId, isPublished) => {
-    try { await quizAPI.togglePublish(quizId); setQuizzes(prev => prev.map((q) => q.id === quizId ? { ...q, isPublished: !isPublished } : q)); toast.success(isPublished ? 'Quiz unpublished' : 'Quiz published!') }
+    try { await quizAPI.togglePublish(quizId); setQuizzes(prev => (prev || []).map((q) => q.id === quizId ? { ...q, isPublished: !isPublished } : q)); toast.success(isPublished ? 'Quiz unpublished' : 'Quiz published!') }
     catch (err) { toast.error('Failed to update quiz') }
   }
 
@@ -107,7 +121,7 @@ const TeacherQuiz = () => {
   const handleDeleteQuiz = async () => {
     const { quizId } = deleteModal; if (!quizId) return
     setDeleting(quizId)
-    try { await quizAPI.deleteQuiz(quizId); setQuizzes(prev => prev.filter((q) => q.id !== quizId)); toast.success('Quiz deleted successfully') }
+    try { await quizAPI.deleteQuiz(quizId); setQuizzes(prev => (prev || []).filter((q) => q.id !== quizId)); toast.success('Quiz deleted successfully') }
     catch (err) { toast.error('Failed to delete quiz') }
     finally { setDeleting(null); setDeleteModal({ open: false, quizId: null, title: '' }) }
   }
@@ -134,7 +148,7 @@ const TeacherQuiz = () => {
         </div>
         {error && <div className={styles.errorBanner} role="alert"><AlertCircle size={16} style={{ marginRight: '6px' }} /> {error}</div>}
 
-        {loading ? <SkeletonCard /> : classes.length === 0 ? (
+        {loading ? <SkeletonCard /> : (classes || []).length === 0 ? (
           <EmptyState
             icon="classes"
             title="No Classes Assigned"
@@ -145,7 +159,7 @@ const TeacherQuiz = () => {
             <div className={styles.classSidebar}>
               <h3 className={styles.sidebarTitle}>Your Classes</h3>
               <div className={styles.classList}>
-                {classes.map(cls => (
+                {(classes || []).map(cls => (
                   <button key={cls.id} className={`${styles.classItem} ${selectedClass?.id === cls.id ? styles.classItemActive : ''}`} onClick={() => { setSelectedClass(cls); setShowCreateForm(false) }}>
                     <BookOpen size={16} />
                     <div className={styles.classItemInfo}><p className={styles.classItemName}>{cls.name}</p><p className={styles.classItemSubject}>{cls.subject}</p></div>
@@ -164,14 +178,14 @@ const TeacherQuiz = () => {
                     <div className={styles.formGroup}><label className={styles.formLabel}><Clock size={14} style={{ marginRight: '4px' }} /> Time Limit (minutes, optional)</label><input type="number" className={styles.formInput} placeholder="e.g. 30" value={timeLimit} onChange={(e) => setTimeLimit(e.target.value)} min="1" max="300" style={{ maxWidth: '200px' }} /></div>
                   </div>
                   <div className={styles.formSection}>
-                    <div className={styles.questionsHeader}><h3 className={styles.formSectionTitle}>Questions ({questions.length})</h3><button className={styles.addQuestionBtn} onClick={addQuestion}><PlusCircle size={14} style={{ marginRight: '4px' }} /> Add Question</button></div>
+                    <div className={styles.questionsHeader}><h3 className={styles.formSectionTitle}>Questions ({(questions || []).length})</h3><button className={styles.addQuestionBtn} onClick={addQuestion}><PlusCircle size={14} style={{ marginRight: '4px' }} /> Add Question</button></div>
                     <div className={styles.questionsList}>
-                      {questions.map((q, qIndex) => (
+                      {(questions || []).map((q, qIndex) => (
                         <div key={qIndex} className={styles.questionCard}>
-                          <div className={styles.questionHeader}><span className={styles.questionNumber}>Q{qIndex + 1}</span><div className={styles.questionControls}><input type="number" className={styles.pointsInput} value={q.points} onChange={(e) => updateQuestion(qIndex, 'points', e.target.value)} min="1" max="100" /><span className={styles.pointsLabel}>pts</span>{questions.length > 1 && <button className={styles.removeQuestionBtn} onClick={() => removeQuestion(qIndex)}><X size={14} /></button>}</div></div>
-                          <div className={styles.formGroup}><label className={styles.formLabel}>Question *</label><textarea className={`${styles.formTextarea} ${getQuestionError(qIndex, 'questionText') ? styles.inputError : ''}`} placeholder="Enter your question here..." value={q.questionText} onChange={(e) => updateQuestion(qIndex, 'questionText', e.target.value)} onBlur={() => touchQuestionField(qIndex, 'questionText')} rows={2} />{getQuestionError(qIndex, 'questionText') && <span className={styles.inlineError} role="alert">{getQuestionError(qIndex, 'questionText')}</span>}</div>
-                          <div className={styles.formGroup}><label className={styles.formLabel}>Answer Options</label><div className={styles.optionsList}>{q.options.map((opt, optIndex) => (<div key={optIndex} className={styles.optionRow}><span className={styles.optionLabel}>{String.fromCharCode(65 + optIndex)}.</span><input type="text" className={styles.optionInput} placeholder={`Option ${String.fromCharCode(65 + optIndex)}`} value={opt} onChange={(e) => updateOption(qIndex, optIndex, e.target.value)} /></div>))}</div>{getQuestionError(qIndex, 'options') && <span className={styles.inlineError} role="alert">{getQuestionError(qIndex, 'options')}</span>}</div>
-                          <div className={styles.formGroup}><label className={styles.formLabel}><CheckCircle size={14} style={{ marginRight: '4px' }} /> Correct Answer *</label><input type="text" className={`${styles.formInput} ${getQuestionError(qIndex, 'correctAnswer') ? styles.inputError : ''} ${styles.correctAnswerInput}`} placeholder="Type the exact correct answer..." value={q.correctAnswer} onChange={(e) => updateQuestion(qIndex, 'correctAnswer', e.target.value)} onBlur={() => touchQuestionField(qIndex, 'correctAnswer')} />{getQuestionError(qIndex, 'correctAnswer') && <span className={styles.inlineError} role="alert">{getQuestionError(qIndex, 'correctAnswer')}</span>}</div>
+                          <div className={styles.questionHeader}><span className={styles.questionNumber}>Q{qIndex + 1}</span><div className={styles.questionControls}><input type="number" className={styles.pointsInput} value={q?.points || 1} onChange={(e) => updateQuestion(qIndex, 'points', e.target.value)} min="1" max="100" /><span className={styles.pointsLabel}>pts</span>{(questions || []).length > 1 && <button className={styles.removeQuestionBtn} onClick={() => removeQuestion(qIndex)}><X size={14} /></button>}</div></div>
+                          <div className={styles.formGroup}><label className={styles.formLabel}>Question *</label><textarea className={`${styles.formTextarea} ${getQuestionError(qIndex, 'questionText') ? styles.inputError : ''}`} placeholder="Enter your question here..." value={q?.questionText || ''} onChange={(e) => updateQuestion(qIndex, 'questionText', e.target.value)} onBlur={() => touchQuestionField(qIndex, 'questionText')} rows={2} />{getQuestionError(qIndex, 'questionText') && <span className={styles.inlineError} role="alert">{getQuestionError(qIndex, 'questionText')}</span>}</div>
+                          <div className={styles.formGroup}><label className={styles.formLabel}>Answer Options</label><div className={styles.optionsList}>{(Array.isArray(q?.options) ? q.options : []).map((opt, optIndex) => (<div key={optIndex} className={styles.optionRow}><span className={styles.optionLabel}>{String.fromCharCode(65 + optIndex)}.</span><input type="text" className={styles.optionInput} placeholder={`Option ${String.fromCharCode(65 + optIndex)}`} value={opt || ''} onChange={(e) => updateOption(qIndex, optIndex, e.target.value)} /></div>))}</div>{getQuestionError(qIndex, 'options') && <span className={styles.inlineError} role="alert">{getQuestionError(qIndex, 'options')}</span>}</div>
+                          <div className={styles.formGroup}><label className={styles.formLabel}><CheckCircle size={14} style={{ marginRight: '4px' }} /> Correct Answer *</label><input type="text" className={`${styles.formInput} ${getQuestionError(qIndex, 'correctAnswer') ? styles.inputError : ''} ${styles.correctAnswerInput}`} placeholder="Type the exact correct answer..." value={q?.correctAnswer || ''} onChange={(e) => updateQuestion(qIndex, 'correctAnswer', e.target.value)} onBlur={() => touchQuestionField(qIndex, 'correctAnswer')} />{getQuestionError(qIndex, 'correctAnswer') && <span className={styles.inlineError} role="alert">{getQuestionError(qIndex, 'correctAnswer')}</span>}</div>
                         </div>
                       ))}
                     </div>
@@ -183,8 +197,8 @@ const TeacherQuiz = () => {
                 </div>
               )}
               <div className={styles.quizzesList}>
-                <div className={styles.quizzesHeader}><h2 className={styles.sectionTitle}><ClipboardList size={18} style={{ marginRight: '6px' }} /> {selectedClass?.name} Quizzes</h2><span className={styles.quizCount}>{quizzes.length} quizzes</span></div>
-                {quizzesLoading ? <SkeletonGrid count={3} type="card" /> : quizzes.length === 0 ? (
+                <div className={styles.quizzesHeader}><h2 className={styles.sectionTitle}><ClipboardList size={18} style={{ marginRight: '6px' }} /> {selectedClass?.name} Quizzes</h2><span className={styles.quizCount}>{(quizzes || []).length} quizzes</span></div>
+                {quizzesLoading ? <SkeletonGrid count={3} type="card" /> : (quizzes || []).length === 0 ? (
                   <EmptyState
                     icon="quizzes"
                     title="No Quizzes Yet"
@@ -193,12 +207,12 @@ const TeacherQuiz = () => {
                   />
                 ) : (
                   <div className={styles.quizCards}>
-                    {quizzes.map(quiz => (
+                    {(quizzes || []).map(quiz => (
                       <div key={quiz.id} className={styles.quizCard}>
                         <div className={styles.quizInfo}>
                           <div className={styles.quizTitleRow}><h3 className={styles.quizTitle}>{quiz.title}</h3><span className={`${styles.publishBadge} ${quiz.isPublished ? styles.publishedBadge : styles.draftBadge}`}>{quiz.isPublished ? <><Play size={10} /> Published</> : <><Pause size={10} /> Draft</>}</span></div>
                           <div className={styles.quizMeta}>
-                            <span><ClipboardList size={12} /> {quiz._count?.questions || 0} questions</span><span>•</span>
+                            <span><ClipboardList size={12} /> {quiz._count?.questions || quiz.questions?.length || 0} questions</span><span>•</span>
                             <span><BarChart3 size={12} /> {quiz._count?.submissions || 0} submissions</span>
                             {quiz.timeLimit && <><span>•</span><span><Clock size={12} /> {quiz.timeLimit} min</span></>}
                             <span>•</span><span>{formatDate(quiz.createdAt)}</span>

@@ -111,7 +111,7 @@ const TakeQuiz = () => {
           </div>
           <div className={styles.quizTitleBlock}>
             <h1 className={styles.quizTitle}>{quiz?.title}</h1>
-            <p className={styles.quizMeta}>{quiz?.class?.name} • {quiz?.class?.subject}{quiz?.timeLimit && ` • <Clock size={12} /> ${quiz.timeLimit} min limit`}</p>
+            <p className={styles.quizMeta}>{quiz?.class?.name} • {quiz?.class?.subject}{quiz?.timeLimit && <> • <Clock size={12} /> {quiz.timeLimit} min limit</>}</p>
             {quiz?.description && <p className={styles.quizDescription}>{quiz.description}</p>}
           </div>
         </div>

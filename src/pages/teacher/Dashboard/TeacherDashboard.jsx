@@ -49,7 +49,7 @@ const TeacherDashboard = () => {
         <div className={styles.pageHeader}>
           <div className={styles.headerLeft}>
             <h1 className={styles.pageTitle}>Welcome back, {user?.name}!</h1>
-            <p className={styles.pageSubtitle}>Here's your teaching overview for today.</p>
+            <p className={styles.pageSubtitle}>Here&apos;s your teaching overview for today.</p>
           </div>
           <div className={styles.headerRight}>
             <Button variant="secondary" onClick={fetchTeacherData}><RefreshCw size={16} style={{ marginRight: '6px' }} /> Refresh</Button>

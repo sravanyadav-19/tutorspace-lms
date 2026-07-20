@@ -196,8 +196,12 @@ export const createQuizSchema = z.object({
       .string()
       .max(2000, 'Description must not exceed 2000 characters')
       .trim()
-      .optional(),
-    classId: uuidSchema,
+      .optional()
+      .or(z.literal(''))
+      .nullable(),
+    classId: z.union([z.number().int().positive(), z.string().regex(/^\d+$/)], {
+      errorMap: () => ({ message: 'Class ID must be a valid ID' })
+    }),
     timeLimit: z
       .number()
       .int()

@@ -14,10 +14,10 @@ export const createQuiz = async (req, res) => {
         timeLimit: timeLimit ? parseInt(timeLimit) : null,
         isPublished: false,
         questions: {
-          create: questions.map((q, index) => ({
+          create: (Array.isArray(questions) ? questions : []).map((q, index) => ({
             questionText: q.questionText,
             questionType: q.questionType || 'multiple_choice',
-            options: q.options,
+            options: Array.isArray(q.options) ? q.options : [],
             correctAnswer: q.correctAnswer,
             points: q.points ? parseInt(q.points) : 1,
             orderNumber: index + 1
@@ -362,7 +362,7 @@ export const submitQuiz = async (req, res) => {
     let totalScore = 0
     let totalPoints = 0
 
-    const gradedAnswers = answers.map(answer => {
+    const gradedAnswers = (Array.isArray(answers) ? answers : []).map(answer => {
       const question = quiz.questions.find(
         q => q.id === parseInt(answer.questionId)
       )
