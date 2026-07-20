@@ -53,7 +53,7 @@ const TeacherDashboard = () => {
           </div>
           <div className={styles.headerRight}>
             <Button variant="secondary" onClick={fetchTeacherData}><RefreshCw size={16} style={{ marginRight: '6px' }} /> Refresh</Button>
-            <Button variant="primary" onClick={() => navigate('/teacher/announcements/new')}><Megaphone size={16} style={{ marginRight: '6px' }} /> New Announcement</Button>
+            <Button variant="primary" onClick={() => navigate('/teacher/announcements')}><Megaphone size={16} style={{ marginRight: '6px' }} /> New Announcement</Button>
           </div>
         </div>
 

@@ -103,6 +103,12 @@
   gap: var(--space-lg);
 }
 
+.statsGrid > * {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  cursor: default;
+}
+
 /* Section Title */
 .sectionTitle {
   font-family: var(--font-display);
@@ -330,11 +336,15 @@
 
   .headerRight {
     width: 100%;
-    flex-direction: column;
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-sm);
   }
 
   .statsGrid {
     grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 1fr;
+    gap: var(--space-md);
   }
 
   .actionButtons {

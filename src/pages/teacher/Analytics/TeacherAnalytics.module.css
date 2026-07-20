@@ -448,12 +448,21 @@
 }
 
 @media (max-width: 768px) {
+  .pageHeader {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
   .contentLayout { grid-template-columns: 1fr; }
   .leftSidebar { position: static; }
   .statsGrid { grid-template-columns: repeat(2, 1fr); }
   .pageTitle { font-size: var(--text-display-lg); }
   .quizAnalyticsHeader { flex-direction: column; align-items: flex-start; }
 }
+
 @media (max-width: 480px) {
   .statsGrid {
     grid-template-columns: 1fr 1fr;

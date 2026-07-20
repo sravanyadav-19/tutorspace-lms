@@ -453,12 +453,51 @@
 }
 
 @media (max-width: 768px) {
+  .filesPage {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
   .contentLayout {
     grid-template-columns: 1fr;
+    gap: var(--space-md);
   }
 
   .classSidebar {
     position: static;
+    padding: var(--space-md);
+  }
+
+  .classList {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: var(--space-sm);
+    padding-bottom: var(--space-xs);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .classItem {
+    width: auto;
+    min-width: 140px;
+    flex-shrink: 0;
+  }
+
+  .uploadSection,
+  .filesSection {
+    padding: var(--space-md);
+  }
+
+  .fileCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
+  .fileActions {
+    width: 100%;
+    justify-content: flex-end;
   }
 
   .pageTitle {
@@ -624,6 +663,7 @@
   background: rgba(204, 120, 92, 0.2);
   border-color: var(--color-primary);
 }
+
 @media (max-width: 480px) {
   .dropZone {
     padding: var(--space-xl);

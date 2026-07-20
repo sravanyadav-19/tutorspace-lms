@@ -576,11 +576,61 @@
 }
 
 @media (max-width: 768px) {
-  .contentLayout { grid-template-columns: 1fr; }
-  .classSidebar { position: static; }
+  .quizPage {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
+  .pageHeader > Button,
+  .pageHeader button {
+    align-self: flex-end;
+  }
+
+  .contentLayout { grid-template-columns: 1fr; gap: var(--space-md); }
+
+  .classSidebar {
+    position: static;
+    padding: var(--space-md);
+  }
+
+  .classList {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: var(--space-sm);
+    padding-bottom: var(--space-xs);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .classItem {
+    width: auto;
+    min-width: 140px;
+    flex-shrink: 0;
+  }
+
+  .createForm {
+    padding: var(--space-md);
+  }
+
+  .formSection {
+    padding: var(--space-md);
+  }
+
+  .questionCard {
+    padding: var(--space-md);
+  }
+
   .pageTitle { font-size: var(--text-display-lg); }
   .quizActions { flex-wrap: wrap; }
 }
+
 @media (max-width: 480px) {
   .questionCard {
     padding: var(--space-lg);
@@ -603,6 +653,7 @@
     font-size: var(--text-display-md);
   }
 }
+
 /* Inline validation styles for Day 15 */
 .inputError {
   border-color: #d32f2f !important;

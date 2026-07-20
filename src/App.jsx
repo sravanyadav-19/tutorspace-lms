@@ -20,6 +20,7 @@ import AdminClassDetail from './pages/admin/Classes/AdminClassDetail'
 import TeacherDashboard from './pages/teacher/Dashboard/TeacherDashboard'
 import TeacherClasses from './pages/teacher/Classes/TeacherClasses'
 import TeacherClassDetail from './pages/teacher/Classes/TeacherClassDetail'
+import TeacherAnnouncements from './pages/teacher/Announcements/TeacherAnnouncements'
 import NewAnnouncement from './pages/teacher/Announcements/New/NewAnnouncement'
 import TeacherFiles from './pages/teacher/Files/TeacherFiles'
 import TeacherQuiz from './pages/teacher/Quiz/TeacherQuiz'
@@ -56,7 +57,7 @@ const Unauthorized = () => (
       color: 'var(--color-ink)', margin: 0 }}>Access Denied</h2>
     <p style={{ fontFamily: 'var(--font-body)',
       color: 'var(--color-muted)', margin: 0 }}>
-      You don't have permission to view this page.
+      You don&apos;t have permission to view this page.
     </p>
     <a
       href="/dashboard"
@@ -106,6 +107,7 @@ function App() {
         <Route path="/teacher/dashboard" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherDashboard /></ProtectedRoute>} />
         <Route path="/teacher/classes" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherClasses /></ProtectedRoute>} />
         <Route path="/teacher/classes/:classId" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherClassDetail /></ProtectedRoute>} />
+        <Route path="/teacher/announcements" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherAnnouncements /></ProtectedRoute>} />
         <Route path="/teacher/classes/:classId/announcements/new" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><NewAnnouncement /></ProtectedRoute>} />
         <Route path="/teacher/files" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherFiles /></ProtectedRoute>} />
         <Route path="/teacher/quizzes" element={<ProtectedRoute allowedRoles={['teacher', 'admin']}><TeacherQuiz /></ProtectedRoute>} />

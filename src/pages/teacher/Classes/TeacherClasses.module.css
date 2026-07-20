@@ -243,12 +243,21 @@
 
 @media (max-width: 768px) {
   .pageHeader {
-    flex-direction: column;
-    gap: var(--space-lg);
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
+  .headerLeft {
+    flex: 1;
+    min-width: 180px;
   }
 
   .headerRight {
-    width: 100%;
+    display: flex;
+    justify-content: flex-end;
   }
 
   .classesGrid {

@@ -27,6 +27,7 @@ const Sidebar = ({ isOpen, onClose, isMobile, isCollapsed }) => {
         return [
           { Icon: LayoutDashboard, label: 'Dashboard', path: '/teacher/dashboard', description: 'Your overview' },
           { Icon: BookOpen, label: 'My Classes', path: '/teacher/classes', description: 'Your classes' },
+          { Icon: Megaphone, label: 'Announcements', path: '/teacher/announcements', description: 'Post updates' },
           { Icon: FileText, label: 'Files', path: '/teacher/files', description: 'Upload files' },
           { Icon: ClipboardList, label: 'Quizzes', path: '/teacher/quizzes', description: 'Create quizzes' },
           { Icon: BarChart3, label: 'Analytics', path: '/teacher/analytics', description: 'View results' }
