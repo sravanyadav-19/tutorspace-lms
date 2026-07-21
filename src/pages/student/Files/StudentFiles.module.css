@@ -38,6 +38,8 @@
   cursor: pointer;
   transition: all var(--transition-fast);
   justify-self: start;
+  display: flex;
+  align-items: center;
 }
 
 .backBtn:hover { border-color: var(--color-primary); color: var(--color-primary); }
@@ -51,15 +53,19 @@
   text-align: center;
 }
 
-.viewerRight { justify-self: end; }
+.viewerRight {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+}
 
 .protectedBadge {
   font-family: var(--font-body);
   font-size: 12px;
   font-weight: var(--font-bold);
-  color: var(--color-muted);
-  background: var(--color-canvas);
-  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  background: rgba(204, 120, 92, 0.1);
+  border: 1px solid rgba(204, 120, 92, 0.2);
   padding: 4px 12px;
   border-radius: var(--radius-full);
 }
@@ -71,9 +77,7 @@
   position: relative;
 }
 
-/* ================================
-   PDF VIEWER + SHIELD + WATERMARK
-================================ */
+/* PDF VIEWER + SHIELD + WATERMARK */
 .pdfWrapper {
   position: relative;
   width: 100%;
@@ -87,7 +91,6 @@
   display: block;
 }
 
-/* THE CLICK SHIELD: Blocks right click but leaves 24px scrollbar open */
 .pdfClickShield {
   position: absolute;
   top: 0;
@@ -113,9 +116,7 @@
   z-index: 10;
 }
 
-/* ================================
-   IMAGE VIEWER + WATERMARK
-================================ */
+/* IMAGE VIEWER + WATERMARK */
 .imageContainer {
   width: 100%;
   height: 100%;
@@ -187,14 +188,14 @@
   pointer-events: none;
 }
 
-/* ================================
-   FILES LIST PAGE
-================================ */
+/* FILES LIST PAGE */
 .filesPage { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-xl); }
-.pageHeader { display: flex; align-items: flex-start; justify-content: space-between; padding-bottom: var(--space-xl); border-bottom: 1px solid var(--color-border-soft); }
-.pageTitle { font-family: var(--font-display); font-size: var(--text-display-xl); font-weight: var(--font-bold); color: var(--color-ink); margin: 0 0 var(--space-sm) 0; }
+.pageHeader { display: flex; align-items: flex-start; justify-content: space-between; padding-bottom: var(--space-xl); border-bottom: 1px solid var(--color-border-soft); gap: var(--space-lg); }
+.pageTitle { font-family: var(--font-display); font-size: var(--text-display-xl); font-weight: var(--font-bold); color: var(--color-ink); margin: 0 0 var(--space-sm) 0; display: flex; align-items: center; gap: var(--space-sm); }
 .pageSubtitle { font-family: var(--font-body); font-size: var(--text-body); color: var(--color-muted); margin: 0; }
+.headerActions { display: flex; gap: var(--space-md); align-items: center; flex-shrink: 0; }
 .errorBanner { background: rgba(198, 69, 69, 0.08); border: 1px solid rgba(198, 69, 69, 0.2); border-radius: var(--radius-sm); padding: var(--space-md) var(--space-xl); color: #c64545; }
+
 .contentLayout { display: grid; grid-template-columns: 260px 1fr; gap: var(--space-xl); align-items: start; }
 .classSidebar { background: var(--color-surface-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-xl); position: sticky; top: var(--space-xl); }
 .sidebarTitle { font-family: var(--font-display); font-size: var(--text-display-sm); font-weight: var(--font-bold); margin: 0 0 var(--space-lg) 0; padding-bottom: var(--space-md); border-bottom: 1px solid var(--color-border-soft); }
@@ -206,30 +207,120 @@
 .classItemInfo { flex: 1; min-width: 0; }
 .classItemName { font-family: var(--font-body); font-weight: var(--font-bold); margin: 0 0 2px 0; font-size: var(--text-body-sm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .classItemSubject { font-family: var(--font-body); font-size: 12px; color: var(--color-muted); margin: 0; }
-.mainContent { display: flex; flex-direction: column; gap: var(--space-lg); }
+
+.mainContent { display: flex; flex-direction: column; gap: var(--space-lg); min-width: 0; }
 .filesSection { background: var(--color-surface-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-xxl); }
-.filesSectionHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-xl); }
-.sectionTitle { font-family: var(--font-display); font-size: var(--text-display-md); font-weight: var(--font-bold); margin: 0; }
+.filesSectionHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-xl); flex-wrap: wrap; gap: var(--space-md); }
+.sectionTitle { font-family: var(--font-display); font-size: var(--text-display-md); font-weight: var(--font-bold); margin: 0; display: flex; align-items: center; gap: var(--space-sm); }
 .fileCount { font-family: var(--font-body); font-size: var(--text-body-sm); font-weight: var(--font-bold); color: var(--color-primary); background: rgba(204, 120, 92, 0.1); padding: 4px 12px; border-radius: var(--radius-full); }
+
+.fileSearchBox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-md);
+}
+
+.searchIcon {
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+
+.fileSearchInput {
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--color-ink);
+  outline: none;
+}
+
 .filesGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
-.fileCard { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); padding: var(--space-xl); background: var(--color-canvas); border: 1px solid var(--color-border); border-radius: var(--radius-lg); cursor: pointer; width: 100%; text-align: center; }
-.fileCard:hover { border-color: var(--color-primary); transform: translateY(-4px); box-shadow: var(--shadow-md); }
-.fileCardIcon { font-size: 48px; width: 80px; height: 80px; background: var(--color-surface-card); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border-soft); }
+.fileCard { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); padding: var(--space-xl); background: var(--color-canvas); border: 1px solid var(--color-border); border-radius: var(--radius-lg); cursor: pointer; width: 100%; text-align: center; transition: all var(--transition-fast); }
+.fileCard:hover { border-color: var(--color-primary); transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.fileCardIcon { font-size: 48px; width: 72px; height: 72px; background: var(--color-surface-card); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border-soft); flex-shrink: 0; }
 .fileCardInfo { flex: 1; width: 100%; }
 .fileCardName { font-family: var(--font-body); font-weight: var(--font-bold); margin: 0 0 var(--space-xs) 0; font-size: var(--text-body-sm); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.fileCardMeta { font-family: var(--font-body); font-size: 12px; color: var(--color-primary); font-weight: var(--font-bold); margin: 0 0 2px 0; text-transform: uppercase; }
-.fileCardDate { font-family: var(--font-body); font-size: 11px; color: var(--color-muted); margin: 0; }
-.viewBtn { font-family: var(--font-body); font-size: var(--text-body-sm); font-weight: var(--font-bold); color: white; background: var(--color-primary); padding: var(--space-sm) var(--space-xl); border-radius: var(--radius-md); width: 100%; }
-.emptyState, .emptyFiles { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-page); gap: var(--space-lg); text-align: center; }
-.emptyIcon { font-size: 64px; }
-.emptyTitle { font-family: var(--font-display); font-size: var(--text-display-md); margin: 0; }
-.emptyText { font-family: var(--font-body); font-size: var(--text-body); color: var(--color-muted); margin: 0; max-width: 400px; }
-.loadingState { text-align: center; padding: var(--space-page); font-family: var(--font-body); color: var(--color-muted); }
+.fileCardMeta { font-family: var(--font-body); font-size: 12px; color: var(--color-muted); margin: 0 0 2px 0; }
 
-@media (max-width: 1024px) { .contentLayout { grid-template-columns: 220px 1fr; } .filesGrid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 768px) { .contentLayout { grid-template-columns: 1fr; } .classSidebar { position: static; } .filesGrid { grid-template-columns: repeat(2, 1fr); } .pageTitle { font-size: var(--text-display-lg); } }
-@media (max-width: 480px) { .filesGrid { grid-template-columns: 1fr; } }
+.pdfPill {
+  font-weight: 700;
+  color: #c64545;
+  background: rgba(198, 69, 69, 0.12);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.pngPill {
+  font-weight: 700;
+  color: #0d9488;
+  background: rgba(13, 148, 136, 0.12);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.fileCardDate { font-family: var(--font-body); font-size: 11px; color: var(--color-muted); margin: 0; }
+.viewBtn { font-family: var(--font-body); font-size: var(--text-body-sm); font-weight: var(--font-bold); color: white; background: var(--color-primary); padding: var(--space-sm) var(--space-xl); border-radius: var(--radius-md); width: 100%; display: flex; align-items: center; justify-content: center; }
+
+@media (max-width: 1024px) {
+  .contentLayout { grid-template-columns: 220px 1fr; }
+  .filesGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .pageHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .contentLayout {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .classSidebar {
+    position: static;
+    padding: var(--space-md);
+  }
+
+  .classList {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: var(--space-sm);
+    padding-bottom: var(--space-xs);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .classItem {
+    width: auto;
+    min-width: 140px;
+    flex-shrink: 0;
+  }
+
+  .filesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pageTitle {
+    font-size: var(--text-display-lg);
+  }
+}
+
 @media (max-width: 480px) {
+  .filesGrid {
+    grid-template-columns: 1fr;
+  }
+
   .filesSection {
     padding: var(--space-lg);
   }
