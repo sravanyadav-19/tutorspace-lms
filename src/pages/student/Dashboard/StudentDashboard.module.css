@@ -250,14 +250,15 @@
 
 @media (max-width: 768px) {
   .pageHeader { flex-direction: column; }
-  .statsGrid { grid-template-columns: repeat(2, 1fr); }
+  .statsGrid { grid-template-columns: 1fr; gap: var(--space-md); }
   .actionButtons { grid-template-columns: repeat(2, 1fr); }
   .classesGrid { grid-template-columns: 1fr; }
   .pageTitle { font-size: var(--text-display-lg); }
 }
+
 @media (max-width: 480px) {
   .statsGrid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: var(--space-md);
   }
 
@@ -287,6 +288,7 @@
     font-size: var(--text-display-md);
   }
 }
+
 .classCard:hover,
 .statCard:hover,
 .quizCard:hover,
