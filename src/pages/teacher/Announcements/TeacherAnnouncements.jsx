@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Megaphone, BookOpen, Plus, Trash2, MessageCircle, RefreshCw, AlertCircle, ChevronDown, ChevronUp, Send, X } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
@@ -11,6 +11,7 @@ import styles from './TeacherAnnouncements.module.css'
 
 const TeacherAnnouncements = () => {
   const toast = useToast()
+  const titleInputRef = useRef(null)
 
   const [classes, setClasses] = useState([])
   const [selectedClass, setSelectedClass] = useState(null)
@@ -31,6 +32,12 @@ const TeacherAnnouncements = () => {
 
   useEffect(() => { fetchClasses() }, [])
   useEffect(() => { if (selectedClass?.id) fetchAnnouncements(selectedClass.id) }, [selectedClass])
+
+  useEffect(() => {
+    if (showCreateForm && titleInputRef.current) {
+      setTimeout(() => titleInputRef.current?.focus(), 100)
+    }
+  }, [showCreateForm])
 
   const fetchClasses = async () => {
     try {
@@ -123,13 +130,14 @@ const TeacherAnnouncements = () => {
   return (
     <DashboardLayout userRole="teacher">
       <div className={styles.announcementsPage}>
+        {/* Page Header */}
         <div className={styles.pageHeader}>
           <div className={styles.headerInfo}>
             <h1 className={styles.pageTitle}>
               <Megaphone size={22} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
               Announcements
             </h1>
-            <p className={styles.pageSubtitle}>Post and manage class updates for your students</p>
+            <p className={styles.pageSubtitle}>Post updates, broadcast homework reminders, and engage with student comments</p>
           </div>
           <div className={styles.headerActions}>
             <Button variant="secondary" onClick={() => fetchClasses()}>
@@ -182,9 +190,10 @@ const TeacherAnnouncements = () => {
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>Title *</label>
                     <input
+                      ref={titleInputRef}
                       type="text"
                       className={styles.formInput}
-                      placeholder="e.g. Test Next Week, Room Change..."
+                      placeholder="e.g. Chapter 4 Quiz on Friday, Room Change..."
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                       required
@@ -263,7 +272,7 @@ const TeacherAnnouncements = () => {
                           {isExpanded && (
                             <div className={styles.commentsThread}>
                               {comments.length === 0 ? (
-                                <p className={styles.noComments}>No comments yet.</p>
+                                <p className={styles.noComments}>No student comments yet.</p>
                               ) : (
                                 comments.map(comment => (
                                   <div key={comment.id} className={styles.commentCard}>
@@ -302,7 +311,7 @@ const TeacherAnnouncements = () => {
           onClose={() => setConfirmModal({ open: false, announcementId: null })}
           onConfirm={handleDelete}
           title="Delete Announcement"
-          message="Delete this announcement? All comments will also be permanently removed."
+          message="Delete this announcement? All student discussion comments will also be permanently removed."
           confirmLabel="Delete"
           confirmVariant="danger"
           loading={!!deleting}

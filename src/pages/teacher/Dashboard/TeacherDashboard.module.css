@@ -243,10 +243,15 @@
   box-shadow: var(--shadow-md);
 }
 
+.classCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .classIcon {
-  font-size: 32px;
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   background: rgba(204, 120, 92, 0.1);
   border-radius: var(--radius-md);
   display: flex;
@@ -281,17 +286,21 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
-}
-
-.statItem {
   font-family: var(--font-body);
-  font-size: var(--text-body-sm);
+  font-size: 12px;
   color: var(--color-muted);
 }
 
 .classActions {
   display: flex;
   justify-content: flex-end;
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--color-border-soft);
+}
+
+.postBtn {
+  width: 100%;
+  justify-content: center;
 }
 
 .statusBadge {
@@ -390,14 +399,4 @@
   .pageTitle {
     font-size: var(--text-display-md);
   }
-}
-
-.classCard:hover,
-.statCard:hover,
-.quizCard:hover,
-.resultCard:hover,
-.fileCard:hover,
-.announcementCard:hover,
-.userCard:hover {
-  border-color: var(--color-primary);
 }
