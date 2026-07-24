@@ -80,6 +80,17 @@
   border-color: #a53b3b;
 }
 
+.button-warning {
+  background: #b45309;
+  color: white;
+  border: 1px solid #b45309;
+}
+
+.button-warning:hover:not(:disabled) {
+  background: #92400e;
+  border-color: #92400e;
+}
+
 /* Button Sizes */
 .button-sm {
   padding: var(--space-sm) var(--space-lg);
