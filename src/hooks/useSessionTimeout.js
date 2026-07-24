@@ -11,6 +11,10 @@ import {
 /**
  * Tracks user activity and exposes idle / warning state.
  * Multi-tab safe via localStorage last-activity timestamp.
+ *
+ * Important: simply focusing / un-hiding the tab does NOT count as
+ * activity. Otherwise a user who left for 25 minutes could return and
+ * accidentally reset the idle clock before logout runs.
  */
 export function useSessionTimeout({ enabled, onTimeout }) {
   const [warningOpen, setWarningOpen] = useState(false)
@@ -41,18 +45,49 @@ export function useSessionTimeout({ enabled, onTimeout }) {
     }
   }, [])
 
+  /** Real user interaction (click, key, scroll, …) — resets idle clock */
   const bumpActivity = useCallback(() => {
     if (!enabled || timedOutRef.current) return
     const now = Date.now()
-    // Always update in-memory; throttle storage for mousemove storms
     lastActivityRef.current = now
     if (now - lastWriteRef.current >= ACTIVITY_THROTTLE_MS) {
       lastWriteRef.current = now
       writeActivity(now)
     }
-    // Any real activity while warning is open dismisses it
+    // Real activity while warning is open dismisses it
     setWarningOpen((open) => (open ? false : open))
   }, [enabled, writeActivity])
+
+  /**
+   * Evaluate idle state. Used by the interval AND when the tab becomes
+   * visible again (browsers throttle timers in background tabs).
+   * Does NOT treat "tab focused" as activity.
+   */
+  const evaluateIdle = useCallback(() => {
+    if (!enabled || timedOutRef.current) return
+
+    const stored = readStoredActivity()
+    const last = Math.max(lastActivityRef.current, stored)
+    lastActivityRef.current = last
+
+    const idleFor = Date.now() - last
+    const untilLogout = SESSION_IDLE_MS - idleFor
+
+    if (untilLogout <= 0) {
+      timedOutRef.current = true
+      setWarningOpen(false)
+      onTimeoutRef.current?.()
+      return
+    }
+
+    if (untilLogout <= SESSION_WARNING_MS) {
+      setWarningOpen(true)
+      setRemainingMs(untilLogout)
+    } else {
+      setWarningOpen((open) => (open ? false : open))
+      setRemainingMs(SESSION_WARNING_MS)
+    }
+  }, [enabled])
 
   const staySignedIn = useCallback(() => {
     timedOutRef.current = false
@@ -62,7 +97,7 @@ export function useSessionTimeout({ enabled, onTimeout }) {
     setRemainingMs(SESSION_WARNING_MS)
   }, [writeActivity])
 
-  // Reset tracking when session becomes active
+  // Reset tracking when session becomes active (login)
   useEffect(() => {
     if (!enabled) {
       setWarningOpen(false)
@@ -78,7 +113,7 @@ export function useSessionTimeout({ enabled, onTimeout }) {
     setRemainingMs(SESSION_WARNING_MS)
   }, [enabled, writeActivity])
 
-  // Activity listeners
+  // Real interaction listeners only (NOT focus / visibility alone)
   useEffect(() => {
     if (!enabled) return undefined
 
@@ -86,71 +121,57 @@ export function useSessionTimeout({ enabled, onTimeout }) {
     ACTIVITY_EVENTS.forEach((evt) => {
       window.addEventListener(evt, handler, { passive: true, capture: true })
     })
-    // Tab focus / visibility also counts as activity
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') bumpActivity()
-    }
-    document.addEventListener('visibilitychange', onVisible)
-    window.addEventListener('focus', handler)
 
     return () => {
       ACTIVITY_EVENTS.forEach((evt) => {
         window.removeEventListener(evt, handler, { capture: true })
       })
-      document.removeEventListener('visibilitychange', onVisible)
-      window.removeEventListener('focus', handler)
     }
   }, [enabled, bumpActivity])
 
-  // Cross-tab activity sync
+  // When user returns to the tab, CHECK idle — do not reset the clock
+  useEffect(() => {
+    if (!enabled) return undefined
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        evaluateIdle()
+      }
+    }
+    const onFocus = () => evaluateIdle()
+
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('focus', onFocus)
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('focus', onFocus)
+    }
+  }, [enabled, evaluateIdle])
+
+  // Cross-tab activity sync (another TutorSpace tab still being used)
   useEffect(() => {
     if (!enabled) return undefined
     const onStorage = (e) => {
       if (e.key !== SESSION_ACTIVITY_KEY || e.newValue == null) return
       const ts = Number(e.newValue)
       if (!Number.isFinite(ts)) return
-      lastActivityRef.current = ts
-      if (warningOpen) setWarningOpen(false)
+      lastActivityRef.current = Math.max(lastActivityRef.current, ts)
+      // Re-evaluate; may clear warning if other tab is active
+      evaluateIdle()
     }
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
-  }, [enabled, warningOpen])
+  }, [enabled, evaluateIdle])
 
-  // Idle checker (single interval for the life of an authenticated session)
+  // Idle checker interval (may be throttled while tab is in background)
   useEffect(() => {
     if (!enabled) return undefined
 
-    const tick = () => {
-      if (timedOutRef.current) return
-
-      // Prefer latest across memory + storage (other tabs)
-      const stored = readStoredActivity()
-      const last = Math.max(lastActivityRef.current, stored)
-      lastActivityRef.current = last
-
-      const idleFor = Date.now() - last
-      const untilLogout = SESSION_IDLE_MS - idleFor
-
-      if (untilLogout <= 0) {
-        timedOutRef.current = true
-        setWarningOpen(false)
-        onTimeoutRef.current?.()
-        return
-      }
-
-      if (untilLogout <= SESSION_WARNING_MS) {
-        setWarningOpen(true)
-        setRemainingMs(untilLogout)
-      } else {
-        setWarningOpen((open) => (open ? false : open))
-        setRemainingMs(SESSION_WARNING_MS)
-      }
-    }
-
-    tick()
-    const id = window.setInterval(tick, SESSION_CHECK_INTERVAL_MS)
+    evaluateIdle()
+    const id = window.setInterval(evaluateIdle, SESSION_CHECK_INTERVAL_MS)
     return () => window.clearInterval(id)
-  }, [enabled])
+  }, [enabled, evaluateIdle])
 
   return {
     warningOpen,
