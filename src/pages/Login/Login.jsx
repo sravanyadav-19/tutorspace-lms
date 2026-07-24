@@ -1,15 +1,38 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { AlertCircle, Eye, EyeOff, Crown, Target, GraduationCap, LogIn, ArrowRight } from 'lucide-react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { AlertCircle, Eye, EyeOff, Crown, Target, GraduationCap, LogIn, ArrowRight, Clock } from 'lucide-react'
 import AuthLayout from '../../components/layout/AuthLayout'
 import Button from '../../components/shared/Button'
 import { useAuth } from '../../context/AuthContext'
 import { authAPI } from '../../services/api'
 import { validateField } from '../../utils/validation'
+import { SESSION_END_REASON } from '../../utils/session'
 import styles from './Login.module.css'
+
+const sessionBannerCopy = (reason) => {
+  switch (reason) {
+    case SESSION_END_REASON.IDLE:
+    case 'idle_timeout':
+      return {
+        title: 'Session timed out',
+        text: 'You were signed out after a period of inactivity. Please sign in again to continue.'
+      }
+    case SESSION_END_REASON.EXPIRED:
+    case 'token_expired':
+      return {
+        title: 'Session expired',
+        text: 'Your login session expired. Sign in again to keep working securely.'
+      }
+    case 'logout':
+      return null
+    default:
+      return null
+  }
+}
 
 const Login = () => {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { login } = useAuth()
 
   const [formData, setFormData] = useState({ email: '', password: '' })
@@ -19,6 +42,21 @@ const Login = () => {
   const [apiError, setApiError] = useState('')
   const [isValid, setIsValid] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [sessionBanner, setSessionBanner] = useState(null)
+
+  useEffect(() => {
+    const fromQuery = searchParams.get('reason')
+    const fromStorage = sessionStorage.getItem('tutorspace_session_reason')
+    const reason = fromQuery || fromStorage
+    const copy = sessionBannerCopy(reason)
+    if (copy) setSessionBanner(copy)
+    if (fromStorage) sessionStorage.removeItem('tutorspace_session_reason')
+    if (fromQuery) {
+      const next = new URLSearchParams(searchParams)
+      next.delete('reason')
+      setSearchParams(next, { replace: true })
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps -- run once on mount
 
   useEffect(() => {
     const newErrors = {}
@@ -100,6 +138,16 @@ const Login = () => {
         {/* Login Card */}
         <div className={styles.loginCard}>
           <div className={styles.cardGlow} />
+
+          {sessionBanner && (
+            <div className={styles.sessionAlert} role="status">
+              <Clock size={18} aria-hidden="true" />
+              <div>
+                <p className={styles.sessionAlertTitle}>{sessionBanner.title}</p>
+                <p className={styles.sessionAlertText}>{sessionBanner.text}</p>
+              </div>
+            </div>
+          )}
 
           {apiError && (
             <div className={styles.errorAlert} role="alert">

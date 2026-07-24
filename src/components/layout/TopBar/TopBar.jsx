@@ -51,7 +51,7 @@ const TopBar = ({ onMenuClick }) => {
 
   const handleLogout = () => {
     setDropdownOpen(false)
-    logout()
+    logout('logout')
   }
 
   return (

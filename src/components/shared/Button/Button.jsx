@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import Spinner from '../Spinner/Spinner'
 import styles from './Button.module.css'
 
-const Button = ({ 
-  children, 
-  variant = 'primary', 
+const Button = forwardRef(({
+  children,
+  variant = 'primary',
   size = 'md',
   disabled = false,
   loading = false,
@@ -12,8 +12,8 @@ const Button = ({
   type = 'button',
   className = '',
   ariaLabel,
-  ...props 
-}) => {
+  ...props
+}, ref) => {
   const isDisabled = disabled || loading
 
   const buttonClass = [
@@ -27,6 +27,7 @@ const Button = ({
 
   return (
     <button
+      ref={ref}
       type={type}
       className={buttonClass}
       disabled={isDisabled}
@@ -40,6 +41,8 @@ const Button = ({
       {children}
     </button>
   )
-}
+})
+
+Button.displayName = 'Button'
 
 export default Button

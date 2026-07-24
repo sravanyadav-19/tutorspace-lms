@@ -425,6 +425,116 @@
   border-top: 1px solid var(--color-border-soft);
 }
 
+/* ======================================
+   FORCE DELETE MASTER MODAL
+   ====================================== */
+.forceOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 19, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: var(--space-lg);
+}
+
+.forceModal {
+  width: 100%;
+  max-width: 460px;
+  background: var(--color-surface-card);
+  border: 1px solid rgba(198, 69, 69, 0.25);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xxl);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.forceIconWrap {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: rgba(198, 69, 69, 0.12);
+  color: #c64545;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.forceTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0;
+  text-align: center;
+}
+
+.forceLead {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--color-body);
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.forceWarning {
+  background: rgba(198, 69, 69, 0.08);
+  border: 1px solid rgba(198, 69, 69, 0.22);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: #9f2d2d;
+  line-height: 1.5;
+}
+
+.forceLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin-top: var(--space-sm);
+}
+
+.forceEmailHint {
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--color-primary);
+  margin: calc(var(--space-xs) * -1) 0 0;
+  word-break: break-all;
+}
+
+.forceInput {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-canvas);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--color-ink);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.forceInput:focus {
+  border-color: #c64545;
+  box-shadow: 0 0 0 3px rgba(198, 69, 69, 0.12);
+}
+
+.forceActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  flex-wrap: wrap;
+}
+
 /* Responsive Media Queries */
 @media (max-width: 768px) {
   .pageHeader {

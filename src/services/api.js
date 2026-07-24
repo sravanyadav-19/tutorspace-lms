@@ -32,9 +32,13 @@ api.interceptors.response.use(
       if (hadToken) {
         localStorage.removeItem('tutorspace_token')
         localStorage.removeItem('tutorspace_user')
+        localStorage.removeItem('tutorspace_last_activity')
+        try {
+          sessionStorage.setItem('tutorspace_session_reason', 'token_expired')
+        } catch { /* ignore */ }
         const path = window.location.pathname || ''
         if (!path.startsWith('/login') && !path.startsWith('/register')) {
-          window.location.href = '/login'
+          window.location.href = '/login?reason=token_expired'
         }
       }
     }
@@ -56,7 +60,16 @@ export const userAPI = {
   getAllUsers: () => api.get('/users'),
   getUserById: (id) => api.get(`/users/${id}`),
   updateUser: (id, data) => api.put(`/users/${id}`, data),
+  /** Soft delete. On 409 with related data, call forceDeleteUser. */
   deleteUser: (id) => api.delete(`/users/${id}`),
+  /**
+   * Admin master delete — cascades enrollments/files/quizzes/etc.
+   * Requires confirmEmail matching the target user.
+   */
+  forceDeleteUser: (id, confirmEmail) =>
+    api.delete(`/users/${id}?force=true`, {
+      data: { force: true, confirmEmail }
+    }),
   createTeacher: (data) => api.post("/users/create-teacher", data)
 }
 

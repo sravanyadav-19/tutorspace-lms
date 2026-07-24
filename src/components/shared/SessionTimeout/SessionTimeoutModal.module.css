@@ -1,0 +1,137 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(20, 20, 19, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  animation: fadeIn 180ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-xxl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  text-align: center;
+  animation: rise 200ms ease;
+}
+
+@keyframes rise {
+  from { transform: translateY(8px); opacity: 0.85; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.iconWrap {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: rgba(232, 165, 90, 0.16);
+  color: #b45309;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.message {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--color-body);
+  margin: 0;
+  line-height: 1.55;
+  max-width: 34ch;
+}
+
+.countdown {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: var(--space-sm) 0;
+  min-width: 4ch;
+}
+
+.countdownLabel {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: var(--font-bold);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: -4px 0 var(--space-sm);
+}
+
+.progressTrack {
+  width: 100%;
+  height: 6px;
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), #e8a55a);
+  border-radius: var(--radius-full);
+  transition: width 200ms linear;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-md);
+  width: 100%;
+  margin-top: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.actions > * {
+  flex: 1;
+  min-width: 120px;
+}
+
+.hint {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-muted);
+  margin: var(--space-xs) 0 0;
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: var(--space-xl);
+  }
+
+  .countdown {
+    font-size: 34px;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+}

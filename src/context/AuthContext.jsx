@@ -1,6 +1,16 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import {
+  SESSION_ACTIVITY_KEY,
+  SESSION_END_REASON
+} from '../utils/session'
 
 const AuthContext = createContext(null)
+
+const clearAuthStorage = () => {
+  localStorage.removeItem('tutorspace_token')
+  localStorage.removeItem('tutorspace_user')
+  localStorage.removeItem(SESSION_ACTIVITY_KEY)
+}
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
@@ -20,37 +30,70 @@ export const AuthProvider = ({ children }) => {
         if (payload.exp * 1000 > Date.now()) {
           setToken(savedToken)
           setUser(userData)
+          // Seed activity so a restored tab doesn't instantly time out
+          if (!localStorage.getItem(SESSION_ACTIVITY_KEY)) {
+            localStorage.setItem(SESSION_ACTIVITY_KEY, String(Date.now()))
+          }
         } else {
-          localStorage.removeItem('tutorspace_token')
-          localStorage.removeItem('tutorspace_user')
+          clearAuthStorage()
+          // Mark reason so Login can show a friendly banner
+          sessionStorage.setItem('tutorspace_session_reason', SESSION_END_REASON.EXPIRED)
         }
       } catch (e) {
         console.error('Corrupted auth data, clearing', e)
-        localStorage.removeItem('tutorspace_token')
-        localStorage.removeItem('tutorspace_user')
+        clearAuthStorage()
       }
     }
     setLoading(false)
   }, [])
 
-  const login = (userData, authToken) => {
+  // Cross-tab logout sync: if another tab clears the token, follow
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === 'tutorspace_token' && e.newValue == null && e.oldValue != null) {
+        setUser(null)
+        setToken(null)
+        const path = window.location.pathname || ''
+        if (!path.startsWith('/login') && !path.startsWith('/register')) {
+          window.location.href = '/login?reason=logout'
+        }
+      }
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [])
+
+  const login = useCallback((userData, authToken) => {
     setUser(userData)
     setToken(authToken)
     localStorage.setItem('tutorspace_token', authToken)
     localStorage.setItem('tutorspace_user', JSON.stringify(userData))
-  }
+    localStorage.setItem(SESSION_ACTIVITY_KEY, String(Date.now()))
+    sessionStorage.removeItem('tutorspace_session_reason')
+  }, [])
 
-  const logout = () => {
+  /**
+   * @param {string} [reason] - idle_timeout | token_expired | logout
+   */
+  const logout = useCallback((reason = SESSION_END_REASON.LOGOUT) => {
     setUser(null)
     setToken(null)
-    localStorage.removeItem('tutorspace_token')
-    localStorage.removeItem('tutorspace_user')
-    window.location.href = '/login'
-  }
+    clearAuthStorage()
+    try {
+      sessionStorage.setItem('tutorspace_session_reason', reason)
+    } catch {
+      /* ignore */
+    }
+    const q =
+      reason && reason !== SESSION_END_REASON.LOGOUT
+        ? `?reason=${encodeURIComponent(reason)}`
+        : ''
+    window.location.href = `/login${q}`
+  }, [])
 
-  const isAuthenticated = () => {
+  const isAuthenticated = useCallback(() => {
     return !!(user && token)
-  }
+  }, [user, token])
 
   const contextValue = {
     user,

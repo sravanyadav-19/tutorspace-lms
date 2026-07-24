@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { RefreshCw, UserPlus, AlertCircle, CheckCircle, Ban, Trash2, Target, Info, Search, Users, GraduationCap, Clock } from 'lucide-react'
+import { RefreshCw, UserPlus, AlertCircle, CheckCircle, Ban, Trash2, Target, Info, Search, Users, GraduationCap, Clock, ShieldAlert } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import ConfirmModal from '../../../components/shared/ConfirmModal'
@@ -22,7 +22,16 @@ const AdminUsers = () => {
   const [activeTab, setActiveTab] = useState('all') // 'all' | 'teacher' | 'student' | 'pending'
   const [statusFilter, setStatusFilter] = useState('all')
   const [actionLoading, setActionLoading] = useState(null)
-  const [confirmModal, setConfirmModal] = useState({ open: false, type: '', userId: null, userName: '' })
+  const [confirmModal, setConfirmModal] = useState({ open: false, type: '', userId: null, userName: '', userEmail: '' })
+  // Force-delete master modal (type email to confirm)
+  const [forceDelete, setForceDelete] = useState({
+    open: false,
+    userId: null,
+    userName: '',
+    userEmail: '',
+    confirmEmail: '',
+    loading: false
+  })
 
   useEffect(() => { fetchUsers() }, [])
 
@@ -97,11 +106,40 @@ const AdminUsers = () => {
     }
   }
 
-  const promptDeactivate = (userId, userName) => setConfirmModal({ open: true, type: 'deactivate', userId, userName })
-  const promptDelete = (userId, userName) => setConfirmModal({ open: true, type: 'delete', userId, userName })
+  const promptDeactivate = (userId, userName, userEmail = '') =>
+    setConfirmModal({ open: true, type: 'deactivate', userId, userName, userEmail })
+
+  const promptDelete = (userId, userName, userEmail = '') =>
+    setConfirmModal({ open: true, type: 'delete', userId, userName, userEmail })
+
+  const closeConfirmModal = () =>
+    setConfirmModal({ open: false, type: '', userId: null, userName: '', userEmail: '' })
+
+  const openForceDelete = (userId, userName, userEmail) => {
+    setForceDelete({
+      open: true,
+      userId,
+      userName,
+      userEmail,
+      confirmEmail: '',
+      loading: false
+    })
+  }
+
+  const closeForceDelete = () => {
+    if (forceDelete.loading) return
+    setForceDelete({
+      open: false,
+      userId: null,
+      userName: '',
+      userEmail: '',
+      confirmEmail: '',
+      loading: false
+    })
+  }
 
   const handleConfirmAction = async () => {
-    const { type, userId } = confirmModal
+    const { type, userId, userName, userEmail } = confirmModal
     if (!userId) return
     setActionLoading(userId)
     try {
@@ -109,16 +147,60 @@ const AdminUsers = () => {
         await userAPI.updateUser(userId, { status: 'inactive' })
         setUsers(prev => (prev || []).map(u => u.id === userId ? { ...u, status: 'inactive' } : u))
         toast.success('User account deactivated')
+        closeConfirmModal()
       } else {
+        // Soft delete first
         await userAPI.deleteUser(userId)
         setUsers(prev => (prev || []).filter(u => u.id !== userId))
         toast.success('User deleted successfully')
+        closeConfirmModal()
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Action failed')
+      const code = err.response?.data?.code
+      const status = err.response?.status
+      // Related data blocks soft delete → offer Force Delete master action
+      if (type === 'delete' && (status === 409 || code === 'USER_HAS_RELATED_DATA')) {
+        closeConfirmModal()
+        openForceDelete(userId, userName, userEmail || err.response?.data?.data?.user?.email || '')
+        toast.error('User has related records — confirm Force Delete to proceed')
+      } else {
+        toast.error(err.response?.data?.message || 'Action failed')
+      }
     } finally {
       setActionLoading(null)
-      setConfirmModal({ open: false, type: '', userId: null, userName: '' })
+    }
+  }
+
+  const handleForceDelete = async () => {
+    const { userId, userEmail, confirmEmail } = forceDelete
+    if (!userId) return
+
+    const typed = (confirmEmail || '').trim().toLowerCase()
+    const expected = (userEmail || '').trim().toLowerCase()
+    if (!typed || typed !== expected) {
+      toast.error('Type the user email exactly to unlock Force Delete')
+      return
+    }
+
+    setForceDelete(prev => ({ ...prev, loading: true }))
+    setActionLoading(userId)
+    try {
+      await userAPI.forceDeleteUser(userId, typed)
+      setUsers(prev => (prev || []).filter(u => u.id !== userId))
+      toast.success('User force-deleted and related data cleaned up')
+      setForceDelete({
+        open: false,
+        userId: null,
+        userName: '',
+        userEmail: '',
+        confirmEmail: '',
+        loading: false
+      })
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Force delete failed')
+      setForceDelete(prev => ({ ...prev, loading: false }))
+    } finally {
+      setActionLoading(null)
     }
   }
 
@@ -152,8 +234,14 @@ const AdminUsers = () => {
 
   const getConfirmTitle = () => confirmModal.type === 'delete' ? 'Delete User' : 'Deactivate User'
   const getConfirmMessage = () => confirmModal.type === 'delete'
-    ? `Permanently delete "${confirmModal.userName}"? All associated data will be removed.`
+    ? `Delete "${confirmModal.userName}"? If they have classes, files, or quizzes, you will be asked to confirm a Force Delete.`
     : `Deactivate "${confirmModal.userName}"? They will be unable to sign in until re-activated.`
+
+  // Master unlock: typed email must match the target user
+  const forceEmailMatches =
+    !!(forceDelete.userEmail || '').trim() &&
+    (forceDelete.confirmEmail || '').trim().toLowerCase() ===
+      (forceDelete.userEmail || '').trim().toLowerCase()
 
   return (
     <DashboardLayout userRole="admin">
@@ -315,7 +403,7 @@ const AdminUsers = () => {
                             {user.status === 'active' && (
                               <button
                                 className={styles.deactivateBtn}
-                                onClick={() => promptDeactivate(user.id, user.name)}
+                                onClick={() => promptDeactivate(user.id, user.name, user.email)}
                                 disabled={actionLoading === user.id}
                               >
                                 <Ban size={14} style={{ marginRight: '4px' }} />
@@ -336,7 +424,7 @@ const AdminUsers = () => {
 
                             <button
                               className={styles.deleteBtn}
-                              onClick={() => promptDelete(user.id, user.name)}
+                              onClick={() => promptDelete(user.id, user.name, user.email)}
                               disabled={actionLoading === user.id}
                               title="Delete account"
                               aria-label="Delete account"
@@ -397,7 +485,7 @@ const AdminUsers = () => {
                       {user.status === 'active' && (
                         <button
                           className={styles.deactivateBtn}
-                          onClick={() => promptDeactivate(user.id, user.name)}
+                          onClick={() => promptDeactivate(user.id, user.name, user.email)}
                           disabled={actionLoading === user.id}
                         >
                           <Ban size={14} style={{ marginRight: '4px' }} /> Deactivate
@@ -416,7 +504,7 @@ const AdminUsers = () => {
 
                       <button
                         className={styles.deleteBtn}
-                        onClick={() => promptDelete(user.id, user.name)}
+                        onClick={() => promptDelete(user.id, user.name, user.email)}
                         disabled={actionLoading === user.id}
                       >
                         <Trash2 size={15} />
@@ -493,7 +581,7 @@ const AdminUsers = () => {
 
         <ConfirmModal
           isOpen={confirmModal.open}
-          onClose={() => setConfirmModal({ open: false, type: '', userId: null, userName: '' })}
+          onClose={closeConfirmModal}
           onConfirm={handleConfirmAction}
           title={getConfirmTitle()}
           message={getConfirmMessage()}
@@ -501,6 +589,74 @@ const AdminUsers = () => {
           confirmVariant={confirmModal.type === 'delete' ? 'danger' : 'warning'}
           loading={!!actionLoading}
         />
+
+        {/* Force Delete master modal — type email to unlock */}
+        {forceDelete.open && (
+          <div
+            className={styles.forceOverlay}
+            onClick={closeForceDelete}
+            onKeyDown={(e) => { if (e.key === 'Escape') closeForceDelete() }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Force delete user"
+          >
+            <div className={styles.forceModal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.forceIconWrap}>
+                <ShieldAlert size={28} />
+              </div>
+              <h2 className={styles.forceTitle}>Force Delete User</h2>
+              <p className={styles.forceLead}>
+                <strong>{forceDelete.userName}</strong> has related records
+                (enrollments, files, quizzes, comments, etc.).
+              </p>
+              <div className={styles.forceWarning}>
+                This permanently removes the account and cleans up their data.
+                Classes they created are reassigned to you. This cannot be undone.
+              </div>
+              <label className={styles.forceLabel} htmlFor="force-confirm-email">
+                Type their email to confirm
+              </label>
+              <p className={styles.forceEmailHint}>{forceDelete.userEmail}</p>
+              <input
+                id="force-confirm-email"
+                type="email"
+                className={styles.forceInput}
+                placeholder="user@email.com"
+                value={forceDelete.confirmEmail}
+                autoComplete="off"
+                autoFocus
+                disabled={forceDelete.loading}
+                onChange={(e) =>
+                  setForceDelete(prev => ({ ...prev, confirmEmail: e.target.value }))
+                }
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && forceEmailMatches && !forceDelete.loading) {
+                    handleForceDelete()
+                  }
+                }}
+              />
+              <div className={styles.forceActions}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={closeForceDelete}
+                  disabled={forceDelete.loading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  variant="danger"
+                  onClick={handleForceDelete}
+                  disabled={!forceEmailMatches || forceDelete.loading}
+                  loading={forceDelete.loading}
+                >
+                  {forceDelete.loading ? 'Deleting…' : 'Force Delete Permanently'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   )

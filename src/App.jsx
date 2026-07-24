@@ -36,6 +36,7 @@ import TakeQuiz from './pages/student/Quiz/TakeQuiz'
 import StudentResults from './pages/student/Results/StudentResults'
 
 import ProtectedRoute from './components/shared/ProtectedRoute'
+import { SessionTimeoutManager } from './components/shared/SessionTimeout'
 import './App.css'
 
 const Unauthorized = () => (
@@ -84,6 +85,8 @@ function App() {
   return (
     <>
       <ScrollToTop />
+      {/* Idle timeout for every authenticated role */}
+      <SessionTimeoutManager />
       <ErrorBoundary>
         <Routes>
         <Route path="/login" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Login />} />
