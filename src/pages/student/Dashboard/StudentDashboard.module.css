@@ -97,6 +97,56 @@
   margin: 0;
 }
 
+/* Submitted but grades not released */
+.awaitingBanner {
+  background: rgba(232, 165, 90, 0.12);
+  border: 1px solid rgba(232, 165, 90, 0.35);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg) var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.awaitingIcon {
+  color: #b45309;
+  flex-shrink: 0;
+}
+
+.awaitingTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-display-sm);
+  font-weight: var(--font-bold);
+  color: #92400e;
+  margin: 0 0 2px 0;
+}
+
+.awaitingText {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: #b45309;
+  margin: 0;
+}
+
+.actionBadge {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  background: var(--color-primary);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--font-bold);
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .errorBanner {
   background: rgba(198, 69, 69, 0.08);
   border: 1px solid rgba(198, 69, 69, 0.2);
@@ -153,6 +203,7 @@
 }
 
 .actionBtn {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -402,7 +453,8 @@
 
 @media (max-width: 768px) {
   .pageHeader { flex-direction: column; }
-  .quizAlertBanner { flex-direction: column; align-items: flex-start; }
+  .quizAlertBanner,
+  .awaitingBanner { flex-direction: column; align-items: flex-start; }
   .statsGrid { grid-template-columns: 1fr; gap: var(--space-md); }
   .actionButtons { grid-template-columns: repeat(2, 1fr); }
   .announcementsGrid { grid-template-columns: 1fr; }
