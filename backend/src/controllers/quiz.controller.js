@@ -57,14 +57,35 @@ export const getClassQuizzes = async (req, res) => {
             submissions: true
           }
         },
+        // Lightweight release status for teacher list / analytics sidebars
+        submissions: {
+          select: { id: true, isReleased: true }
+        },
         createdBy: { select: { name: true } }
       },
       orderBy: { createdAt: 'desc' }
     })
 
+    // Attach summary fields so the UI doesn't re-count every render
+    const withSummary = quizzes.map((q) => {
+      const subs = Array.isArray(q.submissions) ? q.submissions : []
+      const submissionCount = subs.length || q._count?.submissions || 0
+      const releasedCount = subs.filter((s) => s.isReleased).length
+      const allReleased =
+        submissionCount > 0 && releasedCount === submissionCount
+      const { submissions, ...rest } = q
+      return {
+        ...rest,
+        submissionCount,
+        releasedCount,
+        allReleased,
+        hasUnreleased: submissionCount > 0 && releasedCount < submissionCount
+      }
+    })
+
     res.status(200).json({
       success: true,
-      data: { quizzes }
+      data: { quizzes: withSummary }
     })
   } catch (error) {
     console.error('Get class quizzes error:', error)
@@ -454,15 +475,36 @@ export const getQuizSubmissions = async (req, res) => {
 export const releaseResults = async (req, res) => {
   try {
     const { quizId } = req.params
+    const id = parseInt(quizId)
 
-    await prisma.quizSubmission.updateMany({
-      where: { quizId: parseInt(quizId) },
+    const pending = await prisma.quizSubmission.count({
+      where: { quizId: id, isReleased: false }
+    })
+
+    if (pending === 0) {
+      const total = await prisma.quizSubmission.count({ where: { quizId: id } })
+      if (total === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'No student submissions yet. Nothing to release.'
+        })
+      }
+      return res.status(200).json({
+        success: true,
+        message: 'Grades were already released to all students.',
+        data: { alreadyReleased: true, releasedCount: total }
+      })
+    }
+
+    const result = await prisma.quizSubmission.updateMany({
+      where: { quizId: id, isReleased: false },
       data: { isReleased: true }
     })
 
     res.status(200).json({
       success: true,
-      message: 'Results released to all students!'
+      message: `Results released to ${result.count} student${result.count === 1 ? '' : 's'}!`,
+      data: { releasedCount: result.count }
     })
   } catch (error) {
     console.error('Release results error:', error)

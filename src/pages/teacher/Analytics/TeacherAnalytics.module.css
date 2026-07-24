@@ -498,3 +498,59 @@
     font-size: var(--text-display-md);
   }
 }
+
+.needsReleaseStatus {
+  color: #b45309;
+  background: rgba(232, 165, 90, 0.18);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.releasedSideStatus {
+  color: #1565c0;
+  background: rgba(21, 101, 192, 0.12);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.releasedBanner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  font-weight: var(--font-bold);
+  color: #1565c0;
+  background: rgba(21, 101, 192, 0.1);
+  border: 1px solid rgba(21, 101, 192, 0.2);
+  border-radius: var(--radius-full);
+  padding: 8px 14px;
+  white-space: nowrap;
+}
+
+.noSubsBanner {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  color: var(--color-muted);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 8px 14px;
+  white-space: nowrap;
+}
+
+.releaseBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

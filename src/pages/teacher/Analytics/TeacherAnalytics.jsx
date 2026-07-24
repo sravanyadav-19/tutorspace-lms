@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BookOpen, BarChart3, RefreshCw, Users, CheckCircle, Clock, AlertCircle, Play, Pause } from 'lucide-react'
+import { BookOpen, BarChart3, RefreshCw, Users, CheckCircle, Clock, AlertCircle, Play, Pause, Hourglass } from 'lucide-react'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import EmptyState from '../../../components/shared/EmptyState'
@@ -76,11 +76,19 @@ const TeacherAnalytics = () => {
     if (!quizId) return
     setReleasing(quizId)
     try {
-      await quizAPI.releaseResults(quizId)
-      toast.success('Results & scores released to all students!')
+      const res = await quizAPI.releaseResults(quizId)
+      toast.success(res?.data?.message || 'Results & scores released to all students!')
+      // Refresh list + selected quiz release flags
+      if (selectedClass?.id) {
+        const qRes = await quizAPI.getClassQuizzes(selectedClass.id)
+        const cq = qRes?.data?.data?.quizzes || []
+        setQuizzes(cq)
+        const updated = cq.find((q) => q.id === quizId)
+        if (updated) setSelectedQuiz(updated)
+      }
       if (selectedQuiz?.id) fetchSubmissions(selectedQuiz.id)
     } catch (err) {
-      toast.error('Failed to release results')
+      toast.error(err?.response?.data?.message || 'Failed to release results')
     } finally {
       setReleasing(null)
       setConfirmModal({ open: false, quizId: null })
@@ -100,6 +108,11 @@ const TeacherAnalytics = () => {
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
   const getScoreColor = (percent) => { if (percent >= 80) return styles.scoreHigh; if (percent >= 50) return styles.scoreMid; return styles.scoreLow }
   const analytics = getAnalytics()
+
+  const unreleasedCount = submissions.filter((s) => !s.isReleased).length
+  const allReleased =
+    submissions.length > 0 && unreleasedCount === 0
+  const canReleaseGrades = submissions.length > 0 && unreleasedCount > 0
 
   return (
     <DashboardLayout userRole="teacher">
@@ -164,21 +177,43 @@ const TeacherAnalytics = () => {
                   <p className={styles.sidebarEmpty}>No quizzes in this class</p>
                 ) : (
                   <div className={styles.quizList}>
-                    {(quizzes || []).map(quiz => (
-                      <button
-                        key={quiz.id}
-                        className={`${styles.quizItem} ${selectedQuiz?.id === quiz.id ? styles.quizItemActive : ''}`}
-                        onClick={() => setSelectedQuiz(quiz)}
-                      >
-                        <p className={styles.quizItemTitle}>{quiz.title}</p>
-                        <div className={styles.quizItemMeta}>
-                          <span>{quiz._count?.submissions || 0} submissions</span>
-                          <span className={`${styles.quizItemStatus} ${quiz.isPublished ? styles.publishedStatus : styles.draftStatus}`}>
-                            {quiz.isPublished ? <Play size={10} /> : <Pause size={10} />}
-                          </span>
-                        </div>
-                      </button>
-                    ))}
+                    {(quizzes || []).map((quiz) => {
+                      const subs =
+                        quiz.submissionCount ?? quiz._count?.submissions ?? 0
+                      const needsRelease = quiz.hasUnreleased
+                      const released = quiz.allReleased && subs > 0
+                      return (
+                        <button
+                          key={quiz.id}
+                          className={`${styles.quizItem} ${selectedQuiz?.id === quiz.id ? styles.quizItemActive : ''}`}
+                          onClick={() => setSelectedQuiz(quiz)}
+                        >
+                          <p className={styles.quizItemTitle}>{quiz.title}</p>
+                          <div className={styles.quizItemMeta}>
+                            <span>
+                              {subs} submission{subs === 1 ? '' : 's'}
+                            </span>
+                            {!quiz.isPublished ? (
+                              <span className={`${styles.quizItemStatus} ${styles.draftStatus}`}>
+                                <Pause size={10} /> Draft
+                              </span>
+                            ) : needsRelease ? (
+                              <span className={`${styles.quizItemStatus} ${styles.needsReleaseStatus}`}>
+                                <Hourglass size={10} /> Needs release
+                              </span>
+                            ) : released ? (
+                              <span className={`${styles.quizItemStatus} ${styles.releasedSideStatus}`}>
+                                <CheckCircle size={10} /> Released
+                              </span>
+                            ) : (
+                              <span className={`${styles.quizItemStatus} ${styles.publishedStatus}`}>
+                                <Play size={10} /> Live
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      )
+                    })}
                   </div>
                 )}
               </div>
@@ -200,11 +235,34 @@ const TeacherAnalytics = () => {
                       <h2 className={styles.quizAnalyticsTitle}>{selectedQuiz.title}</h2>
                       <p className={styles.quizAnalyticsMeta}>
                         {selectedClass?.name} • {selectedQuiz._count?.questions || selectedQuiz.questions?.length || 0} questions • {submissions.length} submissions
+                        {canReleaseGrades
+                          ? ` • ${unreleasedCount} awaiting release`
+                          : allReleased
+                            ? ' • all grades released'
+                            : ''}
                       </p>
                     </div>
-                    <button className={styles.releaseBtn} onClick={() => promptRelease(selectedQuiz.id)}>
-                      <BarChart3 size={16} style={{ marginRight: '6px' }} /> Release Grades
-                    </button>
+                    {canReleaseGrades ? (
+                      <button
+                        type="button"
+                        className={styles.releaseBtn}
+                        onClick={() => promptRelease(selectedQuiz.id)}
+                        disabled={!!releasing}
+                      >
+                        <BarChart3 size={16} style={{ marginRight: '6px' }} />
+                        Release grades ({unreleasedCount})
+                      </button>
+                    ) : allReleased ? (
+                      <span className={styles.releasedBanner}>
+                        <CheckCircle size={14} /> Grades released
+                      </span>
+                    ) : (
+                      <span className={styles.noSubsBanner}>
+                        {selectedQuiz.isPublished
+                          ? 'No submissions yet'
+                          : 'Draft — not visible to students'}
+                      </span>
+                    )}
                   </div>
 
                   {analytics && (
@@ -268,7 +326,11 @@ const TeacherAnalytics = () => {
                               <span className={`${styles.scorePercent} ${getScoreColor(percent)}`}>{percent}%</span>
                               <span className={styles.submittedAt}>{formatDate(submission.submittedAt)}</span>
                               <span className={`${styles.releasedStatus} ${submission.isReleased ? styles.released : styles.notReleased}`}>
-                                {submission.isReleased ? <><CheckCircle size={12} /> Released</> : <><Clock size={12} /> Pending</>}
+                                {submission.isReleased ? (
+                                  <><CheckCircle size={12} /> Released</>
+                                ) : (
+                                  <><Hourglass size={12} /> Awaiting release</>
+                                )}
                               </span>
                             </div>
                           )
@@ -286,9 +348,9 @@ const TeacherAnalytics = () => {
           isOpen={confirmModal.open}
           onClose={() => setConfirmModal({ open: false, quizId: null })}
           onConfirm={handleReleaseResults}
-          title="Release Quiz Grades"
-          message="Are you sure you want to release grades to all students? They will immediately see their scores and answer breakdowns."
-          confirmLabel="Release Grades"
+          title="Release grades to students?"
+          message={`Release grades for this quiz? ${unreleasedCount || 'All'} student${(unreleasedCount || 0) === 1 ? '' : 's'} will immediately see scores and answer breakdowns.`}
+          confirmLabel="Release grades"
           confirmVariant="primary"
           loading={!!releasing}
         />

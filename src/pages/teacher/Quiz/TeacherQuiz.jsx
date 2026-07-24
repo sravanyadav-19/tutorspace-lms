@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { BookOpen, PlusCircle, Pencil, Trash2, Play, Pause, BarChart3, ClipboardList, Clock, AlertCircle, X, CheckCircle } from 'lucide-react'
+import { BookOpen, PlusCircle, Pencil, Trash2, Play, Pause, BarChart3, ClipboardList, Clock, AlertCircle, X, CheckCircle, Hourglass, ExternalLink } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/layout/DashboardLayout'
 import Button from '../../../components/shared/Button'
 import ConfirmModal from '../../../components/shared/ConfirmModal'
@@ -12,6 +13,7 @@ import EmptyState from '../../../components/shared/EmptyState'
 
 const TeacherQuiz = () => {
   const toast = useToast()
+  const navigate = useNavigate()
   const titleInputRef = useRef(null)
 
   const [classes, setClasses] = useState([])
@@ -163,20 +165,59 @@ const TeacherQuiz = () => {
   }
 
   const handleReleaseResults = async () => {
-    const { quizId } = releaseModal; if (!quizId) return
+    const { quizId } = releaseModal
+    if (!quizId) return
     setReleasing(quizId)
     try {
-      await quizAPI.releaseResults(quizId)
-      toast.success('Results & grades released to students!')
+      const res = await quizAPI.releaseResults(quizId)
+      const msg = res?.data?.message || 'Results & grades released to students!'
+      toast.success(msg)
+      // Reflect release state immediately on cards
+      setQuizzes((prev) =>
+        (prev || []).map((q) => {
+          if (q.id !== quizId) return q
+          const count = q.submissionCount ?? q._count?.submissions ?? 0
+          return {
+            ...q,
+            allReleased: count > 0,
+            hasUnreleased: false,
+            releasedCount: count
+          }
+        })
+      )
     } catch (err) {
-      toast.error('Failed to release results')
+      toast.error(err?.response?.data?.message || 'Failed to release results')
     } finally {
       setReleasing(null)
       setReleaseModal({ open: false, quizId: null, title: '' })
     }
   }
 
-  const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+
+  /** Draft | Published | Needs release | Grades released */
+  const getLifecycle = (quiz) => {
+    const subs = quiz.submissionCount ?? quiz._count?.submissions ?? 0
+    if (!quiz.isPublished) {
+      return { key: 'draft', label: 'Draft', Icon: Pause }
+    }
+    if (subs === 0) {
+      return { key: 'published', label: 'Published', Icon: Play }
+    }
+    if (quiz.allReleased) {
+      return { key: 'released', label: 'Grades released', Icon: CheckCircle }
+    }
+    return {
+      key: 'needs_release',
+      label: 'Needs grade release',
+      Icon: Hourglass
+    }
+  }
 
   return (
     <DashboardLayout userRole="teacher">
@@ -389,50 +430,158 @@ const TeacherQuiz = () => {
                   />
                 ) : (
                   <div className={styles.quizCards}>
-                    {(quizzes || []).map(quiz => (
-                      <div key={quiz.id} className={styles.quizCard}>
-                        <div className={styles.quizInfo}>
-                          <div className={styles.quizTitleRow}>
-                            <h3 className={styles.quizTitle}>{quiz.title}</h3>
-                            <span className={`${styles.publishBadge} ${quiz.isPublished ? styles.publishedBadge : styles.draftBadge}`}>
-                              {quiz.isPublished ? <><Play size={10} /> Published</> : <><Pause size={10} /> Draft</>}
-                            </span>
+                    {(quizzes || []).map((quiz) => {
+                      const life = getLifecycle(quiz)
+                      const LifeIcon = life.Icon
+                      const subs =
+                        quiz.submissionCount ?? quiz._count?.submissions ?? 0
+                      const qCount =
+                        quiz._count?.questions || quiz.questions?.length || 0
+                      const canRelease =
+                        quiz.isPublished &&
+                        subs > 0 &&
+                        !quiz.allReleased
+                      const alreadyReleased = quiz.allReleased && subs > 0
+
+                      return (
+                        <div key={quiz.id} className={styles.quizCard}>
+                          <div className={styles.quizInfo}>
+                            <div className={styles.quizTitleRow}>
+                              <h3 className={styles.quizTitle}>{quiz.title}</h3>
+                              <span
+                                className={`${styles.lifecycleBadge} ${
+                                  styles[`life-${life.key}`] || ''
+                                }`}
+                              >
+                                <LifeIcon size={11} aria-hidden="true" />
+                                {life.label}
+                              </span>
+                            </div>
+
+                            <div className={styles.quizMeta}>
+                              <span>
+                                <ClipboardList size={12} /> {qCount} questions
+                              </span>
+                              <span>•</span>
+                              <span>
+                                <BarChart3 size={12} /> {subs} submission
+                                {subs === 1 ? '' : 's'}
+                              </span>
+                              {quiz.timeLimit ? (
+                                <>
+                                  <span>•</span>
+                                  <span>
+                                    <Clock size={12} /> {quiz.timeLimit} min
+                                  </span>
+                                </>
+                              ) : null}
+                              <span>•</span>
+                              <span>{formatDate(quiz.createdAt)}</span>
+                            </div>
+
+                            {canRelease && (
+                              <p className={styles.releaseHint}>
+                                <Hourglass size={12} aria-hidden="true" />
+                                {subs} student{subs === 1 ? '' : 's'} waiting for
+                                grades — release when ready.
+                              </p>
+                            )}
+                            {alreadyReleased && (
+                              <p className={styles.releasedHint}>
+                                <CheckCircle size={12} aria-hidden="true" />
+                                Students can view scores and answer breakdowns.
+                              </p>
+                            )}
                           </div>
 
-                          <div className={styles.quizMeta}>
-                            <span><ClipboardList size={12} /> {quiz._count?.questions || quiz.questions?.length || 0} questions</span>
-                            <span>•</span>
-                            <span><BarChart3 size={12} /> {quiz._count?.submissions || 0} submissions</span>
-                            {quiz.timeLimit && <><span>•</span><span><Clock size={12} /> {quiz.timeLimit} min</span></>}
-                            <span>•</span>
-                            <span>{formatDate(quiz.createdAt)}</span>
+                          <div className={styles.quizActions}>
+                            <button
+                              type="button"
+                              className={`${styles.actionBtn} ${
+                                quiz.isPublished
+                                  ? styles.unpublishBtn
+                                  : styles.publishBtn
+                              }`}
+                              onClick={() =>
+                                handleTogglePublish(quiz.id, quiz.isPublished)
+                              }
+                            >
+                              {quiz.isPublished ? (
+                                <>
+                                  <Pause size={14} style={{ marginRight: '4px' }} />
+                                  Unpublish
+                                </>
+                              ) : (
+                                <>
+                                  <Play size={14} style={{ marginRight: '4px' }} />
+                                  Publish
+                                </>
+                              )}
+                            </button>
+
+                            {canRelease ? (
+                              <button
+                                type="button"
+                                className={`${styles.actionBtn} ${styles.resultsBtn}`}
+                                onClick={() =>
+                                  promptRelease(quiz.id, quiz.title)
+                                }
+                                disabled={releasing === quiz.id}
+                              >
+                                <BarChart3
+                                  size={14}
+                                  style={{ marginRight: '4px' }}
+                                />
+                                Release grades
+                              </button>
+                            ) : alreadyReleased ? (
+                              <button
+                                type="button"
+                                className={`${styles.actionBtn} ${styles.analyticsLinkBtn}`}
+                                onClick={() => navigate('/teacher/analytics')}
+                              >
+                                <ExternalLink
+                                  size={14}
+                                  style={{ marginRight: '4px' }}
+                                />
+                                View analytics
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                className={`${styles.actionBtn} ${styles.disabledReleaseBtn}`}
+                                disabled
+                                title={
+                                  !quiz.isPublished
+                                    ? 'Publish the quiz first'
+                                    : 'No submissions yet'
+                                }
+                              >
+                                <BarChart3
+                                  size={14}
+                                  style={{ marginRight: '4px' }}
+                                />
+                                {!quiz.isPublished
+                                  ? 'Publish to release'
+                                  : 'No submissions'}
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                              onClick={() =>
+                                promptDelete(quiz.id, quiz.title)
+                              }
+                              title="Delete quiz"
+                              aria-label="Delete quiz"
+                            >
+                              <Trash2 size={14} />
+                            </button>
                           </div>
                         </div>
-
-                        <div className={styles.quizActions}>
-                          <button
-                            className={`${styles.actionBtn} ${quiz.isPublished ? styles.unpublishBtn : styles.publishBtn}`}
-                            onClick={() => handleTogglePublish(quiz.id, quiz.isPublished)}
-                          >
-                            {quiz.isPublished ? <><Pause size={14} style={{ marginRight: '4px' }} /> Unpublish</> : <><Play size={14} style={{ marginRight: '4px' }} /> Publish</>}
-                          </button>
-                          <button
-                            className={`${styles.actionBtn} ${styles.resultsBtn}`}
-                            onClick={() => promptRelease(quiz.id, quiz.title)}
-                          >
-                            <BarChart3 size={14} style={{ marginRight: '4px' }} /> Release Grades
-                          </button>
-                          <button
-                            className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                            onClick={() => promptDelete(quiz.id, quiz.title)}
-                            title="Delete quiz"
-                            aria-label="Delete quiz"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
               </div>
@@ -455,9 +604,9 @@ const TeacherQuiz = () => {
           isOpen={releaseModal.open}
           onClose={() => setReleaseModal({ open: false, quizId: null, title: '' })}
           onConfirm={handleReleaseResults}
-          title="Release Quiz Grades"
-          message={`Release results for "${releaseModal.title}"? Students who submitted will immediately see their scores and answer breakdowns.`}
-          confirmLabel="Release Grades"
+          title="Release grades to students?"
+          message={`Release results for "${releaseModal.title}"? Students who submitted will immediately see scores and which answers were correct.`}
+          confirmLabel="Release grades"
           confirmVariant="primary"
           loading={!!releasing}
         />
