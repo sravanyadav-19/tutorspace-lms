@@ -73,11 +73,25 @@ const AdminUsers = () => {
   const handleApprove = async (userId) => {
     try {
       setActionLoading(userId)
-      await userAPI.updateUser(userId, { status: 'active' })
-      setUsers(prev => (prev || []).map(u => u.id === userId ? { ...u, status: 'active' } : u))
-      toast.success('User approved successfully!')
+      const res = await userAPI.updateUser(userId, { status: 'active' })
+      const updated = res?.data?.data?.user
+      // Prefer server response so UI matches DB (status + emailVerified)
+      setUsers(prev => (prev || []).map(u => {
+        if (u.id !== userId) return u
+        return {
+          ...u,
+          status: updated?.status || 'active',
+          emailVerified: updated?.emailVerified ?? true,
+          email: updated?.email || u.email,
+          name: updated?.name || u.name
+        }
+      }))
+      toast.success(res?.data?.message || 'User approved successfully!')
     } catch (err) {
+      // Do not optimistically flip status if the API failed
       toast.error(err.response?.data?.message || 'Failed to approve user')
+      // Re-sync list so a partial failure can't leave a fake "active" badge
+      fetchUsers()
     } finally {
       setActionLoading(null)
     }

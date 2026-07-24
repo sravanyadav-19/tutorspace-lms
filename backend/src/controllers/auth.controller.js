@@ -13,9 +13,13 @@ import {
 // REGISTER
 // POST /api/auth/register
 // ================================
+const normalizeEmail = (email) => String(email || '').trim().toLowerCase()
+
 export const register = async (req, res) => {
   try {
-    const { email, password, name, role } = req.body
+    const { password, role } = req.body
+    const email = normalizeEmail(req.body.email)
+    const name = String(req.body.name || '').trim()
 
     // Validate required fields
     if (!email || !password || !name || !role) {
@@ -34,9 +38,9 @@ export const register = async (req, res) => {
       })
     }
 
-    // Check if email already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
+    // Check if email already exists (case-insensitive for legacy rows)
+    const existingUser = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } }
     })
 
     if (existingUser) {
@@ -126,7 +130,8 @@ export const register = async (req, res) => {
 // ================================
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body
+    const email = normalizeEmail(req.body.email)
+    const password = req.body.password
 
     // Validate required fields
     if (!email || !password) {
@@ -136,11 +141,12 @@ export const login = async (req, res) => {
       })
     }
 
-    // Find user with role (wrapped in withRetry so an idle dropped
-    // connection transparently reconnects instead of 500-ing the user)
+    // Find user with role (case-insensitive email match so legacy
+    // mixed-case rows and typed capitals still authenticate).
+    // withRetry: idle dropped DB connections reconnect instead of 500.
     const user = await withRetry(
-      () => prisma.user.findUnique({
-        where: { email },
+      () => prisma.user.findFirst({
+        where: { email: { equals: email, mode: 'insensitive' } },
         include: { role: true }
       }),
       { label: 'auth.login' }
@@ -164,19 +170,41 @@ export const login = async (req, res) => {
       })
     }
 
-    // Check account status
+    // Check account status — distinct messages (do not collapse into
+    // "invalid password" or the admin-approve flow looks broken)
     if (user.status === 'pending') {
-      return res.status(401).json({
+      return res.status(403).json({
         success: false,
         message: 'Your account is pending admin approval. Please wait.'
       })
     }
 
     if (user.status === 'inactive') {
-      return res.status(401).json({
+      return res.status(403).json({
         success: false,
         message: 'Your account has been deactivated. Contact admin.'
       })
+    }
+
+    if (user.status !== 'active') {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account is not active. Contact admin.'
+      })
+    }
+
+    // Heal legacy mixed-case emails so future exact lookups stay consistent
+    if (user.email !== email) {
+      try {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { email }
+        })
+        user.email = email
+      } catch (normalizeErr) {
+        // Non-fatal (unique constraint race); login can still proceed
+        console.warn('Email normalize on login skipped:', normalizeErr.message)
+      }
     }
 
     // Generate token
@@ -309,7 +337,7 @@ export const verifyEmail = async (req, res) => {
 // ================================
 export const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body
+    const email = normalizeEmail(req.body.email)
 
     if (!email) {
       return res.status(400).json({
@@ -318,9 +346,9 @@ export const forgotPassword = async (req, res) => {
       })
     }
 
-    // Find user
-    const user = await prisma.user.findUnique({
-      where: { email }
+    // Find user (case-insensitive)
+    const user = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } }
     })
 
     // Always return success (don't reveal if email exists)

@@ -16,12 +16,29 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isUserUpdate = error.config?.url?.includes("/users/") && error.config?.method === "put"
-    if (error.response?.status === 401 && !isUserUpdate) {
-      localStorage.removeItem('tutorspace_token')
-      localStorage.removeItem('tutorspace_user')
-      window.location.href = '/login'
+    const status = error.response?.status
+    const url = String(error.config?.url || '')
+    const method = String(error.config?.method || '').toLowerCase()
+
+    // Auth endpoints return 401 for bad credentials / pending accounts.
+    // Never hard-redirect those — the page must show the error toast/message.
+    const isAuthCredentialRequest =
+      method === 'post' &&
+      /\/auth\/(login|register|forgot-password|reset-password)/.test(url)
+
+    // Session expired / invalid token while using the app
+    if (status === 401 && !isAuthCredentialRequest) {
+      const hadToken = !!localStorage.getItem('tutorspace_token')
+      if (hadToken) {
+        localStorage.removeItem('tutorspace_token')
+        localStorage.removeItem('tutorspace_user')
+        const path = window.location.pathname || ''
+        if (!path.startsWith('/login') && !path.startsWith('/register')) {
+          window.location.href = '/login'
+        }
+      }
     }
+
     return Promise.reject(error)
   }
 )

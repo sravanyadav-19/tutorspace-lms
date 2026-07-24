@@ -49,7 +49,12 @@ const Login = () => {
     setLoading(true)
     setApiError('')
     try {
-      const response = await authAPI.login(formData)
+      // Normalize email so spacing/case never cause false "invalid password"
+      const credentials = {
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password
+      }
+      const response = await authAPI.login(credentials)
       if (response.data.success) {
         const { user, token } = response.data.data
         login(user, token)
@@ -60,6 +65,8 @@ const Login = () => {
         }
       }
     } catch (error) {
+      // Do not clear the form — user should see the real server message
+      // (pending approval / deactivated / invalid credentials)
       const message = error.response?.data?.message ||
         error.response?.data?.errors?.[0]?.message ||
         'Invalid email or password. Please try again.'

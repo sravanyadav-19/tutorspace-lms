@@ -52,8 +52,8 @@ const Register = () => {
     setApiError('')
     try {
       const response = await authAPI.register({
-        name: formData.name,
-        email: formData.email,
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
         role: 'student'
       })

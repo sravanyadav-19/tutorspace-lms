@@ -1,6 +1,12 @@
 import { z } from 'zod'
 
-const emailSchema = z.string().email('Please provide a valid email address')
+// Always store/compare emails in lowercase trimmed form
+const emailSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .email('Please provide a valid email address')
+
 const passwordSchema = z
   .string()
   .min(6, 'Password must be at least 6 characters')

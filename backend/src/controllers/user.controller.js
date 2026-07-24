@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs'
 import { prisma } from '../lib/prisma.js'
 
+const normalizeEmail = (email) => String(email || '').trim().toLowerCase()
+
 // ================================
 // GET ALL USERS - Admin Only
 // GET /api/users
@@ -167,10 +169,11 @@ export const updateUser = async (req, res) => {
       })
     }
 
-    // Email uniqueness check
-    if (email) {
-      const existing = await prisma.user.findUnique({
-        where: { email }
+    // Email uniqueness check (normalized)
+    const normalizedEmail = email ? normalizeEmail(email) : null
+    if (normalizedEmail) {
+      const existing = await prisma.user.findFirst({
+        where: { email: { equals: normalizedEmail, mode: 'insensitive' } }
       })
       if (existing && existing.id !== userId) {
         return res.status(400).json({
@@ -180,18 +183,27 @@ export const updateUser = async (req, res) => {
       }
     }
 
+    // Admin approve/activate should also clear the email-verify gate so
+    // approved students can sign in even if they never clicked the email link.
+    const updateData = {
+      ...(name && { name: String(name).trim() }),
+      ...(normalizedEmail && { email: normalizedEmail }),
+      ...(status && { status })
+    }
+    if (status === 'active' && req.user.role === 'admin') {
+      updateData.emailVerified = true
+      updateData.emailVerifyToken = null
+    }
+
     const user = await prisma.user.update({
       where: { id: userId },
-      data: {
-        ...(name && { name }),
-        ...(email && { email }),
-        ...(status && { status })
-      },
+      data: updateData,
       select: {
         id: true,
         email: true,
         name: true,
         status: true,
+        emailVerified: true,
         role: {
           select: { name: true }
         }
@@ -200,7 +212,9 @@ export const updateUser = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'User updated successfully',
+      message: status === 'active'
+        ? 'User approved successfully'
+        : 'User updated successfully',
       data: { user }
     })
 
@@ -262,7 +276,9 @@ export const deleteUser = async (req, res) => {
 // ================================
 export const createTeacher = async (req, res) => {
   try {
-    const { email, password, name } = req.body
+    const email = normalizeEmail(req.body.email)
+    const password = req.body.password
+    const name = String(req.body.name || '').trim()
 
     if (!email || !password || !name) {
       return res.status(400).json({
@@ -278,7 +294,9 @@ export const createTeacher = async (req, res) => {
       })
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } })
+    const existing = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } }
+    })
     if (existing) {
       return res.status(409).json({
         success: false,
